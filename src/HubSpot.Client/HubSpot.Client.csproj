@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\HubSpot.Types\HubSpot.Types.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>7.2</LangVersion>
+    <RootNamespace>HubSpot</RootNamespace>
+    <AssemblyName>HubSpot.Client</AssemblyName>
+    <PackageId>EMG.HubSpot.Client</PackageId>
+    <Authors>EMG</Authors>
+    <Company>EMG</Company>
+  </PropertyGroup>
+
+</Project>
