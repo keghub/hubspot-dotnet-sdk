@@ -4,10 +4,15 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>7.2</LangVersion>
     <RootNamespace>HubSpot</RootNamespace>
-    <AssemblyName>HubSpot.Client</AssemblyName>
-    <PackageId>EMG.HubSpot.Client</PackageId>
+    <AssemblyName>HubSpot</AssemblyName>
+    <PackageId>EMG.HubSpot</PackageId>
     <Authors>EMG</Authors>
     <Company>EMG</Company>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HubSpot.Client\HubSpot.Client.csproj" />
+    <ProjectReference Include="..\HubSpot.Types\HubSpot.Types.csproj" />
+  </ItemGroup>
 
 </Project>
