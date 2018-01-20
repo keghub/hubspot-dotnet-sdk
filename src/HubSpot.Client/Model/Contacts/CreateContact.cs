@@ -30,4 +30,22 @@ namespace HubSpot.Model.Contacts
         [JsonProperty("reason")]
         public string Reason { get; set; }
     }
+
+    public class SearchResponse
+    {
+        [JsonProperty("query")]
+        public string Query { get; set; }
+
+        [JsonProperty("offset")]
+        public long Offset { get; set; }
+
+        [JsonProperty("has-more")]
+        public bool HasMore { get; set; }
+
+        [JsonProperty("total")]
+        public long Total { get; set; }
+
+        [JsonProperty("contacts")]
+        public IReadOnlyList<Contact> Contacts { get; set; }
+    }
 }

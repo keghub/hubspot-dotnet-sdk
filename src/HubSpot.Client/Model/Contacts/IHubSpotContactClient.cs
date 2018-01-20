@@ -31,6 +31,8 @@ namespace HubSpot.Model.Contacts
         Task UpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties);
 
         Task<CreateOrUpdateResponse> CreateOrUpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties);
+
+        Task<SearchResponse> SearchAsync(string query);
     }
 
     public enum PropertyMode

@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
 using HubSpot.Model.Contacts;
 using HubSpot.Utils;
 
@@ -249,29 +246,79 @@ namespace HubSpot
             return list;
         }
 
-        public Task<DeleteContactResponse> DeleteAsync(long contactId)
+        public async Task<DeleteContactResponse> DeleteAsync(long contactId)
         {
-            throw new NotImplementedException();
+            var response = await SendAsync<DeleteContactResponse>(HttpMethod.Delete, $"/contacts/v1/contact/vid/{contactId}");
+            return response;
         }
 
-        public Task<Contact> CreateAsync(IReadOnlyList<ValuedProperty> properties)
+        public async Task<Contact> CreateAsync(IReadOnlyList<ValuedProperty> properties)
         {
-            throw new NotImplementedException();
+            var propertyList = new PropertyList
+            {
+                Properties = properties
+            };
+
+            var contact = await SendAsync<PropertyList, Contact>(HttpMethod.Post, propertyList, "/contacts/v1/contact");
+
+            return contact;
         }
 
-        public Task UpdateByIdAsync(long contactId, IReadOnlyList<ValuedProperty> properties)
+        public async Task UpdateByIdAsync(long contactId, IReadOnlyList<ValuedProperty> properties)
         {
-            throw new NotImplementedException();
+            var propertyList = new PropertyList
+            {
+                Properties = properties
+            };
+
+            await SendAsync(HttpMethod.Post, propertyList, $"/contacts/v1/contact/vid/{contactId}/profile");
         }
 
-        public Task UpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties)
+        public async Task UpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentNullException(nameof(email));
+            }
+
+            var propertyList = new PropertyList
+            {
+                Properties = properties
+            };
+
+            await SendAsync(HttpMethod.Post, propertyList, $"/contacts/v1/contact/email/{email}/profile");
         }
 
-        public Task<CreateOrUpdateResponse> CreateOrUpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties)
+        public async Task<CreateOrUpdateResponse> CreateOrUpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentNullException(nameof(email));
+            }
+
+            var propertyList = new PropertyList
+            {
+                Properties = properties
+            };
+
+            var response = await SendAsync<PropertyList, CreateOrUpdateResponse>(HttpMethod.Post, propertyList, $"/contacts/v1/contact/createOrUpdate/email/{email}");
+
+            return response;
+        }
+
+        public async Task<SearchResponse> SearchAsync(string query)
+        {
+            if (string.IsNullOrEmpty(query))
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+
+            var builder = new HttpQueryStringBuilder();
+            builder.Add("q", query);
+
+            var response = await SendAsync<SearchResponse>(HttpMethod.Get, "/contacts/v1/search/query", builder.BuildQuery());
+
+            return response;
         }
     }
 }

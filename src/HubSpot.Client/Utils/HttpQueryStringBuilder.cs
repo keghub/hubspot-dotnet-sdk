@@ -21,7 +21,7 @@ namespace HubSpot.Utils
         {
             if (string.IsNullOrEmpty(query))
             {
-                throw new ArgumentNullException(nameof(query));
+                query = string.Empty;
             }
 
             if (query.StartsWith("?"))
@@ -30,6 +30,7 @@ namespace HubSpot.Utils
             }
 
             var items = from fragment in query.Split('&')
+                        where fragment.Length > 0
                         let pieces = fragment.Split('=')
                         let key = HttpUtility.UrlDecode(pieces[0])
                         let value = HttpUtility.UrlDecode(pieces[1])
