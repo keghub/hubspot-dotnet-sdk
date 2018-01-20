@@ -13,10 +13,10 @@ namespace HubSpot.Model.Contacts
         public bool HasMore { get; set; }
 
         [JsonProperty("vid-offset")]
-        public long ContactOffset { get; set; }
+        public long? ContactOffset { get; set; }
 
         [JsonProperty("time-offset")]
-        public DateTimeOffset TimeOffset { get; set; }
+        public DateTimeOffset? TimeOffset { get; set; }
     }
 
     public class ContactListItem : Contact

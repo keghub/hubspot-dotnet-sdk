@@ -31,8 +31,8 @@ namespace HubSpot.Utils
 
             var items = from fragment in query.Split('&')
                         let pieces = fragment.Split('=')
-                        let key = pieces[0]
-                        let value = pieces[1]
+                        let key = HttpUtility.UrlDecode(pieces[0])
+                        let value = HttpUtility.UrlDecode(pieces[1])
                         select new Fragment(key, value);
 
             return new HttpQueryStringBuilder(items);
