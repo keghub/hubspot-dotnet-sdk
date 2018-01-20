@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2020
+VisualStudioVersion = 15.0.27004.2009
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AA9C11F7-D6E5-4D73-8693-153620062A49}"
 EndProject
@@ -23,6 +23,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HubSpot", "src\HubSpot\HubSpot.csproj", "{FB7076C1-0D6F-436B-B3D3-B582F29C62A2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests.HubSpot", "tests\Tests.HubSpot\Tests.HubSpot.csproj", "{6776684F-4AB5-414F-9FA2-9513561B3A2C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestClient", "client\TestClient\TestClient.csproj", "{7265CEBE-B763-42CA-9086-7F2EBC5D3CB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -94,6 +96,18 @@ Global
 		{6776684F-4AB5-414F-9FA2-9513561B3A2C}.Release|x64.Build.0 = Release|Any CPU
 		{6776684F-4AB5-414F-9FA2-9513561B3A2C}.Release|x86.ActiveCfg = Release|Any CPU
 		{6776684F-4AB5-414F-9FA2-9513561B3A2C}.Release|x86.Build.0 = Release|Any CPU
+		{7265CEBE-B763-42CA-9086-7F2EBC5D3CB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7265CEBE-B763-42CA-9086-7F2EBC5D3CB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7265CEBE-B763-42CA-9086-7F2EBC5D3CB8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7265CEBE-B763-42CA-9086-7F2EBC5D3CB8}.Debug|x64.Build.0 = Debug|Any CPU
+		{7265CEBE-B763-42CA-9086-7F2EBC5D3CB8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7265CEBE-B763-42CA-9086-7F2EBC5D3CB8}.Debug|x86.Build.0 = Debug|Any CPU
+		{7265CEBE-B763-42CA-9086-7F2EBC5D3CB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7265CEBE-B763-42CA-9086-7F2EBC5D3CB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7265CEBE-B763-42CA-9086-7F2EBC5D3CB8}.Release|x64.ActiveCfg = Release|Any CPU
+		{7265CEBE-B763-42CA-9086-7F2EBC5D3CB8}.Release|x64.Build.0 = Release|Any CPU
+		{7265CEBE-B763-42CA-9086-7F2EBC5D3CB8}.Release|x86.ActiveCfg = Release|Any CPU
+		{7265CEBE-B763-42CA-9086-7F2EBC5D3CB8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

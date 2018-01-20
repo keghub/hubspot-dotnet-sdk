@@ -1,20 +1,92 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 using HubSpot.Model.Contacts;
+using HubSpot.Utils;
 
 namespace HubSpot
 {
-    public partial class HttpHubSpotClient : IHubSpotContactClient
+    public static class HttpQueryStringBuilderContactExtensions
     {
-        public Task<Contact> GetByIdAsync(long contactId, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
+        public static void AddProperties(this HttpQueryStringBuilder builder, IEnumerable<IProperty> properties)
         {
-            throw new NotImplementedException();
+            foreach (var property in properties ?? Array.Empty<IProperty>())
+            {
+                builder.Add("property", property.Name);
+            }
         }
 
-        public Task<Contact> GetByEmailAsync(string email, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
+
+        public static void AddShowListMemberships(this HttpQueryStringBuilder builder, bool showListMemberships)
         {
-            throw new NotImplementedException();
+            builder.Add("showListMemberships", showListMemberships ? "true" : "false");
+        }
+
+        public static void AddFormSubmissionMode(this HttpQueryStringBuilder builder, FormSubmissionMode formSubmissionMode)
+        {
+            builder.Add("formSubmissionMode", GetFormSubmissionMode(formSubmissionMode));
+
+            string GetFormSubmissionMode(FormSubmissionMode mode)
+            {
+                switch (mode)
+                {
+                    case FormSubmissionMode.All: return "all";
+                    case FormSubmissionMode.Newest: return "newest";
+                    case FormSubmissionMode.None: return "none";
+                    case FormSubmissionMode.Oldest: return "oldest";
+
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(mode));
+                }
+            }
+        }
+
+        public static void AddPropertyMode(this HttpQueryStringBuilder builder, PropertyMode propertyMode)
+        {
+            builder.Add("propertyMode", propertyMode == PropertyMode.ValueAndHistory ? "value_and_history" : "value_only");
+        }
+    }
+
+    public partial class HttpHubSpotClient : IHubSpotContactClient
+    {
+
+
+        public async Task<Contact> GetByIdAsync(long contactId, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
+        {
+            var builder = new HttpQueryStringBuilder();
+
+            builder.AddProperties(properties);
+            builder.AddPropertyMode(propertyMode);
+            builder.AddFormSubmissionMode(formSubmissionMode);
+            builder.AddShowListMemberships(showListMemberships);
+
+            var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", builder.BuildQuery());
+
+            return contact;
+
+        }
+
+        public async Task<Contact> GetByEmailAsync(string email, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentNullException(nameof(email));
+            }
+
+            var builder = new HttpQueryStringBuilder();
+
+            builder.AddProperties(properties);
+            builder.AddPropertyMode(propertyMode);
+            builder.AddFormSubmissionMode(formSubmissionMode);
+            builder.AddShowListMemberships(showListMemberships);
+
+            var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/email/{email}/profile", builder.BuildQuery());
+
+            return contact;
         }
 
         public Task<Contact> GetByUserTokenAsync(string userToken, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -36,26 +37,22 @@ namespace HubSpot
 
         private static HttpClient CreateClient(HubSpotAuthenticator authenticator)
         {
-            return new HttpClient(authenticator);
+            return new HttpClient(authenticator) {BaseAddress = authenticator.ServiceUri};
         }
 
         public IHubSpotContactClient Contacts => this;
 
         #region HTTP Methods
 
-        private string ComposeUrl(string url, IReadOnlyDictionary<string, string> query = null)
+        private string ComposeUrl(string url, IQueryString query)
         {
-            var queryPart = string.Empty;
+            if (query != null && query.HasItems)
+                return $"{url}?{query.Query}";
 
-            if (query != null)
-            {
-                queryPart = $"?{string.Join("&", query.Select(i => $"{i.Key}={i.Value}"))}";
-            }
-
-            return url + queryPart;
+            return url;
         }
 
-        private async Task<TResult> SendAsync<TContent, TResult>(HttpMethod method, TContent content, string url, IReadOnlyDictionary<string, string> query = null)
+        private async Task<TResult> SendAsync<TContent, TResult>(HttpMethod method, TContent content, string url, IQueryString query = null)
         {
             var json = JsonConvert.SerializeObject(content, SerializerSettings);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
@@ -81,7 +78,7 @@ namespace HubSpot
             }
         }
 
-        private async Task<TResult> SendAsync<TResult>(HttpMethod method, string url, IReadOnlyDictionary<string, string> query = null)
+        private async Task<TResult> SendAsync<TResult>(HttpMethod method, string url, IQueryString query = null)
         {
             var requestUrl = ComposeUrl(url, query);
 
@@ -104,7 +101,7 @@ namespace HubSpot
             }
         }
 
-        private async Task SendAsync<TContent>(HttpMethod method, TContent content, string url, IReadOnlyDictionary<string, string> query = null)
+        private async Task SendAsync<TContent>(HttpMethod method, TContent content, string url, IQueryString query = null)
         {
             var json = JsonConvert.SerializeObject(content, SerializerSettings);
             var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
@@ -198,10 +195,5 @@ namespace HubSpot
         }
 
         #endregion
-    }
-
-    public abstract class HubSpotAuthenticator : HttpClientHandler
-    {
-
     }
 }
