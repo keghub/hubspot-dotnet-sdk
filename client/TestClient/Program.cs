@@ -17,7 +17,7 @@ namespace TestClient
 
             //var contact = await hubspot.Contacts.GetByEmailAsync(
             //                                        email: "renato.golia@educations.com",
-            //                                        properties: new[] {Properties.FirstName, Properties.LastName, Properties.Email},
+            //                                        properties: new[] {ContactProperties.FirstName, ContactProperties.LastName, ContactProperties.Email},
             //                                        propertyMode: PropertyMode.ValueOnly,
             //                                        formSubmissionMode: FormSubmissionMode.None,
             //                                        showListMemberships: false
@@ -25,7 +25,7 @@ namespace TestClient
 
             //var contact2 = await hubspot.Contacts.GetByIdAsync(contact.Id);
 
-            //Console.WriteLine($"Hello {contact.Properties["firstname"].Value}! Your name is {contact2.Properties["firstname"].Value}");
+            //Console.WriteLine($"Hello {contact.ContactProperties["firstname"].Value}! Your name is {contact2.ContactProperties["firstname"].Value}");
 
             //var list = await hubspot.Contacts.GetManyByIdAsync(new[] {contact.Id});
 

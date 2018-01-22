@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using HubSpot.Model;
 using HubSpot.Model.Contacts;
 using HubSpot.Utils;
 
@@ -306,15 +307,27 @@ namespace HubSpot
             return response;
         }
 
-        public async Task<SearchResponse> SearchAsync(string query)
+        public async Task<SearchResponse> SearchAsync(string query, IReadOnlyList<IProperty> properties = null, int count = 20, long? contactOffset = null)
         {
             if (string.IsNullOrEmpty(query))
             {
                 throw new ArgumentNullException(nameof(query));
             }
 
+            if (count > 100)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), "Up to 100 contacts can be requested at the same time");
+            }
+
             var builder = new HttpQueryStringBuilder();
             builder.Add("q", query);
+            builder.AddProperties(properties);
+            builder.Add("count", count.ToString());
+
+            if (contactOffset.HasValue)
+            {
+                builder.Add("offset", contactOffset.Value.ToString());
+            }
 
             var response = await SendAsync<SearchResponse>(HttpMethod.Get, "/contacts/v1/search/query", builder.BuildQuery());
 

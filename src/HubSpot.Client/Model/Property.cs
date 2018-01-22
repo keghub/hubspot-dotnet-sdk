@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace HubSpot.Model.Contacts
+namespace HubSpot.Model
 {
     public interface IProperty
     {
@@ -12,18 +13,6 @@ namespace HubSpot.Model.Contacts
     {
         ValuedProperty Value(string value);
     }
-
-    public static class Properties
-    {
-        public static readonly IProperty LastModifiedDate = new Property("lastmodifieddate");
-        public static readonly IProperty AssociatedCompanyId = new Property("associatedcompanyid");
-        public static readonly IProperty CreateDate = new Property("createdate");
-
-        public static readonly IUpdateableProperty FirstName = new Property("firstname");
-        public static readonly IUpdateableProperty LastName = new Property("lastname");
-        public static readonly IUpdateableProperty Email = new Property("email");
-    }
-
 
     public class Property : IUpdateableProperty
     {
@@ -37,6 +26,11 @@ namespace HubSpot.Model.Contacts
         public ValuedProperty Value(string value) => new ValuedProperty(Name, value);
     }
 
+    public class PropertyList
+    {
+        [JsonProperty("properties")]
+        public IReadOnlyList<ValuedProperty> Properties { get; set; }
+    }
 
     public class ValuedProperty
     {

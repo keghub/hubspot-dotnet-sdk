@@ -26,13 +26,13 @@ namespace HubSpot.Model.Contacts
 
         Task<Contact> CreateAsync(IReadOnlyList<ValuedProperty> properties);
 
-        Task UpdateByIdAsync(long contactId, IReadOnlyList<ValuedProperty> properties);
+        Task UpdateByIdAsync(long contactId, IReadOnlyList<ValuedProperty> propertiesToUpdate);
 
-        Task UpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties);
+        Task UpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> propertiesToUpdate);
 
         Task<CreateOrUpdateResponse> CreateOrUpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties);
 
-        Task<SearchResponse> SearchAsync(string query);
+        Task<SearchResponse> SearchAsync(string query, IReadOnlyList<IProperty> properties = null, int count = 20, long? contactOffset = null);
     }
 
     public enum PropertyMode
