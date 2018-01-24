@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace HubSpot.Model.Contacts
+namespace HubSpot.Model
 {
     public interface IProperty
     {
@@ -13,18 +14,6 @@ namespace HubSpot.Model.Contacts
         ValuedProperty Value(string value);
     }
 
-    public static class Properties
-    {
-        public static readonly IProperty LastModifiedDate = new Property("lastmodifieddate");
-        public static readonly IProperty AssociatedCompanyId = new Property("associatedcompanyid");
-        public static readonly IProperty CreateDate = new Property("createdate");
-
-        public static readonly IUpdateableProperty FirstName = new Property("firstname");
-        public static readonly IUpdateableProperty LastName = new Property("lastname");
-        public static readonly IUpdateableProperty Email = new Property("email");
-    }
-
-
     public class Property : IUpdateableProperty
     {
         public Property(string name)
@@ -35,8 +24,24 @@ namespace HubSpot.Model.Contacts
         public string Name { get; }
 
         public ValuedProperty Value(string value) => new ValuedProperty(Name, value);
+
+        public static implicit operator Property(string name) => new Property(name);
     }
 
+    public class PropertyList
+    {
+        [JsonProperty("properties")]
+        public IReadOnlyList<ValuedProperty> Properties { get; set; }
+    }
+
+    public class ObjectPropertyList
+    {
+        [JsonProperty("objectId")]
+        public long ObjectId { get; set; }
+
+        [JsonProperty("properties")]
+        public IReadOnlyList<ValuedProperty> Properties { get; set; }
+    }
 
     public class ValuedProperty
     {
@@ -51,5 +56,20 @@ namespace HubSpot.Model.Contacts
 
         [JsonProperty("value")]
         public string Value { get; set; }
+    }
+
+    public class PagedList<T>
+    {
+        [JsonProperty("results")]
+        public IReadOnlyList<T> Results { get; set; }
+
+        [JsonProperty("hasMore")]
+        public bool HasMore { get; set; }
+
+        [JsonProperty("offset")]
+        public long? Offset { get; set; }
+
+        [JsonProperty("total")]
+        public long Total { get; set; }
     }
 }

@@ -1,75 +1,307 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading.Tasks;
+using HubSpot.Model;
 using HubSpot.Model.Contacts;
+using HubSpot.Utils;
 
 namespace HubSpot
 {
     public partial class HttpHubSpotClient : IHubSpotContactClient
     {
-        public Task<Contact> GetByIdAsync(long contactId, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
+        async Task<Contact> IHubSpotContactClient.GetByIdAsync(long contactId, IReadOnlyList<IProperty> properties, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
         {
-            throw new NotImplementedException();
+            var builder = new HttpQueryStringBuilder();
+
+            builder.AddProperties(properties);
+            builder.AddPropertyMode(propertyMode);
+            builder.AddFormSubmissionMode(formSubmissionMode);
+            builder.AddShowListMemberships(showListMemberships);
+
+            var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", builder.BuildQuery());
+
+            return contact;
         }
 
-        public Task<Contact> GetByEmailAsync(string email, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
+        async Task<Contact> IHubSpotContactClient.GetByEmailAsync(string email, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentNullException(nameof(email));
+            }
+
+            var builder = new HttpQueryStringBuilder();
+
+            builder.AddProperties(properties);
+            builder.AddPropertyMode(propertyMode);
+            builder.AddFormSubmissionMode(formSubmissionMode);
+            builder.AddShowListMemberships(showListMemberships);
+
+            var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/email/{email}/profile", builder.BuildQuery());
+
+            return contact;
         }
 
-        public Task<Contact> GetByUserTokenAsync(string userToken, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
+        async Task<Contact> IHubSpotContactClient.GetByUserTokenAsync(string userToken, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(userToken))
+            {
+                throw new ArgumentNullException(nameof(userToken));
+            }
+
+            var builder = new HttpQueryStringBuilder();
+
+            builder.AddProperties(properties);
+            builder.AddPropertyMode(propertyMode);
+            builder.AddFormSubmissionMode(formSubmissionMode);
+            builder.AddShowListMemberships(showListMemberships);
+
+            var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/utk/{userToken}/profile", builder.BuildQuery());
+
+            return contact;
         }
 
-        public Task<IReadOnlyDictionary<long, Contact>> GetManyContactsByIdAsync(IReadOnlyList<long> contactIds, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, bool includeDeletes = false)
+        async Task<IReadOnlyDictionary<long, Contact>> IHubSpotContactClient.GetManyByIdAsync(IReadOnlyList<long> contactIds, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, bool includeDeletes = false)
         {
-            throw new NotImplementedException();
+            if (contactIds == null || contactIds.Count == 0)
+            {
+                return new Dictionary<long, Contact>();
+            }
+
+            if (contactIds.Count >= 100)
+            {
+                throw new ArgumentOutOfRangeException(nameof(contactIds), "Up to 100 contacts can be requested at the same time");
+            }
+
+            var builder = new HttpQueryStringBuilder();
+
+            foreach (var id in contactIds)
+            {
+                builder.Add("vid", id.ToString());
+            }
+
+            builder.AddProperties(properties);
+            builder.AddPropertyMode(propertyMode);
+            builder.AddFormSubmissionMode(formSubmissionMode);
+            builder.AddShowListMemberships(showListMemberships);
+
+            var contacts = await SendAsync<Dictionary<long, Contact>>(HttpMethod.Get, "/contacts/v1/contact/vids/batch/", builder.BuildQuery());
+
+            return contacts;
         }
 
-        public Task<IReadOnlyDictionary<long, Contact>> GetManyByEmailAsync(IReadOnlyList<string> emails, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, bool includeDeletes = false)
+        async Task<IReadOnlyDictionary<long, Contact>> IHubSpotContactClient.GetManyByEmailAsync(IReadOnlyList<string> emails, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, bool includeDeletes = false)
         {
-            throw new NotImplementedException();
+            if (emails == null || emails.Count == 0)
+            {
+                return new Dictionary<long, Contact>();
+            }
+
+            if (emails.Count >= 100)
+            {
+                throw new ArgumentOutOfRangeException(nameof(emails), "Up to 100 contacts can be requested at the same time");
+            }
+
+            var builder = new HttpQueryStringBuilder();
+
+            foreach (var email in emails)
+            {
+                builder.Add("email", email);
+            }
+
+            builder.AddProperties(properties);
+            builder.AddPropertyMode(propertyMode);
+            builder.AddFormSubmissionMode(formSubmissionMode);
+            builder.AddShowListMemberships(showListMemberships);
+
+            var contacts = await SendAsync<Dictionary<long, Contact>>(HttpMethod.Get, "/contacts/v1/contact/emails/batch/", builder.BuildQuery());
+
+            return contacts;
+
         }
 
-        public Task<ContactList> GetAllAsync(IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, int count = 20, long? contactOffset = null)
+        async Task<ContactList> IHubSpotContactClient.GetAllAsync(IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, int count = 20, long? contactOffset = null)
         {
-            throw new NotImplementedException();
+            if (count > 100)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), "Up to 100 contacts can be requested at the same time");
+            }
+
+            var builder = new HttpQueryStringBuilder();
+
+            builder.AddProperties(properties);
+            builder.AddPropertyMode(propertyMode);
+            builder.AddFormSubmissionMode(formSubmissionMode);
+            builder.AddShowListMemberships(showListMemberships);
+            builder.Add("count", count.ToString());
+
+            if (contactOffset.HasValue)
+            {
+                builder.Add("vidOffset", contactOffset.Value.ToString());
+            }
+
+            var list = await SendAsync<ContactList>(HttpMethod.Get, "/contacts/v1/lists/all/contacts/all", builder.BuildQuery());
+
+            return list;
         }
 
-        public Task<ContactList> GetRecentlyUpdatedAsync(IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, int count = 20, long? contactOffset = null, DateTimeOffset? timeOffset = null)
+        async Task<ContactList> IHubSpotContactClient.GetRecentlyUpdatedAsync(IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, int count = 20, long? contactOffset = null, DateTimeOffset? timeOffset = null)
         {
-            throw new NotImplementedException();
+            if (count > 100)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), "Up to 100 contacts can be requested at the same time");
+            }
+
+            var builder = new HttpQueryStringBuilder();
+
+            builder.AddProperties(properties);
+            builder.AddPropertyMode(propertyMode);
+            builder.AddFormSubmissionMode(formSubmissionMode);
+            builder.AddShowListMemberships(showListMemberships);
+            builder.Add("count", count.ToString());
+
+            if (contactOffset.HasValue)
+            {
+                builder.Add("vidOffset", contactOffset.Value.ToString());
+            }
+
+            if (timeOffset.HasValue)
+            {
+                builder.Add("timeOffset", timeOffset.Value.ToUnixTimeMilliseconds().ToString());
+            }
+
+            var list = await SendAsync<ContactList>(HttpMethod.Get, "/contacts/v1/lists/recently_updated/contacts/recent", builder.BuildQuery());
+
+            return list;
+
         }
 
-        public Task<ContactList> GetRecentlyCreatedAsync(IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, int count = 20, long? contactOffset = null, DateTimeOffset? timeOffset = null)
+        async Task<ContactList> IHubSpotContactClient.GetRecentlyCreatedAsync(IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, int count = 20, long? contactOffset = null, DateTimeOffset? timeOffset = null)
         {
-            throw new NotImplementedException();
+            if (count > 100)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), "Up to 100 contacts can be requested at the same time");
+            }
+
+            var builder = new HttpQueryStringBuilder();
+
+            builder.AddProperties(properties);
+            builder.AddPropertyMode(propertyMode);
+            builder.AddFormSubmissionMode(formSubmissionMode);
+            builder.AddShowListMemberships(showListMemberships);
+            builder.Add("count", count.ToString());
+
+            if (contactOffset.HasValue)
+            {
+                builder.Add("vidOffset", contactOffset.Value.ToString());
+            }
+
+            if (timeOffset.HasValue)
+            {
+                builder.Add("timeOffset", timeOffset.Value.ToUnixTimeMilliseconds().ToString());
+            }
+
+            var list = await SendAsync<ContactList>(HttpMethod.Get, "/contacts/v1/lists/all/contacts/recent", builder.BuildQuery());
+
+            return list;
         }
 
-        public Task<DeleteContactResponse> DeleteAsync(long contactId)
+        async Task<DeleteContactResponse> IHubSpotContactClient.DeleteAsync(long contactId)
         {
-            throw new NotImplementedException();
+            var response = await SendAsync<DeleteContactResponse>(HttpMethod.Delete, $"/contacts/v1/contact/vid/{contactId}");
+            return response;
         }
 
-        public Task<Contact> CreateAsync(IReadOnlyList<ValuedProperty> properties)
+        async Task<Contact> IHubSpotContactClient.CreateAsync(IReadOnlyList<ValuedProperty> properties)
         {
-            throw new NotImplementedException();
+            var propertyList = new PropertyList
+            {
+                Properties = properties
+            };
+
+            var contact = await SendAsync<PropertyList, Contact>(HttpMethod.Post, propertyList, "/contacts/v1/contact");
+
+            return contact;
         }
 
-        public Task UpdateByIdAsync(long contactId, IReadOnlyList<ValuedProperty> properties)
+        async Task IHubSpotContactClient.UpdateByIdAsync(long contactId, IReadOnlyList<ValuedProperty> properties)
         {
-            throw new NotImplementedException();
+            var propertyList = new PropertyList
+            {
+                Properties = properties
+            };
+
+            await SendAsync(HttpMethod.Post, propertyList, $"/contacts/v1/contact/vid/{contactId}/profile");
         }
 
-        public Task UpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties)
+        async Task IHubSpotContactClient.UpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentNullException(nameof(email));
+            }
+
+            var propertyList = new PropertyList
+            {
+                Properties = properties
+            };
+
+            await SendAsync(HttpMethod.Post, propertyList, $"/contacts/v1/contact/email/{email}/profile");
         }
 
-        public Task<CreateOrUpdateResponse> CreateOrUpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties)
+        async Task<CreateOrUpdateResponse> IHubSpotContactClient.CreateOrUpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentNullException(nameof(email));
+            }
+
+            var propertyList = new PropertyList
+            {
+                Properties = properties
+            };
+
+            var response = await SendAsync<PropertyList, CreateOrUpdateResponse>(HttpMethod.Post, propertyList, $"/contacts/v1/contact/createOrUpdate/email/{email}");
+
+            return response;
+        }
+
+        async Task<SearchResponse> IHubSpotContactClient.SearchAsync(string query, IReadOnlyList<IProperty> properties = null, int count = 20, long? contactOffset = null)
+        {
+            if (string.IsNullOrEmpty(query))
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+
+            if (count > 100)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), "Up to 100 contacts can be requested at the same time");
+            }
+
+            var builder = new HttpQueryStringBuilder();
+            builder.Add("q", query);
+            builder.AddProperties(properties);
+            builder.Add("count", count.ToString());
+
+            if (contactOffset.HasValue)
+            {
+                builder.Add("offset", contactOffset.Value.ToString());
+            }
+
+            var response = await SendAsync<SearchResponse>(HttpMethod.Get, "/contacts/v1/search/query", builder.BuildQuery());
+
+            return response;
+        }
+
+        async Task IHubSpotContactClient.MergeAsync(long primaryContactId, long secondaryContactId)
+        {
+            var payload = new
+            {
+                vidToMerge = secondaryContactId
+            };
+
+            await SendAsync<object>(HttpMethod.Post, payload, $"/contacts/v1/contact/merge-vids/{primaryContactId}/");
         }
     }
 }

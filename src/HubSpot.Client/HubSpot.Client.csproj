@@ -17,8 +17,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Model\Companies\" />
-    <Folder Include="Model\Leads\" />
+    <Compile Update="HttpHubSpotClient.Companies.cs">
+      <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
+    </Compile>
+    <Compile Update="HttpHubSpotClient.Contacts.cs">
+      <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
+    </Compile>
+    <Compile Update="HttpHubSpotClient.Deals.cs">
+      <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>

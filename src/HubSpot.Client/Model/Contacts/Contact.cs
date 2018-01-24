@@ -28,7 +28,7 @@ namespace HubSpot.Model.Contacts
         public Uri ProfileUrl { get; set; }
 
         [JsonProperty("properties")]
-        public IReadOnlyDictionary<string, PropertyValue> Properties { get; set; }
+        public IReadOnlyDictionary<string, VersionedProperty> Properties { get; set; }
 
         [JsonProperty("form-submissions")]
         public IReadOnlyList<FormSubmission> FormSubmissions { get; set; }
@@ -40,16 +40,19 @@ namespace HubSpot.Model.Contacts
         public IReadOnlyList<IdentityProfile> IdentityProfiles { get; set; }
     }
 
-    public class PropertyValue
+    public class VersionedProperty : IVersionedProperty
     {
         [JsonProperty("value")]
         public string Value { get; set; }
 
         [JsonProperty("versions")]
         public IReadOnlyList<TimestampedValue> Versions { get; set; } = Array.Empty<TimestampedValue>();
+
+        IReadOnlyList<ITimestampedValue> IVersionedProperty.Versions => Versions;
     }
 
-    public class TimestampedValue
+
+    public class TimestampedValue : ITimestampedValue
     {
         [JsonProperty("value")]
         public string Value { get; set; }
