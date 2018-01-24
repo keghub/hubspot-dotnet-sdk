@@ -17,9 +17,9 @@ namespace HubSpot.Model.Companies
 
         Task<CompanyList> GetAllAsync(IReadOnlyList<IProperty> properties = null, IReadOnlyList<IProperty> propertiesWithHistory = null, int limit = 100, long? companyOffset = null);
 
-        Task<CompanyListResponse> GetRecentlyCreatedAsync(int count = 100, long? offset = null);
+        Task<PagedList<Company>> GetRecentlyCreatedAsync(int count = 100, long? offset = null);
 
-        Task<CompanyListResponse> GetRecentlyUpdatedAsync(int count = 100, long? offset = null);
+        Task<PagedList<Company>> GetRecentlyUpdatedAsync(int count = 100, long? offset = null);
 
         Task<SearchResponse> SearchAsync(string domain, IReadOnlyList<IProperty> properties = null, int limit = 100, long? companyOffset = null);
 

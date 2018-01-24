@@ -3,15 +3,6 @@ using Newtonsoft.Json;
 
 namespace HubSpot.Model.Companies
 {
-    public class ObjectPropertyList
-    {
-        [JsonProperty("objectId")]
-        public long ObjectId { get; set; }
-
-        [JsonProperty("properties")]
-        public IReadOnlyList<ValuedProperty> Properties { get; set; }
-    }
-
     public class DeleteCompanyResponse
     {
         [JsonProperty("companyId")]
@@ -33,20 +24,7 @@ namespace HubSpot.Model.Companies
         public long? Offset { get; set; }
     }
 
-    public class CompanyListResponse
-    {
-        [JsonProperty("results")]
-        public IReadOnlyList<Company> Companies { get; set; }
 
-        [JsonProperty("has-more")]
-        public bool HasMore { get; set; }
-
-        [JsonProperty("offset")]
-        public long? Offset { get; set; }
-
-        [JsonProperty("total")]
-        public long Total { get; set; }
-    }
 
     public class SearchResponse
     {

@@ -74,7 +74,7 @@ namespace HubSpot
             return result;
         }
 
-        async Task<CompanyListResponse> IHubSpotCompanyClient.GetRecentlyCreatedAsync(int count = 100, long? offset = null)
+        async Task<PagedList<Company>> IHubSpotCompanyClient.GetRecentlyCreatedAsync(int count = 100, long? offset = null)
         {
             var builder = new HttpQueryStringBuilder();
             builder.Add("count", count.ToString());
@@ -82,12 +82,12 @@ namespace HubSpot
             if (offset.HasValue)
                 builder.Add("offset", offset.Value.ToString());
 
-            var result = await SendAsync<CompanyListResponse>(HttpMethod.Get, "/companies/v2/companies/recent/created", builder.BuildQuery());
+            var result = await SendAsync<PagedList<Company>>(HttpMethod.Get, "/companies/v2/companies/recent/created", builder.BuildQuery());
 
             return result;
         }
 
-        async Task<CompanyListResponse> IHubSpotCompanyClient.GetRecentlyUpdatedAsync(int count = 100, long? offset = null)
+        async Task<PagedList<Company>> IHubSpotCompanyClient.GetRecentlyUpdatedAsync(int count = 100, long? offset = null)
         {
             var builder = new HttpQueryStringBuilder();
             builder.Add("count", count.ToString());
@@ -95,7 +95,7 @@ namespace HubSpot
             if (offset.HasValue)
                 builder.Add("offset", offset.Value.ToString());
 
-            var result = await SendAsync<CompanyListResponse>(HttpMethod.Get, "/companies/v2/companies/recent/modified", builder.BuildQuery());
+            var result = await SendAsync<PagedList<Company>>(HttpMethod.Get, "/companies/v2/companies/recent/modified", builder.BuildQuery());
 
             return result;
         }

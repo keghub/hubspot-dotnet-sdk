@@ -8,51 +8,6 @@ using HubSpot.Utils;
 
 namespace HubSpot
 {
-    public static class HttpQueryStringBuilderContactExtensions
-    {
-        public static void AddProperties(this HttpQueryStringBuilder builder, IEnumerable<IProperty> properties, string fieldName = "property")
-        {
-            if (string.IsNullOrEmpty(fieldName))
-            {
-                throw new ArgumentNullException(nameof(fieldName));
-            }
-
-            foreach (var property in properties ?? Array.Empty<IProperty>())
-            {
-                builder.Add(fieldName, property.Name);
-            }
-        }
-
-        public static void AddShowListMemberships(this HttpQueryStringBuilder builder, bool showListMemberships)
-        {
-            builder.Add("showListMemberships", showListMemberships ? "true" : "false");
-        }
-
-        public static void AddFormSubmissionMode(this HttpQueryStringBuilder builder, FormSubmissionMode formSubmissionMode)
-        {
-            builder.Add("formSubmissionMode", GetFormSubmissionMode(formSubmissionMode));
-
-            string GetFormSubmissionMode(FormSubmissionMode mode)
-            {
-                switch (mode)
-                {
-                    case FormSubmissionMode.All: return "all";
-                    case FormSubmissionMode.Newest: return "newest";
-                    case FormSubmissionMode.None: return "none";
-                    case FormSubmissionMode.Oldest: return "oldest";
-
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(mode));
-                }
-            }
-        }
-
-        public static void AddPropertyMode(this HttpQueryStringBuilder builder, PropertyMode propertyMode)
-        {
-            builder.Add("propertyMode", propertyMode == PropertyMode.ValueAndHistory ? "value_and_history" : "value_only");
-        }
-    }
-
     public partial class HttpHubSpotClient : IHubSpotContactClient
     {
         async Task<Contact> IHubSpotContactClient.GetByIdAsync(long contactId, IReadOnlyList<IProperty> properties, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)

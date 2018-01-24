@@ -34,6 +34,15 @@ namespace HubSpot.Model
         public IReadOnlyList<ValuedProperty> Properties { get; set; }
     }
 
+    public class ObjectPropertyList
+    {
+        [JsonProperty("objectId")]
+        public long ObjectId { get; set; }
+
+        [JsonProperty("properties")]
+        public IReadOnlyList<ValuedProperty> Properties { get; set; }
+    }
+
     public class ValuedProperty
     {
         public ValuedProperty(string propertyName, string value)
@@ -47,5 +56,20 @@ namespace HubSpot.Model
 
         [JsonProperty("value")]
         public string Value { get; set; }
+    }
+
+    public class PagedList<T>
+    {
+        [JsonProperty("results")]
+        public IReadOnlyList<T> Results { get; set; }
+
+        [JsonProperty("hasMore")]
+        public bool HasMore { get; set; }
+
+        [JsonProperty("offset")]
+        public long? Offset { get; set; }
+
+        [JsonProperty("total")]
+        public long Total { get; set; }
     }
 }
