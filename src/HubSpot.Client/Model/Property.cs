@@ -24,6 +24,8 @@ namespace HubSpot.Model
         public string Name { get; }
 
         public ValuedProperty Value(string value) => new ValuedProperty(Name, value);
+
+        public static implicit operator Property(string name) => new Property(name);
     }
 
     public class PropertyList

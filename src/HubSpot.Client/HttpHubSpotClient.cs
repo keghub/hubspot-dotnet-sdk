@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using HubSpot.Model.Companies;
 using HubSpot.Model.Contacts;
 using HubSpot.Utils;
 using Microsoft.Extensions.Logging;
@@ -33,5 +34,7 @@ namespace HubSpot
         };
 
         public IHubSpotContactClient Contacts => this;
+
+        public IHubSpotCompanyClient Companies => this;
     }
 }

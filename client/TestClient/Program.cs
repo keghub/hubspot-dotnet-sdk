@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using HubSpot;
+using HubSpot.Model;
 using HubSpot.Model.Contacts;
 using Microsoft.Extensions.Logging;
 
@@ -31,7 +33,19 @@ namespace TestClient
 
             //var list = await hubspot.Contacts.GetManyByEmailAsync(new[] {"renato.golia@educations.com", "renato.golia@studentum.se"});
 
-            var list = await hubspot.Contacts.GetRecentlyCreatedAsync(count: 10);
+            var companies = await hubspot.Companies.SearchAsync("studentum.se", new Property[] { "domain", "name", "createdate" });
+
+            foreach (var company in companies.Companies)
+            {
+                var contacts = await hubspot.Companies.GetContactsInCompanyAsync(company.Id);
+
+                Console.WriteLine($"{company.Properties["name"].Value} has{(contacts.HasMore ? " at least" : string.Empty)} {contacts.Contacts.Count} contacts");
+
+                foreach (var contact in contacts.Contacts)
+                {
+                    Console.WriteLine($"{contact.Id} {contact.Properties.SingleOrDefault(p => p.Name == "firstname")?.Value} {contact.Properties.SingleOrDefault(p => p.Name == "lastname")?.Value}");
+                }
+            }
 
             Console.WriteLine("Bye");
         }

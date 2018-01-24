@@ -21,6 +21,14 @@ namespace HubSpot.Model.Companies
 
         Task<CompanyListResponse> GetRecentlyUpdatedAsync(int count = 100, long? offset = null);
 
-        Task<SearchResponse> SearchAsync(IReadOnlyList<IProperty> properties = null, int limit = 100, long? companyOffset = null);
+        Task<SearchResponse> SearchAsync(string domain, IReadOnlyList<IProperty> properties = null, int limit = 100, long? companyOffset = null);
+
+        Task<ContactList> GetContactsInCompanyAsync(long companyId, int count = 100, long? companyOffset = null);
+
+        Task<ContactIdList> GetContactIdsInCompanyAsync(long companyId, int count = 100, long? companyOffset = null);
+
+        Task<Company> AddContactToCompanyAsync(long companyId, long contactId);
+
+        Task RemoveContactFromCompanyAsync(long companyId, long contactId);
     }
 }

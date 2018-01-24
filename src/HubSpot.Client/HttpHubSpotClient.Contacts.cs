@@ -10,11 +10,16 @@ namespace HubSpot
 {
     public static class HttpQueryStringBuilderContactExtensions
     {
-        public static void AddProperties(this HttpQueryStringBuilder builder, IEnumerable<IProperty> properties)
+        public static void AddProperties(this HttpQueryStringBuilder builder, IEnumerable<IProperty> properties, string fieldName = "property")
         {
+            if (string.IsNullOrEmpty(fieldName))
+            {
+                throw new ArgumentNullException(nameof(fieldName));
+            }
+
             foreach (var property in properties ?? Array.Empty<IProperty>())
             {
-                builder.Add("property", property.Name);
+                builder.Add(fieldName, property.Name);
             }
         }
 
@@ -50,7 +55,7 @@ namespace HubSpot
 
     public partial class HttpHubSpotClient : IHubSpotContactClient
     {
-        public async Task<Contact> GetByIdAsync(long contactId, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
+        async Task<Contact> IHubSpotContactClient.GetByIdAsync(long contactId, IReadOnlyList<IProperty> properties, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
         {
             var builder = new HttpQueryStringBuilder();
 
@@ -64,7 +69,7 @@ namespace HubSpot
             return contact;
         }
 
-        public async Task<Contact> GetByEmailAsync(string email, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
+        async Task<Contact> IHubSpotContactClient.GetByEmailAsync(string email, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -83,7 +88,7 @@ namespace HubSpot
             return contact;
         }
 
-        public async Task<Contact> GetByUserTokenAsync(string userToken, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
+        async Task<Contact> IHubSpotContactClient.GetByUserTokenAsync(string userToken, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true)
         {
             if (string.IsNullOrEmpty(userToken))
             {
@@ -102,7 +107,7 @@ namespace HubSpot
             return contact;
         }
 
-        public async Task<IReadOnlyDictionary<long, Contact>> GetManyByIdAsync(IReadOnlyList<long> contactIds, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, bool includeDeletes = false)
+        async Task<IReadOnlyDictionary<long, Contact>> IHubSpotContactClient.GetManyByIdAsync(IReadOnlyList<long> contactIds, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, bool includeDeletes = false)
         {
             if (contactIds == null || contactIds.Count == 0)
             {
@@ -131,7 +136,7 @@ namespace HubSpot
             return contacts;
         }
 
-        public async Task<IReadOnlyDictionary<long, Contact>> GetManyByEmailAsync(IReadOnlyList<string> emails, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, bool includeDeletes = false)
+        async Task<IReadOnlyDictionary<long, Contact>> IHubSpotContactClient.GetManyByEmailAsync(IReadOnlyList<string> emails, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, bool includeDeletes = false)
         {
             if (emails == null || emails.Count == 0)
             {
@@ -161,7 +166,7 @@ namespace HubSpot
 
         }
 
-        public async Task<ContactList> GetAllAsync(IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, int count = 20, long? contactOffset = null)
+        async Task<ContactList> IHubSpotContactClient.GetAllAsync(IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, int count = 20, long? contactOffset = null)
         {
             if (count > 100)
             {
@@ -186,7 +191,7 @@ namespace HubSpot
             return list;
         }
 
-        public async Task<ContactList> GetRecentlyUpdatedAsync(IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, int count = 20, long? contactOffset = null, DateTimeOffset? timeOffset = null)
+        async Task<ContactList> IHubSpotContactClient.GetRecentlyUpdatedAsync(IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, int count = 20, long? contactOffset = null, DateTimeOffset? timeOffset = null)
         {
             if (count > 100)
             {
@@ -217,7 +222,7 @@ namespace HubSpot
 
         }
 
-        public async Task<ContactList> GetRecentlyCreatedAsync(IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, int count = 20, long? contactOffset = null, DateTimeOffset? timeOffset = null)
+        async Task<ContactList> IHubSpotContactClient.GetRecentlyCreatedAsync(IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueOnly, FormSubmissionMode formSubmissionMode = FormSubmissionMode.Newest, bool showListMemberships = false, int count = 20, long? contactOffset = null, DateTimeOffset? timeOffset = null)
         {
             if (count > 100)
             {
@@ -247,13 +252,13 @@ namespace HubSpot
             return list;
         }
 
-        public async Task<DeleteContactResponse> DeleteAsync(long contactId)
+        async Task<DeleteContactResponse> IHubSpotContactClient.DeleteAsync(long contactId)
         {
             var response = await SendAsync<DeleteContactResponse>(HttpMethod.Delete, $"/contacts/v1/contact/vid/{contactId}");
             return response;
         }
 
-        public async Task<Contact> CreateAsync(IReadOnlyList<ValuedProperty> properties)
+        async Task<Contact> IHubSpotContactClient.CreateAsync(IReadOnlyList<ValuedProperty> properties)
         {
             var propertyList = new PropertyList
             {
@@ -265,7 +270,7 @@ namespace HubSpot
             return contact;
         }
 
-        public async Task UpdateByIdAsync(long contactId, IReadOnlyList<ValuedProperty> properties)
+        async Task IHubSpotContactClient.UpdateByIdAsync(long contactId, IReadOnlyList<ValuedProperty> properties)
         {
             var propertyList = new PropertyList
             {
@@ -275,7 +280,7 @@ namespace HubSpot
             await SendAsync(HttpMethod.Post, propertyList, $"/contacts/v1/contact/vid/{contactId}/profile");
         }
 
-        public async Task UpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties)
+        async Task IHubSpotContactClient.UpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -290,7 +295,7 @@ namespace HubSpot
             await SendAsync(HttpMethod.Post, propertyList, $"/contacts/v1/contact/email/{email}/profile");
         }
 
-        public async Task<CreateOrUpdateResponse> CreateOrUpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties)
+        async Task<CreateOrUpdateResponse> IHubSpotContactClient.CreateOrUpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -307,7 +312,7 @@ namespace HubSpot
             return response;
         }
 
-        public async Task<SearchResponse> SearchAsync(string query, IReadOnlyList<IProperty> properties = null, int count = 20, long? contactOffset = null)
+        async Task<SearchResponse> IHubSpotContactClient.SearchAsync(string query, IReadOnlyList<IProperty> properties = null, int count = 20, long? contactOffset = null)
         {
             if (string.IsNullOrEmpty(query))
             {
@@ -332,6 +337,16 @@ namespace HubSpot
             var response = await SendAsync<SearchResponse>(HttpMethod.Get, "/contacts/v1/search/query", builder.BuildQuery());
 
             return response;
+        }
+
+        async Task IHubSpotContactClient.MergeAsync(long primaryContactId, long secondaryContactId)
+        {
+            var payload = new
+            {
+                vidToMerge = secondaryContactId
+            };
+
+            await SendAsync<object>(HttpMethod.Post, payload, $"/contacts/v1/contact/merge-vids/{primaryContactId}/");
         }
     }
 }

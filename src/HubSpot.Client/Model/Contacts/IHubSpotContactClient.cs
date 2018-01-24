@@ -33,6 +33,8 @@ namespace HubSpot.Model.Contacts
         Task<CreateOrUpdateResponse> CreateOrUpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties);
 
         Task<SearchResponse> SearchAsync(string query, IReadOnlyList<IProperty> properties = null, int count = 20, long? contactOffset = null);
+
+        Task MergeAsync(long primaryContactId, long secondaryContactId);
     }
 
     public enum PropertyMode

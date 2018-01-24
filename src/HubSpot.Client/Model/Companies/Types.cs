@@ -61,7 +61,7 @@ namespace HubSpot.Model.Companies
 
         public class SearchResponseOffset
         {
-            [JsonProperty("companyId")]
+            [JsonProperty("companyId", DefaultValueHandling = DefaultValueHandling.Include)]
             public long CompanyId { get; set; }
 
             [JsonProperty("isPrimary")]
