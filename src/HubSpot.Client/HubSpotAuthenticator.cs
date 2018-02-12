@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using HubSpot.Utils;
+using Kralizek.Extensions.Http;
 
 namespace HubSpot
 {

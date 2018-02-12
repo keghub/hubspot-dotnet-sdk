@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using HubSpot.Model;
 using HubSpot.Model.Deals;
 using HubSpot.Utils;
+using Kralizek.Extensions.Http;
 
 namespace HubSpot
 {
@@ -28,7 +29,7 @@ namespace HubSpot
                 properties
             };
 
-            var response = await SendAsync<object, Deal>(HttpMethod.Post, request, "/deals/v1/deal/");
+            var response = await SendAsync<object, Deal>(HttpMethod.Post, "/deals/v1/deal/", request);
 
             return response;
         }
@@ -41,7 +42,7 @@ namespace HubSpot
             }
 
             var list = new PropertyList { Properties = propertiesToUpdate };
-            var result = await SendAsync<PropertyList, Deal>(HttpMethod.Put, list, $"/deals/v1/deal/{dealId}");
+            var result = await SendAsync<PropertyList, Deal>(HttpMethod.Put, $"/deals/v1/deal/{dealId}", list);
 
             return result;
         }
@@ -53,7 +54,7 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(dealsToUpdate));
             }
 
-            await SendAsync(HttpMethod.Post, dealsToUpdate, "/deals/v1/batch-async/update");
+            await SendAsync(HttpMethod.Post, "/deals/v1/batch-async/update", dealsToUpdate);
         }
 
         async Task IHubSpotDealClient.DeleteAsync(long dealId)

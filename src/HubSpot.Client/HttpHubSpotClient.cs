@@ -4,6 +4,7 @@ using HubSpot.Model.Companies;
 using HubSpot.Model.Contacts;
 using HubSpot.Model.Deals;
 using HubSpot.Utils;
+using Kralizek.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 

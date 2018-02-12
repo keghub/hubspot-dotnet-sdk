@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using HubSpot.Model;
 using HubSpot.Model.Companies;
 using HubSpot.Utils;
+using Kralizek.Extensions.Http;
 
 namespace HubSpot
 {
@@ -25,7 +26,7 @@ namespace HubSpot
             }
 
             var list = new PropertyList {Properties = properties};
-            var result = await SendAsync<PropertyList, Company>(HttpMethod.Post, list, "/companies/v2/companies/");
+            var result = await SendAsync<PropertyList, Company>(HttpMethod.Post, "/companies/v2/companies/", list);
 
             return result;
         }
@@ -38,7 +39,7 @@ namespace HubSpot
             }
 
             var list = new PropertyList { Properties = propertiesToUpdate };
-            var result = await SendAsync<PropertyList, Company>(HttpMethod.Put, list, $"/companies/v2/companies/{companyId}");
+            var result = await SendAsync<PropertyList, Company>(HttpMethod.Put, $"/companies/v2/companies/{companyId}", list);
 
             return result;
         }
@@ -50,7 +51,7 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(companiesToUpdate));
             }
 
-            await SendAsync(HttpMethod.Post, companiesToUpdate, "/companies/v1/batch-async/update");
+            await SendAsync(HttpMethod.Post, "/companies/v1/batch-async/update", companiesToUpdate);
         }
 
         async Task<DeleteCompanyResponse> IHubSpotCompanyClient.DeleteAsync(long companyId)
@@ -59,7 +60,7 @@ namespace HubSpot
             return result;
         }
 
-        async Task<CompanyList> IHubSpotCompanyClient.GetAllAsync(IReadOnlyList<IProperty> properties, IReadOnlyList<IProperty> propertiesWithHistory, int limit = 100, long? companyOffset = null)
+        async Task<CompanyList> IHubSpotCompanyClient.GetAllAsync(IReadOnlyList<IProperty> properties, IReadOnlyList<IProperty> propertiesWithHistory, int limit, long? companyOffset)
         {
             var builder = new HttpQueryStringBuilder();
             builder.AddProperties(properties, "properties");
@@ -74,7 +75,7 @@ namespace HubSpot
             return result;
         }
 
-        async Task<PagedList<Company>> IHubSpotCompanyClient.GetRecentlyCreatedAsync(int count = 100, long? offset = null)
+        async Task<PagedList<Company>> IHubSpotCompanyClient.GetRecentlyCreatedAsync(int count, long? offset)
         {
             var builder = new HttpQueryStringBuilder();
             builder.Add("count", count.ToString());
@@ -87,7 +88,7 @@ namespace HubSpot
             return result;
         }
 
-        async Task<PagedList<Company>> IHubSpotCompanyClient.GetRecentlyUpdatedAsync(int count = 100, long? offset = null)
+        async Task<PagedList<Company>> IHubSpotCompanyClient.GetRecentlyUpdatedAsync(int count, long? offset)
         {
             var builder = new HttpQueryStringBuilder();
             builder.Add("count", count.ToString());
@@ -100,7 +101,7 @@ namespace HubSpot
             return result;
         }
 
-        async Task<SearchResponse> IHubSpotCompanyClient.SearchAsync(string domain, IReadOnlyList<IProperty> properties = null, int limit = 100, long? companyOffset = null)
+        async Task<SearchResponse> IHubSpotCompanyClient.SearchAsync(string domain, IReadOnlyList<IProperty> properties, int limit, long? companyOffset)
         {
             if (string.IsNullOrEmpty(domain))
             {
@@ -121,12 +122,12 @@ namespace HubSpot
                 }
             };
 
-            var response = await SendAsync<object, SearchResponse>(HttpMethod.Post, request, $"/companies/v2/domains/{domain}/companies");
+            var response = await SendAsync<object, SearchResponse>(HttpMethod.Post, $"/companies/v2/domains/{domain}/companies", request);
 
             return response;
         }
 
-        async Task<ContactList> IHubSpotCompanyClient.GetContactsInCompanyAsync(long companyId, int count = 100, long? companyOffset = null)
+        async Task<ContactList> IHubSpotCompanyClient.GetContactsInCompanyAsync(long companyId, int count, long? companyOffset)
         {
             var builder = new HttpQueryStringBuilder();
             builder.Add("count", count.ToString());
@@ -139,7 +140,7 @@ namespace HubSpot
             return result;
         }
 
-        async Task<ContactIdList> IHubSpotCompanyClient.GetContactIdsInCompanyAsync(long companyId, int count = 100, long? companyOffset = null)
+        async Task<ContactIdList> IHubSpotCompanyClient.GetContactIdsInCompanyAsync(long companyId, int count, long? companyOffset)
         {
             var builder = new HttpQueryStringBuilder();
             builder.Add("count", count.ToString());
