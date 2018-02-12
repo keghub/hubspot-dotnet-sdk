@@ -3,6 +3,7 @@ using System.Net.Http;
 using HubSpot.Model.Companies;
 using HubSpot.Model.Contacts;
 using HubSpot.Model.Deals;
+using HubSpot.Model.Lists;
 using HubSpot.Utils;
 using Kralizek.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -40,5 +41,7 @@ namespace HubSpot
         public IHubSpotCompanyClient Companies => this;
 
         public IHubSpotDealClient Deals => this;
+
+        public IHubSpotListClient Lists => this;
     }
 }
