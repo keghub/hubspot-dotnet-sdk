@@ -38,7 +38,7 @@ namespace HubSpot.Model.Lists
         public bool IsDeleteable { get; set; }
 
         [JsonProperty("filters")]
-        public IReadOnlyList<Filter> Filters { get; set; }
+        public IReadOnlyList<IReadOnlyList<Filter>> Filters { get; set; }
     }
 
     public class ContactListMetadata
