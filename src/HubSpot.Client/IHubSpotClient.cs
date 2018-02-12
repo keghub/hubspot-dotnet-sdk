@@ -1,6 +1,7 @@
 ﻿using HubSpot.Model.Companies;
 using HubSpot.Model.Contacts;
 using HubSpot.Model.Deals;
+using HubSpot.Model.Lists;
 
 namespace HubSpot
 {
@@ -11,5 +12,7 @@ namespace HubSpot
         IHubSpotCompanyClient Companies { get; }
 
         IHubSpotDealClient Deals { get; }
+
+        IHubSpotListClient Lists { get; }
     }
 }
