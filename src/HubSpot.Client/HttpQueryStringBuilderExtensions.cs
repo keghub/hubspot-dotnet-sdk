@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using HubSpot.Model;
 using HubSpot.Model.Contacts;
-using HubSpot.Utils;
 using Kralizek.Extensions.Http;
 
 namespace HubSpot

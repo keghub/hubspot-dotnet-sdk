@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <LangVersion>7.2</LangVersion>
     <IsPackable>false</IsPackable>
+    <RootNamespace>Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
