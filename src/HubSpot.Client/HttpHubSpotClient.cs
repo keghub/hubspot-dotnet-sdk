@@ -26,7 +26,7 @@ namespace HubSpot
             return new HttpClient(authenticator) { BaseAddress = authenticator.ServiceUri };
         }
 
-        private static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
+        public static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
         {
             DefaultValueHandling = DefaultValueHandling.Ignore,
             DateFormatHandling = DateFormatHandling.IsoDateFormat,

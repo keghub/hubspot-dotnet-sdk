@@ -8,7 +8,7 @@ using Kralizek.Extensions.Http;
 
 namespace HubSpot
 {
-    public abstract class HubSpotAuthenticator : HttpClientHandler
+    public abstract class HubSpotAuthenticator : DelegatingHandler
     {
         public virtual Uri ServiceUri { get; } = new Uri("https://api.hubapi.com");
     }
