@@ -8,6 +8,7 @@ using HubSpot.Utils;
 using Kralizek.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace HubSpot
 {
@@ -32,7 +33,8 @@ namespace HubSpot
             DateFormatHandling = DateFormatHandling.IsoDateFormat,
             Converters = new JsonConverter[]
             {
-                new UnixEpochConverter()
+                new UnixEpochConverter(),
+                new StringEnumConverter()
             }
         };
 

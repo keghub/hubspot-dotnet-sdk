@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using HubSpot.Model;
 using HubSpot.Model.Contacts;
+using HubSpot.Model.Contacts.Properties;
 using HubSpot.Utils;
 using Kralizek.Extensions.Http;
 
@@ -11,6 +12,11 @@ namespace HubSpot
 {
     public partial class HttpHubSpotClient : IHubSpotContactClient
     {
+        IHubSpotContactPropertyClient IHubSpotContactClient.Properties => this;
+
+        IHubSpotContactPropertyGroupClient IHubSpotContactClient.PropertyGroups => this;
+
+
         async Task<Contact> IHubSpotContactClient.GetByIdAsync(long contactId, IReadOnlyList<IProperty> properties, PropertyMode propertyMode, FormSubmissionMode formSubmissionMode, bool showListMemberships)
         {
             var builder = new HttpQueryStringBuilder();

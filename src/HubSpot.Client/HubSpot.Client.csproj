@@ -23,6 +23,9 @@
     </Compile>
     <Compile Update="HttpHubSpotClient.Contacts.cs">
       <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
+    </Compile>    
+    <Compile Update="HttpHubSpotClient.Contacts.Properties.cs">
+      <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
     </Compile>
     <Compile Update="HttpHubSpotClient.Deals.cs">
       <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
