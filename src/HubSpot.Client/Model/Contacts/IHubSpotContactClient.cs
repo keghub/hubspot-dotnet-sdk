@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using HubSpot.Model.Contacts.Properties;
 
 namespace HubSpot.Model.Contacts
 {
     public interface IHubSpotContactClient
     {
+        IHubSpotContactPropertyClient Properties { get; }
+
+        IHubSpotContactPropertyGroupClient PropertyGroups { get; }
+
         Task<Contact> GetByIdAsync(long contactId, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true);
 
         Task<Contact> GetByEmailAsync(string email, IReadOnlyList<IProperty> properties = null, PropertyMode propertyMode = PropertyMode.ValueAndHistory, FormSubmissionMode formSubmissionMode = FormSubmissionMode.All, bool showListMemberships = true);
