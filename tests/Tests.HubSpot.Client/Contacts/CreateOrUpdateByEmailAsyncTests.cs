@@ -16,21 +16,10 @@ namespace Tests.Contacts
     [TestFixture]
     public class CreateOrUpdateByEmailAsyncTests : ContactTests
     {
-        private IFixture fixture;
-
-        [SetUp]
-        public void Initialize()
-        {
-            fixture = new Fixture();
-
-            fixture.Customizations.Add(new TypeRelay(typeof(IReadOnlyDictionary<string, VersionedProperty>), typeof(Dictionary<string, VersionedProperty>)));
-        }
 
         [Test, AutoData]
-        public async Task Request_is_correct(string email)
+        public async Task Request_is_correct(string email, Contact contact)
         {
-            var contact = fixture.Create<Contact>();
-
             var properties = (from p in contact.Properties
                               select new ValuedProperty(p.Key, p.Value.Value)).ToArray();
 
