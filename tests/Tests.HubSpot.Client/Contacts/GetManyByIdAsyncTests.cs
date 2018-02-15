@@ -55,7 +55,7 @@ namespace Tests.Contacts
             Assert.That(response, Is.Empty);
         }
 
-        [Test]
+        [Test, TestCase]
         public void Throws_OutOfRange_if_more_than_100([Random(101, 1000, 1)] int count)
         {
             var sut = CreateSystemUnderTest();
