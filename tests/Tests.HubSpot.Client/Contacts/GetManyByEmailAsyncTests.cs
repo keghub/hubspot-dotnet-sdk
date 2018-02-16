@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using Kralizek.Extensions.Http;
 using NUnit.Framework;
 using WorldDomination.Net.Http;
 
@@ -19,7 +20,7 @@ namespace Tests.Contacts
             {
                 HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = EmptyObject
+                    Content = JsonContent.EmptyObject
                 }
             };
 
@@ -55,8 +56,8 @@ namespace Tests.Contacts
             Assert.That(response, Is.Empty);
         }
 
-        [Test, TestCase]
-        public void Throws_OutOfRange_if_more_than_100([Random(101, 1000, 1)] int count)
+        [Test, TestCase(201)]
+        public void Throws_OutOfRange_if_more_than_100(int count)
         {
             var sut = CreateSystemUnderTest();
 

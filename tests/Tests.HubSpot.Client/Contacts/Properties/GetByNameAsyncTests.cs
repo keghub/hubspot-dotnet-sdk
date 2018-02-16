@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using Kralizek.Extensions.Http;
 using NUnit.Framework;
 using WorldDomination.Net.Http;
 
@@ -18,7 +19,7 @@ namespace Tests.Contacts.Properties
                 HttpMethod = HttpMethod.Get,
                 HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = EmptyObject
+                    Content = JsonContent.EmptyObject
                 }
             };
 

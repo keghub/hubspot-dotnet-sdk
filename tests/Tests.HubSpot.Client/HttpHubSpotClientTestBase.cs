@@ -9,10 +9,6 @@ namespace Tests
 {
     public abstract class HttpHubSpotClientTestBase
     {
-        protected static HttpContent EmptyObject => new StringContent("{}");
-
-        protected static HttpContent EmptyArray => new StringContent("[]");
-
         protected static HttpContent Object<T>(T obj) => new StringContent(JsonConvert.SerializeObject(obj, HttpHubSpotClient.SerializerSettings));
 
         protected HttpHubSpotClient CreateClient(params HttpMessageOptions[] options)
