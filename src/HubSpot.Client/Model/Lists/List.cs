@@ -30,7 +30,6 @@ namespace HubSpot.Model.Lists
         [JsonProperty("listId")]
         public long ListId { get; set; }
 
-
         [JsonProperty("updatedAt")]
         public DateTimeOffset UpdatedAt { get; set; }
 
@@ -87,6 +86,5 @@ namespace HubSpot.Model.Lists
 
         [JsonProperty("operator")]
         public string Operator { get; set; }
-
     }
 }

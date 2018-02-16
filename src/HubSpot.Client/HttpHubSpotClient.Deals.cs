@@ -118,7 +118,6 @@ namespace HubSpot
             }
 
             await SendAsync(HttpMethod.Put, $"/deals/v1/deal/{dealId}/associations/COMPANY", builder.BuildQuery());
-
         }
 
         async Task IHubSpotDealClient.RemoveAssociationToCompaniesAsync(long dealId, IReadOnlyList<long> ids)
@@ -135,7 +134,6 @@ namespace HubSpot
             }
 
             await SendAsync(HttpMethod.Delete, $"/deals/v1/deal/{dealId}/associations/COMPANY", builder.BuildQuery());
-
         }
 
         async Task<DealList> IHubSpotDealClient.GetAllAsync(IReadOnlyList<IProperty> properties, IReadOnlyList<IProperty> propertiesWithHistory, bool includeAssociations, int limit, long? offset)
@@ -152,7 +150,6 @@ namespace HubSpot
             var result = await SendAsync<DealList>(HttpMethod.Get, "/deals/v1/deal/paged", builder.BuildQuery());
 
             return result;
-
         }
 
         async Task<PagedList<Deal>> IHubSpotDealClient.GetRecentlyUpdatedAsync(DateTimeOffset? since, bool includePropertyVersions, int count, long? offset)
@@ -203,7 +200,6 @@ namespace HubSpot
             var result = await SendAsync<DealList>(HttpMethod.Get, $"/deals/v1/deal/associated/CONTACT/{contactId}/paged", builder.BuildQuery());
 
             return result;
-
         }
 
         async Task<DealList> IHubSpotDealClient.FindByCompanyAsync(long companyId, IReadOnlyList<IProperty> properties, IReadOnlyList<IProperty> propertiesWithHistory, bool includeAssociations, int limit, long? offset)
@@ -220,7 +216,6 @@ namespace HubSpot
             var result = await SendAsync<DealList>(HttpMethod.Get, $"/deals/v1/deal/associated/COMPANY/{companyId}/paged", builder.BuildQuery());
 
             return result;
-
         }
     }
 }

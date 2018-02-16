@@ -9,11 +9,11 @@ namespace HubSpot.Internal
 {
     public interface ITypeStore
     {
-        ConstructorInfo GetConstructor<THubSpot, TEntity>()
-            where TEntity : HubSpotEntity<THubSpot>;
+        IReadOnlyList<PropertyInfo> GetDefaultProperties<THubSpot, TEntity>()
+            where TEntity : class, IHubSpotEntity, new();
 
         IReadOnlyList<PropertyInfo> GetCustomProperties<THubSpot, TEntity>()
-            where TEntity : HubSpotEntity<THubSpot>;
+            where TEntity : class, IHubSpotEntity, new();
 
         bool TryGetTypeConverter(Type type, out ITypeConverter converter);
     }
@@ -29,18 +29,13 @@ namespace HubSpot.Internal
     {
         private readonly IReadOnlyDictionary<Type, ITypeConverter> _converters;
 
-        private readonly ConcurrentDictionary<Type, ConstructorInfo> _constructors = new ConcurrentDictionary<Type, ConstructorInfo>();
+        private readonly ConcurrentDictionary<Type, PropertyInfo[]> _customProperties = new ConcurrentDictionary<Type, PropertyInfo[]>();
 
-        private readonly ConcurrentDictionary<Type, PropertyInfo[]> _properties = new ConcurrentDictionary<Type, PropertyInfo[]>();
+        private readonly ConcurrentDictionary<Type, PropertyInfo[]> _defaultProperties = new ConcurrentDictionary<Type, PropertyInfo[]>();
 
         public TypeStore(IReadOnlyList<TypeConverterRegistration> typeConverterRegistrations)
         {
-            if (typeConverterRegistrations == null)
-            {
-                throw new ArgumentNullException(nameof(typeConverterRegistrations));
-            }
-
-            var converters = CreateRegistry(typeConverterRegistrations);
+            var converters = CreateRegistry(typeConverterRegistrations ?? Array.Empty<TypeConverterRegistration>());
 
             _converters = converters;
         }
@@ -60,18 +55,20 @@ namespace HubSpot.Internal
             return converters;
         }
 
-        public ConstructorInfo GetConstructor<THubSpot, TEntity>()
-            where TEntity : HubSpotEntity<THubSpot>
+        public IReadOnlyList<PropertyInfo> GetCustomProperties<THubSpot, TEntity>()
+            where TEntity : class, IHubSpotEntity, new()
         {
-            var constructor = _constructors.GetOrAdd(typeof(TEntity), type => type.GetConstructor(new[] { typeof(THubSpot) }));
-            return constructor;
+            var properties = _customProperties.GetOrAdd(typeof(TEntity),
+                type => type.GetProperties().Where(p => p.GetCustomAttributes<CustomPropertyAttribute>().Any()).ToArray());
+
+            return properties;
         }
 
-        public IReadOnlyList<PropertyInfo> GetCustomProperties<THubSpot, TEntity>()
-            where TEntity : HubSpotEntity<THubSpot>
+        public IReadOnlyList<PropertyInfo> GetDefaultProperties<THubSpot, TEntity>()
+            where TEntity : class, IHubSpotEntity, new()
         {
-            var properties = _properties.GetOrAdd(typeof(TEntity), 
-                type => type.GetProperties().Where(p => p.GetCustomAttributes<CustomPropertyAttribute>().Any()).ToArray());
+            var properties = _defaultProperties.GetOrAdd(typeof(TEntity),
+                type => type.GetProperties().Where(p => p.GetCustomAttributes<DefaultPropertyAttribute>().Any()).ToArray());
 
             return properties;
         }

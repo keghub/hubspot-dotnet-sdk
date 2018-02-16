@@ -55,6 +55,4 @@ namespace HubSpot.Model.Contacts
         Newest = 2,
         All = 3
     }
-
-
 }

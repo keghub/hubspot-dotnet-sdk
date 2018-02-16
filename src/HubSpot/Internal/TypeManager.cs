@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
+using HubSpot.Model;
 
 namespace HubSpot.Internal
 {
     public abstract class TypeManager<THubSpot, TEntity> : ITypeManager<THubSpot, TEntity>
-        where TEntity : HubSpotEntity<THubSpot>
+        where TEntity : class, IHubSpotEntity, new()
     {
         private readonly ITypeStore _typeStore;
 
@@ -16,23 +19,47 @@ namespace HubSpot.Internal
             _typeStore = typeStore ?? throw new ArgumentNullException(nameof(typeStore));
         }
 
-        public Task<T> TransformAsync<T>(THubSpot item)
-            where T : TEntity
+        public T ConvertFrom<T>(THubSpot item)
+            where T : class, TEntity, new()
         {
-            var constructor = _typeStore.GetConstructor<THubSpot, T>();
+            var entity = new T();
 
-            var entity = constructor.Invoke(new object[] { item }) as T;
+            SetDefaultProperties(item, entity);
 
-            SetCustomProperties(item, entity);
+            var properties = SetCustomProperties(item, entity);
 
-            return Task.FromResult(entity);
+            entity.Properties = properties.ToDictionary(k => k.PropertyName, i => i.Value);
+
+            return entity;
         }
 
         private void SetDefaultProperties<T>(THubSpot item, T entity)
-            where T : TEntity { }
+            where T : class, TEntity, new()
+        {
+            var defaultProperties = _typeStore.GetDefaultProperties<THubSpot, T>();
 
-        private void SetCustomProperties<T>(THubSpot item, T entity)
-            where T : TEntity
+            var hubspotProperties = GetDefaultProperties(item);
+
+            var zipped = from ep in defaultProperties
+                         from hp in hubspotProperties
+                         let propertyName = GetDefaultPropertyName(ep)
+                         where string.Equals(propertyName, hp.Key, StringComparison.OrdinalIgnoreCase)
+                         select new
+                         {
+                             propertyName = hp.Key,
+                             property = ep,
+                             value = hp.Value,
+                             type = ep.PropertyType
+                         };
+
+            foreach (var zip in zipped)
+            {
+                zip.property.SetValue(entity, zip.value);
+            }
+        }
+
+        private IEnumerable<PropertyData> SetCustomProperties<T>(THubSpot item, T entity)
+            where T : class, TEntity, new()
         {
             var customProperties = _typeStore.GetCustomProperties<THubSpot, T>();
 
@@ -41,40 +68,99 @@ namespace HubSpot.Internal
             var zipped = from ep in customProperties
                          from hp in hubspotProperties
                          let propertyName = GetPropertyName(ep)
-                         where string.Equals(propertyName, hp, StringComparison.OrdinalIgnoreCase)
-                         where HasCustomProperty(item, hp)
+                         where string.Equals(propertyName, hp.Key, StringComparison.OrdinalIgnoreCase)
+                         where HasCustomProperty(item, hp.Key)
                          select new
                          {
-                             propertyName = hp,
+                             propertyName = hp.Key,
                              property = ep,
-                             value = GetCustomPropertyValue(item, hp),
+                             value = hp.Value,
                              type = ep.PropertyType
                          };
 
             foreach (var zip in zipped)
             {
-                if (_typeStore.TryGetTypeConverter(zip.type, out var converter))
+                if (_typeStore.TryGetTypeConverter(zip.type, out var converter) && converter.TryConvertTo(zip.value, out var convertedValue))
                 {
-                    var convertedValue = converter.Convert(zip.value);
                     zip.property.SetValue(entity, convertedValue);
+
+                    yield return new PropertyData(zip.propertyName, convertedValue);
                 }
             }
         }
 
-        private string GetPropertyName(PropertyInfo property) => property.GetCustomAttribute<CustomPropertyAttribute>().PropertyName;
+        private static string GetPropertyName(PropertyInfo property) => property.GetCustomAttribute<CustomPropertyAttribute>().PropertyName;
 
-        public IReadOnlyList<string> GetCustomProperties<T>()
-            where T : TEntity
+        private static string GetDefaultPropertyName(PropertyInfo property) => property.GetCustomAttribute<DefaultPropertyAttribute>().PropertyName;
+
+        public IReadOnlyList<(string name, PropertyInfo property, CustomPropertyAttribute metadata)> GetCustomProperties<T>(Func<CustomPropertyAttribute, bool> filter)
+            where T : class, TEntity, new()
         {
+            filter = filter ?? (a => true);
+
             var customProperties = _typeStore.GetCustomProperties<THubSpot, T>();
 
-            return customProperties.Select(p => p.Name).ToArray();
+            var items = from property in customProperties
+                        let attribute = Attribute.GetCustomAttribute(property, typeof(CustomPropertyAttribute)) as CustomPropertyAttribute
+                        where filter(attribute)
+                        select (property.Name, property, attribute);
+
+            return items.ToArray();
         }
 
-        protected abstract IReadOnlyList<string> GetCustomProperties(THubSpot item);
+        protected abstract IReadOnlyList<KeyValuePair<string, string>> GetCustomProperties(THubSpot item);
+
+        protected abstract IReadOnlyList<KeyValuePair<string, object>> GetDefaultProperties(THubSpot item);
 
         protected abstract bool HasCustomProperty(THubSpot item, string propertyName);
 
-        protected abstract string GetCustomPropertyValue(THubSpot item, string propertyName);
+        public IReadOnlyList<(string name, string value)> GetModifiedProperties<T>(T item)
+            where T : class, TEntity, new()
+        {
+            var properties = GetCustomProperties<T>(TypeManager.ModifiableProperties);
+
+            var data = from property in properties
+                       let value = property.property.GetValue(item)
+                       select new PropertyData
+                       {
+                           PropertyName = property.metadata.PropertyName,
+                           Value = value
+                       };
+
+            var modifiedProperties = GetModifiedProperties(data, item);
+
+            return modifiedProperties.ToArray();
+        }
+
+        private IEnumerable<(string name, string value)> GetModifiedProperties(IEnumerable<PropertyData> data, IHubSpotEntity entity)
+        {
+            foreach (var property in data)
+            {
+                if (!_typeStore.TryGetTypeConverter(property.Value.GetType(), out var converter))
+                {
+                    throw new Exception($"Converter not found for {property.Value.GetType()}");
+                }
+
+                if (!converter.TryConvertFrom(property.Value, out var newValue))
+                {
+                    throw new Exception($"{converter.GetType()} could not convert {property.Value ?? "<null>"} for {property.PropertyName}");
+                }
+
+                if (!entity.Properties.TryGetValue(property.PropertyName, out var value))
+                {
+                    yield return (property.PropertyName, newValue);
+                }
+
+                if (!converter.TryConvertFrom(value, out string oldValue))
+                {
+                    throw new Exception($"{converter.GetType()} could not convert {value ?? "<null>"} for {property.PropertyName}");
+                }
+
+                if (!string.Equals(newValue, oldValue))
+                {
+                    yield return (property.PropertyName, newValue);
+                }
+            }
+        }
     }
 }

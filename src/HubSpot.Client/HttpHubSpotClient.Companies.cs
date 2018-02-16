@@ -25,7 +25,7 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(properties));
             }
 
-            var list = new PropertyList {Properties = properties};
+            var list = new PropertyList { Properties = properties };
             var result = await SendAsync<PropertyList, Company>(HttpMethod.Post, "/companies/v2/companies/", list);
 
             return result;

@@ -16,7 +16,6 @@ namespace Tests.Contacts
     [TestFixture]
     public class CreateOrUpdateByEmailAsyncTests : ContactTests
     {
-
         [Test, AutoData]
         public async Task Request_is_correct(string email, Contact contact)
         {
