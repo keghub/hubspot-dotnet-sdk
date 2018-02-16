@@ -11,11 +11,11 @@ namespace HubSpot.Contacts
 {
     public class HubSpotContactConnector : IHubSpotContactConnector
     {
-        private readonly IHubSpotContactClient _client;
+        private readonly IHubSpotClient _client;
         private readonly ITypeManager<Model.Contacts.Contact, Contact> _typeManager;
         private readonly ILogger<HubSpotContactConnector> _logger;
 
-        public HubSpotContactConnector(IHubSpotContactClient client, ITypeManager<Model.Contacts.Contact, Contact> typeManager, ILogger<HubSpotContactConnector> logger)
+        public HubSpotContactConnector(IHubSpotClient client, ITypeManager<Model.Contacts.Contact, Contact> typeManager, ILogger<HubSpotContactConnector> logger)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _typeManager = typeManager ?? throw new ArgumentNullException(nameof(typeManager));
@@ -27,9 +27,9 @@ namespace HubSpot.Contacts
         {
             var properties = _typeManager.GetCustomProperties<TContact>(TypeManager.AllProperties).Select(p => new Property(p.metadata.PropertyName)).ToArray();
 
-            var hubspotContact = await _client.GetByIdAsync(contactId, properties, PropertyMode.ValueOnly, FormSubmissionMode.None, false).ConfigureAwait(false);
+            var hubspotContact = await _client.Contacts.GetByIdAsync(contactId, properties, PropertyMode.ValueOnly, FormSubmissionMode.None, false).ConfigureAwait(false);
 
-            var contact = _typeManager.ConvertFrom<TContact>(hubspotContact);
+            var contact = _typeManager.ConvertTo<TContact>(hubspotContact);
 
             return contact;
         }
@@ -44,9 +44,9 @@ namespace HubSpot.Contacts
 
             var properties = _typeManager.GetCustomProperties<TContact>(TypeManager.AllProperties).Select(p => new Property(p.metadata.PropertyName)).ToArray();
 
-            var hubspotContact = await _client.GetByEmailAsync(email, properties, PropertyMode.ValueOnly, FormSubmissionMode.None, false).ConfigureAwait(false);
+            var hubspotContact = await _client.Contacts.GetByEmailAsync(email, properties, PropertyMode.ValueOnly, FormSubmissionMode.None, false).ConfigureAwait(false);
 
-            var contact = _typeManager.ConvertFrom<TContact>(hubspotContact);
+            var contact = _typeManager.ConvertTo<TContact>(hubspotContact);
 
             return contact;
         }
@@ -61,9 +61,9 @@ namespace HubSpot.Contacts
 
             var properties = _typeManager.GetCustomProperties<TContact>(TypeManager.AllProperties).Select(p => new Property(p.metadata.PropertyName)).ToArray();
 
-            var hubspotContact = await _client.GetByUserTokenAsync(userToken, properties, PropertyMode.ValueOnly, FormSubmissionMode.None, false).ConfigureAwait(false);
+            var hubspotContact = await _client.Contacts.GetByUserTokenAsync(userToken, properties, PropertyMode.ValueOnly, FormSubmissionMode.None, false).ConfigureAwait(false);
 
-            var contact = _typeManager.ConvertFrom<TContact>(hubspotContact);
+            var contact = _typeManager.ConvertTo<TContact>(hubspotContact);
 
             return contact;
         }
@@ -76,20 +76,24 @@ namespace HubSpot.Contacts
                 throw new ArgumentNullException(nameof(contact));
             }
 
-            var properties = from property in _typeManager.GetModifiedProperties(contact)
-                             select new ValuedProperty(property.name, property.value);
+            var properties = (from property in _typeManager.GetModifiedProperties(contact)
+                              select new ValuedProperty(property.name, property.value)).ToArray();
+
 
             if (IsNewContact())
             {
-                var newContact = await _client.CreateAsync(properties.ToArray());
-                return _typeManager.ConvertFrom<TContact>(newContact);
+                var newContact = await _client.Contacts.CreateAsync(properties.ToArray());
+                return _typeManager.ConvertTo<TContact>(newContact);
             }
-            else
+
+            if (properties.Any())
             {
-                await _client.UpdateByIdAsync(contact.Id, properties.ToArray());
+                await _client.Contacts.UpdateByIdAsync(contact.Id, properties.ToArray());
                 var newContact = await GetByIdAsync<TContact>(contact.Id);
                 return newContact;
             }
+
+            return contact;
 
             bool IsNewContact()
             {

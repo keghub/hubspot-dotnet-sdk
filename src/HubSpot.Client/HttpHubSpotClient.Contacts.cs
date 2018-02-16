@@ -231,6 +231,11 @@ namespace HubSpot
 
         async Task IHubSpotContactClient.UpdateByIdAsync(long contactId, IReadOnlyList<ValuedProperty> properties)
         {
+            if (properties == null || properties.Count == 0)
+            {
+                return;
+            }
+
             var propertyList = new PropertyList
             {
                 Properties = properties

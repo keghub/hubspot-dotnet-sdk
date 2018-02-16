@@ -22,16 +22,23 @@ namespace Tests.Contacts
         private Mock<IHubSpotContactClient> mockContactClient;
         private Mock<ITypeManager<Contact, HubSpot.Contacts.Contact>> mockTypeManager;
 
+        private Mock<IHubSpotClient> mockHubSpotClient;
+
         [SetUp]
         public void Initialize()
         {
-            mockContactClient = new Mock<IHubSpotContactClient>(MockBehavior.Strict);
-            mockTypeManager = new Mock<ITypeManager<Contact, HubSpot.Contacts.Contact>>(MockBehavior.Strict);
+            mockTypeManager = new Mock<ITypeManager<Contact, HubSpot.Contacts.Contact>>();
+
+            mockContactClient = new Mock<IHubSpotContactClient>();
+
+            mockHubSpotClient = new Mock<IHubSpotClient>();
+            mockHubSpotClient.SetupGet(p => p.Contacts).Returns(() => mockContactClient.Object);
         }
+
 
         private HubSpotContactConnector CreateSystemUnderTest()
         {
-            return new HubSpotContactConnector(mockContactClient.Object, mockTypeManager.Object, Mock.Of<ILogger<HubSpotContactConnector>>());
+            return new HubSpotContactConnector(mockHubSpotClient.Object, mockTypeManager.Object, Mock.Of<ILogger<HubSpotContactConnector>>());
         }
 
         [Test, AutoData]
@@ -41,7 +48,7 @@ namespace Tests.Contacts
                              .ReturnsAsync(contact)
                              .Verifiable();
 
-            mockTypeManager.Setup(p => p.ConvertFrom<TestContact>(contact))
+            mockTypeManager.Setup(p => p.ConvertTo<TestContact>(contact))
                            .Returns(expected)
                            .Verifiable();
 
@@ -64,7 +71,7 @@ namespace Tests.Contacts
                              .ReturnsAsync(contact)
                              .Verifiable();
 
-            mockTypeManager.Setup(p => p.ConvertFrom<TestContact>(contact))
+            mockTypeManager.Setup(p => p.ConvertTo<TestContact>(contact))
                            .Returns(expected)
                            .Verifiable();
 
@@ -87,7 +94,7 @@ namespace Tests.Contacts
                              .ReturnsAsync(contact)
                              .Verifiable();
 
-            mockTypeManager.Setup(p => p.ConvertFrom<TestContact>(contact))
+            mockTypeManager.Setup(p => p.ConvertTo<TestContact>(contact))
                            .Returns(expected)
                            .Verifiable();
 

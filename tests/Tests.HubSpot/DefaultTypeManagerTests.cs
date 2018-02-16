@@ -39,7 +39,7 @@ namespace Tests
     //    {
     //        var sut = new TypeManager<HubSpotContact, TestContact>(mockTypeStore.Object);
 
-    //        var result = await sut.ConvertFrom<TestContact>(hubSpot);
+    //        var result = await sut.ConvertTo<TestContact>(hubSpot);
 
     //        Assert.That(result.InnerEntity, Is.SameAs(hubSpot));
     //    }
