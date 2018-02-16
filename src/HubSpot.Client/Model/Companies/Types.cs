@@ -24,8 +24,6 @@ namespace HubSpot.Model.Companies
         public long? Offset { get; set; }
     }
 
-
-
     public class SearchResponse
     {
         [JsonProperty("results")]

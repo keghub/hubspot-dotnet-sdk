@@ -23,7 +23,6 @@ namespace HubSpot.Model.Deals
 
         [JsonProperty("imports")]
         public IReadOnlyList<Import> Imports { get; set; }
-
     }
 
     public class VersionedProperty : IVersionedProperty

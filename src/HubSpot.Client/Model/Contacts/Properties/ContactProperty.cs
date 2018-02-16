@@ -89,7 +89,9 @@ namespace HubSpot.Model.Contacts.Properties
         [EnumMember(Value = "select")] Select,
         [EnumMember(Value = "radio")] Radio,
         [EnumMember(Value = "checkbox")] CheckBox,
-        [EnumMember(Value = "booleancheckbox")] BooleanCheckBox
+
+        [EnumMember(Value = "booleancheckbox")]
+        BooleanCheckBox
     }
 
     public class PropertyOption

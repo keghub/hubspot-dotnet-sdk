@@ -13,5 +13,4 @@ namespace HubSpot.Model.Contacts
         public static readonly IUpdateableProperty LastName = new Property("lastname");
         public static readonly IUpdateableProperty Email = new Property("email");
     }
-
 }

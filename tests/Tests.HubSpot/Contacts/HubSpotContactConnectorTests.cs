@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using HubSpot;
@@ -12,7 +14,8 @@ using Moq;
 using NUnit.Framework;
 using Contact = HubSpot.Model.Contacts.Contact;
 
-namespace Tests.Contacts {
+namespace Tests.Contacts
+{
     [TestFixture]
     public class HubSpotContactConnectorTests
     {
@@ -38,12 +41,12 @@ namespace Tests.Contacts {
                              .ReturnsAsync(contact)
                              .Verifiable();
 
-            mockTypeManager.Setup(p => p.TransformAsync<TestContact>(contact))
-                           .ReturnsAsync(expected)
+            mockTypeManager.Setup(p => p.ConvertFrom<TestContact>(contact))
+                           .Returns(expected)
                            .Verifiable();
 
-            mockTypeManager.Setup(p => p.GetCustomProperties<TestContact>())
-                           .Returns(contact.Properties.Keys.ToArray());
+            mockTypeManager.Setup(p => p.GetCustomProperties<TestContact>(TypeManager.AllProperties))
+                           .Returns(Array.Empty<(string, PropertyInfo, CustomPropertyAttribute)>());
 
             var sut = CreateSystemUnderTest();
 
@@ -61,12 +64,12 @@ namespace Tests.Contacts {
                              .ReturnsAsync(contact)
                              .Verifiable();
 
-            mockTypeManager.Setup(p => p.TransformAsync<TestContact>(contact))
-                           .ReturnsAsync(expected)
+            mockTypeManager.Setup(p => p.ConvertFrom<TestContact>(contact))
+                           .Returns(expected)
                            .Verifiable();
 
-            mockTypeManager.Setup(p => p.GetCustomProperties<TestContact>())
-                           .Returns(contact.Properties.Keys.ToArray());
+            mockTypeManager.Setup(p => p.GetCustomProperties<TestContact>(TypeManager.AllProperties))
+                           .Returns(Array.Empty<(string, PropertyInfo, CustomPropertyAttribute)>());
 
             var sut = CreateSystemUnderTest();
 
@@ -84,12 +87,12 @@ namespace Tests.Contacts {
                              .ReturnsAsync(contact)
                              .Verifiable();
 
-            mockTypeManager.Setup(p => p.TransformAsync<TestContact>(contact))
-                           .ReturnsAsync(expected)
+            mockTypeManager.Setup(p => p.ConvertFrom<TestContact>(contact))
+                           .Returns(expected)
                            .Verifiable();
 
-            mockTypeManager.Setup(p => p.GetCustomProperties<TestContact>())
-                           .Returns(contact.Properties.Keys.ToArray());
+            mockTypeManager.Setup(p => p.GetCustomProperties<TestContact>(TypeManager.AllProperties))
+                           .Returns(Array.Empty<(string, PropertyInfo, CustomPropertyAttribute)>());
 
             var sut = CreateSystemUnderTest();
 
@@ -99,6 +102,5 @@ namespace Tests.Contacts {
 
             mockTypeManager.Verify();
         }
-
     }
 }

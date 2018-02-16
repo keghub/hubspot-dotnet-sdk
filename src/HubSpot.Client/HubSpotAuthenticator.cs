@@ -20,6 +20,7 @@ namespace HubSpot
         public ApiKeyHubSpotAuthenticator(string apiKey)
         {
             _apiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
+            InnerHandler = new HttpClientHandler();
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)

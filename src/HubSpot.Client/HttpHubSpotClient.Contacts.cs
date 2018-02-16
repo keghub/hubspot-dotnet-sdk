@@ -16,7 +16,6 @@ namespace HubSpot
 
         IHubSpotContactPropertyGroupClient IHubSpotContactClient.PropertyGroups => this;
 
-
         async Task<Contact> IHubSpotContactClient.GetByIdAsync(long contactId, IReadOnlyList<IProperty> properties, PropertyMode propertyMode, FormSubmissionMode formSubmissionMode, bool showListMemberships)
         {
             var builder = new HttpQueryStringBuilder();
@@ -125,7 +124,6 @@ namespace HubSpot
             var contacts = await SendAsync<Dictionary<long, Contact>>(HttpMethod.Get, "/contacts/v1/contact/emails/batch/", builder.BuildQuery());
 
             return contacts;
-
         }
 
         async Task<ContactList> IHubSpotContactClient.GetAllAsync(IReadOnlyList<IProperty> properties, PropertyMode propertyMode, FormSubmissionMode formSubmissionMode, bool showListMemberships, int count, long? contactOffset)
@@ -181,7 +179,6 @@ namespace HubSpot
             var list = await SendAsync<ContactList>(HttpMethod.Get, "/contacts/v1/lists/recently_updated/contacts/recent", builder.BuildQuery());
 
             return list;
-
         }
 
         async Task<ContactList> IHubSpotContactClient.GetRecentlyCreatedAsync(IReadOnlyList<IProperty> properties, PropertyMode propertyMode, FormSubmissionMode formSubmissionMode, bool showListMemberships, int count, long? contactOffset, DateTimeOffset? timeOffset)

@@ -51,7 +51,6 @@ namespace HubSpot.Model.Contacts
         IReadOnlyList<ITimestampedValue> IVersionedProperty.Versions => Versions;
     }
 
-
     public class TimestampedValue : ITimestampedValue
     {
         [JsonProperty("value")]
@@ -113,7 +112,6 @@ namespace HubSpot.Model.Contacts
 
         [JsonProperty("identities")]
         public IReadOnlyList<Identity> Identities { get; set; }
-
     }
 
     public class Identity

@@ -182,13 +182,12 @@ namespace HubSpot
         {
             var request = new
             {
-                vids = new[] {contactId}
+                vids = new[] { contactId }
             };
 
             var response = await SendAsync<object, ContactListResponse>(HttpMethod.Post, $"/contacts/v1/lists/{listId}/remove", request);
 
             return response;
-
         }
     }
 }

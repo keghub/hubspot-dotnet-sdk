@@ -1,8 +1,4 @@
-﻿using System;
-using System.Text;
-using HubSpot;
-using Contact = HubSpot.Contacts.Contact;
-using HubSpotContact = HubSpot.Model.Contacts.Contact;
+﻿using HubSpot;
 
 namespace Tests.Contacts
 {
@@ -10,7 +6,5 @@ namespace Tests.Contacts
     {
         [CustomProperty("customProperty")]
         public string CustomProperty { get; set; }
-
-        public TestContact(HubSpotContact entity) : base(entity) { }
     }
 }

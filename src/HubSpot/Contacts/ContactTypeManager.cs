@@ -1,18 +1,38 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using HubSpot.Internal;
+using HubSpotContact = HubSpot.Model.Contacts.Contact;
 
 namespace HubSpot.Contacts
 {
-    public class ContactTypeManager<TEntity> : TypeManager<Model.Contacts.Contact, TEntity>
-        where TEntity : Contact
+    public class ContactTypeManager : TypeManager<HubSpotContact, Contact>
     {
         public ContactTypeManager(ITypeStore typeStore) : base(typeStore) { }
 
-        protected override IReadOnlyList<string> GetCustomProperties(Model.Contacts.Contact item) => item.Properties.Keys.ToArray();
+        protected override IReadOnlyList<KeyValuePair<string, string>> GetCustomProperties(HubSpotContact item)
+        {
+            var properties = from kvp in item.Properties
+                             let key = kvp.Key
+                             let value = kvp.Value.Value
+                             select new KeyValuePair<string, string>(key, value);
 
-        protected override bool HasCustomProperty(Model.Contacts.Contact item, string propertyName) => item.Properties.ContainsKey(propertyName);
+            return properties.ToArray();
+        }
 
-        protected override string GetCustomPropertyValue(Model.Contacts.Contact item, string propertyName) => item.Properties.TryGetValue(propertyName, out var property) ? property.Value : null;
+        protected override IReadOnlyList<KeyValuePair<string, object>> GetDefaultProperties(HubSpotContact item)
+        {
+            return new[]
+            {
+                new KeyValuePair<string, object>("vid", item.Id),
+                new KeyValuePair<string, object>("canonical-vid", item.CanonicalId),
+                new KeyValuePair<string, object>("is-contact", item.IsContact),
+                new KeyValuePair<string, object>("portal-id", item.PortalId),
+                new KeyValuePair<string, object>("merged-vids", item.MergedIds),
+                new KeyValuePair<string, object>("profile-token", item.ProfileToken),
+                new KeyValuePair<string, object>("profile-url", item.ProfileUrl)
+            };
+        }
+
+        protected override bool HasCustomProperty(HubSpotContact item, string propertyName) => item.Properties.ContainsKey(propertyName);
     }
 }

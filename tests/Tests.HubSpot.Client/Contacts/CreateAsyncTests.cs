@@ -13,7 +13,6 @@ namespace Tests.Contacts
     [TestFixture]
     public class CreateAsyncTests : ContactTests
     {
-
         [Test, AutoData]
         public async Task Request_is_correct(Contact contact)
         {

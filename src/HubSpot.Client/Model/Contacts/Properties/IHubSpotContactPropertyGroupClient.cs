@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace HubSpot.Model.Contacts.Properties {
+namespace HubSpot.Model.Contacts.Properties
+{
     public interface IHubSpotContactPropertyGroupClient
     {
         Task<IReadOnlyList<ContactPropertyGroup>> GetAllAsync();
