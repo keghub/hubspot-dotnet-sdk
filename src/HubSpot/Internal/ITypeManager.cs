@@ -7,7 +7,7 @@ namespace HubSpot.Internal
     public interface ITypeManager<in THubSpot, in TEntity>
         where TEntity : class, IHubSpotEntity
     {
-        T ConvertFrom<T>(THubSpot item)
+        T ConvertTo<T>(THubSpot item)
             where T : class, TEntity, new();
 
         IReadOnlyList<(string name, PropertyInfo property, CustomPropertyAttribute metadata)> GetCustomProperties<T>(Func<CustomPropertyAttribute, bool> filter)

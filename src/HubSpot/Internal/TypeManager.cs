@@ -19,7 +19,7 @@ namespace HubSpot.Internal
             _typeStore = typeStore ?? throw new ArgumentNullException(nameof(typeStore));
         }
 
-        public T ConvertFrom<T>(THubSpot item)
+        public T ConvertTo<T>(THubSpot item)
             where T : class, TEntity, new()
         {
             var entity = new T();
@@ -150,15 +150,17 @@ namespace HubSpot.Internal
                 {
                     yield return (property.PropertyName, newValue);
                 }
-
-                if (!converter.TryConvertFrom(value, out string oldValue))
+                else
                 {
-                    throw new Exception($"{converter.GetType()} could not convert {value ?? "<null>"} for {property.PropertyName}");
-                }
+                    if (!converter.TryConvertFrom(value, out string oldValue))
+                    {
+                        throw new Exception($"{converter.GetType()} could not convert {value ?? "<null>"} for {property.PropertyName}");
+                    }
 
-                if (!string.Equals(newValue, oldValue))
-                {
-                    yield return (property.PropertyName, newValue);
+                    if (!string.Equals(newValue, oldValue))
+                    {
+                        yield return (property.PropertyName, newValue);
+                    }
                 }
             }
         }

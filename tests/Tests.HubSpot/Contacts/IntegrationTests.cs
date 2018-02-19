@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture.AutoMoq;
 using AutoFixture.NUnit3;
+using HubSpot;
 using HubSpot.Contacts;
 using HubSpot.Converters;
 using HubSpot.Internal;
@@ -20,12 +21,16 @@ namespace Tests.Contacts
     [TestFixture]
     public class IntegrationTests
     {
+        private Mock<IHubSpotClient> mockHubSpotClient;
         private Mock<IHubSpotContactClient> mockClient;
 
         [SetUp]
         public void Initialize()
         {
             mockClient = new Mock<IHubSpotContactClient>();
+
+            mockHubSpotClient = new Mock<IHubSpotClient>();
+            mockHubSpotClient.SetupGet(p => p.Contacts).Returns(mockClient.Object);
         }
 
         private HubSpotContactConnector CreateSystemUnderTest()
@@ -41,7 +46,7 @@ namespace Tests.Contacts
             var typeStore = new TypeStore(registrations);
             var typeManager = new ContactTypeManager(typeStore);
 
-            var connector = new HubSpotContactConnector(mockClient.Object, typeManager, Mock.Of<ILogger<HubSpotContactConnector>>());
+            var connector = new HubSpotContactConnector(mockHubSpotClient.Object, typeManager, Mock.Of<ILogger<HubSpotContactConnector>>());
 
             return connector;
         }
