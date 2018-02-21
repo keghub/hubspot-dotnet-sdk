@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Linq;
-using System.Net;
 using System.Reflection;
-using System.Threading.Tasks;
-using HubSpot.Model;
 
 namespace HubSpot.Internal
 {
@@ -19,7 +15,7 @@ namespace HubSpot.Internal
             _typeStore = typeStore ?? throw new ArgumentNullException(nameof(typeStore));
         }
 
-        public T ConvertTo<T>(THubSpot item)
+        public virtual T ConvertTo<T>(THubSpot item)
             where T : class, TEntity, new()
         {
             var entity = new T();
@@ -33,7 +29,7 @@ namespace HubSpot.Internal
             return entity;
         }
 
-        private void SetDefaultProperties<T>(THubSpot item, T entity)
+        protected void SetDefaultProperties<T>(THubSpot item, T entity)
             where T : class, TEntity, new()
         {
             var defaultProperties = _typeStore.GetDefaultProperties<THubSpot, T>();
@@ -58,7 +54,7 @@ namespace HubSpot.Internal
             }
         }
 
-        private IEnumerable<PropertyData> SetCustomProperties<T>(THubSpot item, T entity)
+        protected IEnumerable<PropertyData> SetCustomProperties<T>(THubSpot item, T entity)
             where T : class, TEntity, new()
         {
             var customProperties = _typeStore.GetCustomProperties<THubSpot, T>();
@@ -69,7 +65,6 @@ namespace HubSpot.Internal
                          from hp in hubspotProperties
                          let propertyName = GetPropertyName(ep)
                          where string.Equals(propertyName, hp.Key, StringComparison.OrdinalIgnoreCase)
-                         where HasCustomProperty(item, hp.Key)
                          select new
                          {
                              propertyName = hp.Key,

@@ -34,7 +34,7 @@ namespace TestClient
             var typeStore = new TypeStore(registrations);
             var typeManager = new ContactTypeManager(typeStore);
 
-            var connector = new HubSpotContactConnector(hubspot.Contacts, typeManager, loggerFactory.CreateLogger<HubSpotContactConnector>());
+            var connector = new HubSpotContactConnector(hubspot, typeManager, loggerFactory.CreateLogger<HubSpotContactConnector>());
 
             try
             {

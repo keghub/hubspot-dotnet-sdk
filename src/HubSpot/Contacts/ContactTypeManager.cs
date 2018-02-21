@@ -5,7 +5,9 @@ using HubSpotContact = HubSpot.Model.Contacts.Contact;
 
 namespace HubSpot.Contacts
 {
-    public class ContactTypeManager : TypeManager<HubSpotContact, Contact>
+    public interface IContactTypeManager : ITypeManager<HubSpotContact, Contact> { }
+
+    public class ContactTypeManager : TypeManager<HubSpotContact, Contact>, IContactTypeManager
     {
         public ContactTypeManager(ITypeStore typeStore) : base(typeStore) { }
 
