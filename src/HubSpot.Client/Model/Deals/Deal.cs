@@ -16,13 +16,32 @@ namespace HubSpot.Model.Deals
         public bool IsDeleted { get; set; }
 
         [JsonProperty("associations")]
-        public IReadOnlyDictionary<string, IReadOnlyList<long>> Associations { get; set; }
+        public AssociationList Associations { get; set; } = AssociationList.Empty;
 
         [JsonProperty("properties")]
         public IReadOnlyDictionary<string, VersionedProperty> Properties { get; set; }
 
         [JsonProperty("imports")]
         public IReadOnlyList<Import> Imports { get; set; }
+    }
+
+    public class AssociationList
+    {
+        [JsonProperty("associatedCompanyIds")]
+        public IReadOnlyList<long> Companies { get; set; }
+
+        [JsonProperty("associatedVids")]
+        public IReadOnlyList<long> Contacts { get; set; }
+
+        [JsonProperty("associatedDealIds")]
+        public IReadOnlyList<long> Deals { get; set; }
+
+        public static readonly AssociationList Empty = new AssociationList
+        {
+            Contacts = Array.Empty<long>(),
+            Companies = Array.Empty<long>(),
+            Deals = Array.Empty<long>()
+        };
     }
 
     public class VersionedProperty : IVersionedProperty
@@ -40,7 +59,7 @@ namespace HubSpot.Model.Deals
         public string SourceId { get; set; }
 
         [JsonProperty("versions")]
-        public IReadOnlyList<Companies.TimestampedValue> Versions { get; set; }
+        public IReadOnlyList<TimestampedValue> Versions { get; set; }
 
         IReadOnlyList<ITimestampedValue> IVersionedProperty.Versions => Versions;
     }
