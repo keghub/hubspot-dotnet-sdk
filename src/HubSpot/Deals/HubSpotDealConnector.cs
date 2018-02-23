@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using HubSpot.Internal;
@@ -25,9 +26,9 @@ namespace HubSpot.Deals
         {
             var hubspotContact = await _client.Deals.GetByIdAsync(dealId, includePropertyVersions: false).ConfigureAwait(false);
 
-            var contact = _typeManager.ConvertTo<TDeal>(hubspotContact);
+            var deal = _typeManager.ConvertTo<TDeal>(hubspotContact);
 
-            return contact;
+            return deal;
         }
 
         public async Task<TDeal> SaveAsync<TDeal>(TDeal deal)
@@ -69,8 +70,20 @@ namespace HubSpot.Deals
 
             bool IsNew()
             {
-                return deal.Id == 0;
+                return deal.Id == 0 && deal.Created == default;
             }
+        }
+
+        public async Task<IReadOnlyList<TDeal>> FindDeals<TDeal>(IDealFilter filter = null)
+            where TDeal : Deal, new()
+        {
+            filter = filter ?? FilterDeals.All;
+
+            var properties = _typeManager.GetCustomProperties<TDeal>(TypeManager.AllProperties).Select(p => new Property(p.metadata.PropertyName)).ToArray();
+
+            var matchingDeals = await filter.GetDeals(_client, properties);
+
+            return matchingDeals.Select(_typeManager.ConvertTo<TDeal>).ToArray();
         }
     }
 }

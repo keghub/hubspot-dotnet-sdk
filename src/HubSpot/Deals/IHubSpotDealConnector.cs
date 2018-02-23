@@ -1,5 +1,5 @@
-﻿using System.Threading.Tasks;
-using HubSpot.Model.Contacts;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HubSpot.Deals
 {
@@ -10,6 +10,9 @@ namespace HubSpot.Deals
 
         Task<TDeal> SaveAsync<TDeal>(TDeal deal)
             where TDeal : Deal, new();
+
+        Task<IReadOnlyList<TDeal>> FindDeals<TDeal>(IDealFilter filter = null)
+            where TDeal : Deal, new();
     }
 
     public static class HubSpotDealConnectorExtensions
@@ -17,5 +20,8 @@ namespace HubSpot.Deals
         public static Task<Deal> GetByIdAsync(this IHubSpotDealConnector connector, long dealId) => connector.GetByIdAsync<Deal>(dealId);
 
         public static Task<Deal> SaveAsync(this IHubSpotDealConnector connector, Deal deal) => connector.SaveAsync(deal);
+
+        public static Task<IReadOnlyList<Deal>> FindDeals(this IHubSpotDealConnector connector, IDealFilter filter) => connector.FindDeals<Deal>(filter);
     }
+
 }
