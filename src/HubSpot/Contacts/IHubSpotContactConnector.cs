@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace HubSpot.Contacts
 {
@@ -15,6 +16,9 @@ namespace HubSpot.Contacts
 
         Task<TContact> SaveAsync<TContact>(TContact contact)
             where TContact : Contact, new();
+
+        Task<IReadOnlyList<TContact>> FindContacts<TContact>(IContactFilter filter = null)
+            where TContact : Contact, new();
     }
 
     public static class HubSpotContactConnectorExtensions
@@ -26,5 +30,7 @@ namespace HubSpot.Contacts
         public static Task<Contact> GetByUserTokenAsync(this IHubSpotContactConnector connector, string userToken) => connector.GetByUserTokenAsync<Contact>(userToken);
 
         public static Task<Contact> SaveAsync(this IHubSpotContactConnector connector, Contact contact) => connector.SaveAsync(contact);
+
+        public static Task<IReadOnlyList<Contact>> FindContacts(this IHubSpotContactConnector connector, IContactFilter filter = null) => connector.FindContacts<Contact>(filter);
     }
 }

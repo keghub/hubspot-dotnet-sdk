@@ -100,5 +100,18 @@ namespace HubSpot.Contacts
                 return contact.Id == 0;
             }
         }
+
+        public async Task<IReadOnlyList<TContact>> FindContacts<TContact>(IContactFilter filter = null)
+            where TContact : Contact, new()
+        {
+            filter = filter ?? FilterContacts.All;
+
+            var properties = _typeManager.GetCustomProperties<TContact>(TypeManager.AllProperties).Select(p => new Property(p.metadata.PropertyName)).ToArray();
+
+            var matchingDeals = await filter.GetContacts(_client, properties);
+
+            return matchingDeals.Select(_typeManager.ConvertTo<TContact>).ToArray();
+
+        }
     }
 }
