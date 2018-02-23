@@ -42,14 +42,28 @@ namespace HubSpot.Deals
 
             ((IHubSpotEntity)entity).Properties = properties.ToDictionary(k => k.PropertyName, i => i.Value);
 
-            ((IHubSpotDealEntity)entity).Associations = new Dictionary<string, IReadOnlyList<long>>
-            {
-                [AssociatedCompanyIds] = new List<long>(item.Associations.Companies),
-                [AssociatedContactIds] = new List<long>(item.Associations.Contacts),
-                [AssociatedDealIds] = new List<long>(item.Associations.Deals)
-            };
+            SetAssociations(item, entity);
 
             return entity;
+        }
+
+        private void SetAssociations<T>(HubSpotDeal item, T entity) 
+            where T : Deal, new()
+        {
+            var companies = new List<long>(item.Associations.Companies);
+            var contacts = new List<long>(item.Associations.Contacts);
+            var deals = new List<long>(item.Associations.Deals);
+            
+            ((IHubSpotDealEntity)entity).Associations = new Dictionary<string, IReadOnlyList<long>>
+            {
+                [AssociatedCompanyIds] = companies,
+                [AssociatedContactIds] = contacts,
+                [AssociatedDealIds] = deals
+            };
+
+            entity.AssociatedCompanyIds = companies;
+            entity.AssociatedContactIds = contacts;
+            entity.AssociatedDealIds = deals;
         }
 
         protected override IReadOnlyList<KeyValuePair<string, string>> GetCustomProperties(HubSpotDeal item)

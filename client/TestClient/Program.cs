@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HubSpot;
 using HubSpot.Contacts;
 using HubSpot.Converters;
+using HubSpot.Deals;
 using HubSpot.Internal;
 using HubSpot.Model;
 using HubSpot.Model.Contacts;
@@ -16,7 +17,7 @@ namespace TestClient
     {
         static async Task Main(string[] args)
         {
-            var loggerFactory = new LoggerFactory().AddConsole((s, l) => l >= LogLevel.Information);
+            var loggerFactory = new LoggerFactory().AddConsole((s, l) => l >= LogLevel.Trace);
             var logger = loggerFactory.CreateLogger<Program>();
 
             HubSpotAuthenticator authenticator = new ApiKeyHubSpotAuthenticator(Environment.GetEnvironmentVariable("HUBSPOT_APIKEY"));
@@ -29,31 +30,25 @@ namespace TestClient
                 new TypeConverterRegistration { Converter = new LongTypeConverter(), Type = typeof(long?) },
                 new TypeConverterRegistration { Converter = new DateTimeTypeConverter(), Type = typeof(DateTimeOffset) },
                 new TypeConverterRegistration { Converter = new DateTimeTypeConverter(), Type = typeof(DateTimeOffset?) },
+                new TypeConverterRegistration { Converter = new IntTypeConverter(), Type = typeof(int) },
+                new TypeConverterRegistration { Converter = new IntTypeConverter(), Type = typeof(int?) },
+                new TypeConverterRegistration { Converter = new DecimalTypeConverter(), Type = typeof(decimal) },
+                new TypeConverterRegistration { Converter = new DecimalTypeConverter(), Type = typeof(decimal?) },
             };
 
             var typeStore = new TypeStore(registrations);
-            var typeManager = new ContactTypeManager(typeStore);
+            var typeManager = new DealTypeManager(typeStore);
 
-            var connector = new HubSpotContactConnector(hubspot, typeManager, loggerFactory.CreateLogger<HubSpotContactConnector>());
+            var connector = new HubSpotDealConnector(hubspot, typeManager, loggerFactory.CreateLogger<HubSpotDealConnector>());
+            
 
             try
             {
-                var me = await connector.GetByIdAsync(4448901);
+                var dealId = 212898453;
 
-                logger.LogInformation(me, c => $"Found {c.FirstName} {c.LastName} ({c.Email})");
+                var deals = await connector.FindDeals<Deal>(FilterDeals.RecentlyCreated);
 
-                var company = await hubspot.Companies.GetByIdAsync(me.AssociatedCompanyId);
-
-                logger.LogInformation(company, c => $"Found {c.Properties["name"].Value}");
-
-                var contactIds = await hubspot.Companies.GetContactIdsInCompanyAsync(company.Id);
-
-                foreach (var contactId in contactIds.ContactIds)
-                {
-                    var contact = await connector.GetByIdAsync(contactId);
-
-                    Console.WriteLine($"Found {contact.Id}: {contact.FirstName} {contact.LastName} ({contact.Email})");
-                }
+                Console.WriteLine($"Found {deals.Count} deals.");
             }
             catch (Exception ex)
             {
