@@ -24,5 +24,7 @@ namespace HubSpot.Contacts
         public static IContactFilter ById(params long[] ids) => new IdContactFilter(ids);
 
         public static IContactFilter Query(string searchQuery) => new SearchContactFilter(searchQuery);
+
+        public static IContactFilter ByCompanyId(long companyId) => new CompanyContactFilter(companyId);
     }
 }

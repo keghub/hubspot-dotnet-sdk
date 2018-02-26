@@ -36,5 +36,67 @@ namespace HubSpot.Internal
 
             return Array.Empty<TValue>();
         }
+
+        public static IEnumerable<IEnumerable<T>> Batch<T>(this IEnumerable<T> items, int size) => Batch(items, size, f => f);
+
+        public static IEnumerable<TResult> Batch<TSource, TResult>(this IEnumerable<TSource> items, int size, Func<IEnumerable<TSource>, TResult> selector)
+        {
+            if (size <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(size));
+            }
+
+            if (items == null)
+            {
+                return Enumerable.Empty<TResult>();
+            }
+
+            if (selector == null)
+            {
+                throw new ArgumentNullException(nameof(selector));
+            }
+
+            return Batch();
+
+            IEnumerable<TResult> Batch()
+            {
+                TSource[] bucket = null;
+
+                var count = 0;
+
+                using (var enumerator = items.GetEnumerator())
+                {
+
+                    while (enumerator.MoveNext())
+                    {
+                        var item = enumerator.Current;
+
+                        if (bucket == null)
+                        {
+                            bucket = new TSource[size];
+                        }
+
+                        bucket[count++] = item;
+
+                        if (count != size)
+                        {
+                            continue;
+                        }
+
+                        yield return selector(bucket);
+
+                        bucket = null;
+
+                        count = 0;
+                    }
+
+                    if (bucket != null && count > 0)
+                    {
+                        Array.Resize(ref bucket, count);
+                        yield return selector(bucket);
+                    }
+                }
+            }
+        }
     }
 }

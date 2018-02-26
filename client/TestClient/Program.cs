@@ -37,18 +37,21 @@ namespace TestClient
             };
 
             var typeStore = new TypeStore(registrations);
-            var typeManager = new DealTypeManager(typeStore);
+            var typeManager = new ContactTypeManager(typeStore);
 
-            var connector = new HubSpotDealConnector(hubspot, typeManager, loggerFactory.CreateLogger<HubSpotDealConnector>());
+            var connector = new HubSpotContactConnector(hubspot, typeManager, loggerFactory.CreateLogger<HubSpotContactConnector>());
             
 
             try
             {
-                var dealId = 212898453;
+                var me = await connector.GetByIdAsync(4448901);
 
-                var deals = await connector.FindDeals<Deal>(FilterDeals.RecentlyCreated);
+                var companyMembers = await connector.FindContacts(FilterContacts.ByCompanyId(me.AssociatedCompanyId));
 
-                Console.WriteLine($"Found {deals.Count} deals.");
+                foreach (var member in companyMembers)
+                {
+                    Console.WriteLine($"{member.Id} {member.FirstName} {member.LastName} {member.Email}");
+                }
             }
             catch (Exception ex)
             {
