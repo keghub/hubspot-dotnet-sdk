@@ -55,5 +55,12 @@ namespace HubSpot.Model.Companies
 
         [JsonProperty("hasMore")]
         public bool HasMore { get; set; }
+
+        public void Deconstruct(out IReadOnlyList<long> items, out bool hasMore, out long? offset)
+        {
+            items = ContactIds;
+            hasMore = HasMore;
+            offset = Offset;
+        }
     }
 }
