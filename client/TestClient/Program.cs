@@ -46,7 +46,7 @@ namespace TestClient
             {
                 var me = await connector.GetByIdAsync(4448901);
 
-                var companyMembers = await connector.FindContacts(FilterContacts.ByCompanyId(me.AssociatedCompanyId));
+                var companyMembers = await connector.FindContactsAsync(FilterContacts.ByCompanyId(me.AssociatedCompanyId));
 
                 foreach (var member in companyMembers)
                 {

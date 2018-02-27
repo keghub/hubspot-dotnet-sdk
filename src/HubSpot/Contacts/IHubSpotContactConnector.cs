@@ -17,7 +17,7 @@ namespace HubSpot.Contacts
         Task<TContact> SaveAsync<TContact>(TContact contact)
             where TContact : Contact, new();
 
-        Task<IReadOnlyList<TContact>> FindContacts<TContact>(IContactFilter filter = null)
+        Task<IReadOnlyList<TContact>> FindContactsAsync<TContact>(IContactFilter filter = null)
             where TContact : Contact, new();
     }
 
@@ -31,6 +31,6 @@ namespace HubSpot.Contacts
 
         public static Task<Contact> SaveAsync(this IHubSpotContactConnector connector, Contact contact) => connector.SaveAsync(contact);
 
-        public static Task<IReadOnlyList<Contact>> FindContacts(this IHubSpotContactConnector connector, IContactFilter filter = null) => connector.FindContacts<Contact>(filter);
+        public static Task<IReadOnlyList<Contact>> FindContactsAsync(this IHubSpotContactConnector connector, IContactFilter filter = null) => connector.FindContactsAsync<Contact>(filter);
     }
 }

@@ -1,0 +1,37 @@
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Moq;
+using Moq.Language;
+using NUnit.Framework;
+
+namespace Tests
+{
+    public static class TestExtensions
+    {
+        public static bool IsSupersetOf<T>(this IEnumerable<T> superset, IEnumerable<T> subset)
+        {
+            CollectionAssert.IsSupersetOf(superset, subset);
+            return true;
+        }
+
+        public static ISetupSequentialResult<T> ReturnsSequence<T>(this ISetupSequentialResult<T> setup, IEnumerable<T> results)
+        {
+            foreach (var item in results)
+            {
+                setup.Returns(item);
+            }
+
+            return setup;
+        }
+
+        public static ISetupSequentialResult<Task<T>> ReturnsSequenceAsync<T>(this ISetupSequentialResult<Task<T>> setup, IEnumerable<T> results)
+        {
+            foreach (var item in results)
+            {
+                setup.ReturnsAsync(item);
+            }
+
+            return setup;
+        }
+    }
+}
