@@ -48,7 +48,7 @@ namespace HubSpot.Model
         public ValuedProperty(string propertyName, string value)
         {
             Property = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
-            Value = value ?? throw new ArgumentNullException(nameof(value));
+            Value = value;
         }
 
         [JsonProperty("property")]

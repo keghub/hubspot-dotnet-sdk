@@ -90,8 +90,6 @@ namespace HubSpot.Deals
             };
         }
 
-        protected override bool HasCustomProperty(HubSpotDeal item, string propertyName) => item.Properties.ContainsKey(propertyName);
-
         public IReadOnlyList<(AssociationType type, Operation operation, long id)> GetModifiedAssociations<T>(T item)
             where T : Deal, new()
         {

@@ -37,6 +37,26 @@ namespace HubSpot.Internal
             return Array.Empty<TValue>();
         }
 
+        public static object DefaultValue(this Type type)
+        {
+            if (type.IsValueType && Nullable.GetUnderlyingType(type) == null)
+            {
+                return Activator.CreateInstance(type);
+            }
+
+            return null;
+        }
+
+        public static bool IsDefaultValue(this object obj)
+        {
+            if (obj == null)
+            {
+                return true;
+            }
+
+            return obj.Equals(obj.GetType().DefaultValue());
+        }
+
         public static IEnumerable<IEnumerable<T>> Batch<T>(this IEnumerable<T> items, int size) => Batch(items, size, f => f);
 
         public static IEnumerable<TResult> Batch<TSource, TResult>(this IEnumerable<TSource> items, int size, Func<IEnumerable<TSource>, TResult> selector)

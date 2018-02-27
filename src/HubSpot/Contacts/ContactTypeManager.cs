@@ -34,7 +34,5 @@ namespace HubSpot.Contacts
                 new KeyValuePair<string, object>("profile-url", item.ProfileUrl)
             };
         }
-
-        protected override bool HasCustomProperty(HubSpotContact item, string propertyName) => item.Properties.ContainsKey(propertyName);
     }
 }

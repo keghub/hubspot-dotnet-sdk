@@ -107,8 +107,6 @@ namespace HubSpot.Internal
 
         protected abstract IReadOnlyList<KeyValuePair<string, object>> GetDefaultProperties(THubSpot item);
 
-        protected abstract bool HasCustomProperty(THubSpot item, string propertyName);
-
         public IReadOnlyList<(string name, string value)> GetModifiedProperties<T>(T item)
             where T : class, TEntity, new()
         {
@@ -127,34 +125,46 @@ namespace HubSpot.Internal
             return modifiedProperties.ToArray();
         }
 
-        private IEnumerable<(string name, string value)> GetModifiedProperties(IEnumerable<PropertyData> data, IHubSpotEntity entity)
+        private IEnumerable<(string name, string value)> GetModifiedProperties(IEnumerable<PropertyData> currentValues, IHubSpotEntity entity)
         {
-            foreach (var property in data)
+            var oldValues = entity.Properties;
+
+            foreach (var property in currentValues)
             {
-                if (!_typeStore.TryGetTypeConverter(property.Value.GetType(), out var converter))
+                if (!property.Value.IsDefaultValue())
                 {
-                    throw new Exception($"Converter not found for {property.Value.GetType()}");
-                }
+                    if (!_typeStore.TryGetTypeConverter(property.Value.GetType(), out var converter))
+                    {
+                        throw new Exception($"Converter not found for {property.Value.GetType()}");
+                    }
 
-                if (!converter.TryConvertFrom(property.Value, out var newValue))
-                {
-                    throw new Exception($"{converter.GetType()} could not convert {property.Value ?? "<null>"} for {property.PropertyName}");
-                }
+                    if (!converter.TryConvertFrom(property.Value, out var newValue))
+                    {
+                        throw new Exception($"{converter.GetType()} could not convert {property.Value ?? "<null>"} for {property.PropertyName}");
+                    }
 
-                if (!entity.Properties.TryGetValue(property.PropertyName, out var value))
-                {
-                    yield return (property.PropertyName, newValue);
+                    if (!oldValues.TryGetValue(property.PropertyName, out var value))
+                    {
+                        yield return (property.PropertyName, newValue);
+                    }
+                    else
+                    {
+                        if (!converter.TryConvertFrom(value, out var oldValue))
+                        {
+                            throw new Exception($"{converter.GetType()} could not convert {value ?? "<null>"} for {property.PropertyName}");
+                        }
+
+                        if (!string.Equals(newValue, oldValue))
+                        {
+                            yield return (property.PropertyName, newValue);
+                        }
+                    }
                 }
                 else
                 {
-                    if (!converter.TryConvertFrom(value, out string oldValue))
+                    if (oldValues.TryGetValue(property.PropertyName, out var value) && value != null)
                     {
-                        throw new Exception($"{converter.GetType()} could not convert {value ?? "<null>"} for {property.PropertyName}");
-                    }
-
-                    if (!string.Equals(newValue, oldValue))
-                    {
-                        yield return (property.PropertyName, newValue);
+                        yield return (property.PropertyName, null);
                     }
                 }
             }

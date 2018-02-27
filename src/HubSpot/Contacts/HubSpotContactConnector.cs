@@ -76,42 +76,42 @@ namespace HubSpot.Contacts
                 throw new ArgumentNullException(nameof(contact));
             }
 
-            var properties = (from property in _typeManager.GetModifiedProperties(contact)
-                              select new ValuedProperty(property.name, property.value)).ToArray();
+            var modifiedProperties = (from property in _typeManager.GetModifiedProperties(contact)
+                                      select new ValuedProperty(property.name, property.value)).ToArray();
 
-
-            if (IsNewContact())
+            if (modifiedProperties.Any())
             {
-                var newContact = await _client.Contacts.CreateAsync(properties.ToArray());
-                return _typeManager.ConvertTo<TContact>(newContact);
-            }
-
-            if (properties.Any())
-            {
-                await _client.Contacts.UpdateByIdAsync(contact.Id, properties.ToArray());
-                var newContact = await GetByIdAsync<TContact>(contact.Id);
-                return newContact;
+                if (IsNewContact())
+                {
+                    var newContact = await _client.Contacts.CreateAsync(modifiedProperties);
+                    return _typeManager.ConvertTo<TContact>(newContact);
+                }
+                else
+                {
+                    await _client.Contacts.UpdateByIdAsync(contact.Id, modifiedProperties);
+                    var newContact = await GetByIdAsync<TContact>(contact.Id);
+                    return newContact;
+                }
             }
 
             return contact;
 
             bool IsNewContact()
             {
-                return contact.Id == 0;
+                return contact.Id == 0 && contact.Created == default;
             }
         }
 
-        public async Task<IReadOnlyList<TContact>> FindContacts<TContact>(IContactFilter filter = null)
+        public async Task<IReadOnlyList<TContact>> FindContactsAsync<TContact>(IContactFilter filter = null)
             where TContact : Contact, new()
         {
             filter = filter ?? FilterContacts.All;
 
             var properties = _typeManager.GetCustomProperties<TContact>(TypeManager.AllProperties).Select(p => new Property(p.metadata.PropertyName)).ToArray();
 
-            var matchingDeals = await filter.GetContacts(_client, properties);
+            var matchingContacts = await filter.GetContacts(_client, properties);
 
-            return matchingDeals.Select(_typeManager.ConvertTo<TContact>).ToArray();
-
+            return matchingContacts.Select(_typeManager.ConvertTo<TContact>).ToArray();
         }
     }
 }
