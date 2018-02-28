@@ -31,7 +31,7 @@ namespace HubSpot.Model.Contacts
         public string Query { get; set; }
 
         [JsonProperty("offset")]
-        public long Offset { get; set; }
+        public long? Offset { get; set; }
 
         [JsonProperty("has-more")]
         public bool HasMore { get; set; }
