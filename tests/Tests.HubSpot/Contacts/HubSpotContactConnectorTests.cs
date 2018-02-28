@@ -34,7 +34,6 @@ namespace Tests.Contacts
             mockHubSpotClient.SetupGet(p => p.Contacts).Returns(() => mockContactClient.Object);
         }
 
-
         private HubSpotContactConnector CreateSystemUnderTest()
         {
             return new HubSpotContactConnector(mockHubSpotClient.Object, mockTypeManager.Object, Mock.Of<ILogger<HubSpotContactConnector>>());
