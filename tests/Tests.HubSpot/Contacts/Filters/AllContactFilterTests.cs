@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoFixture;
+using AutoFixture.AutoMoq;
 using AutoFixture.NUnit3;
 using HubSpot;
 using HubSpot.Contacts.Filters;
@@ -11,6 +13,7 @@ using HubSpot.Model;
 using HubSpot.Model.Contacts;
 using Moq;
 using NUnit.Framework;
+using ContactList = HubSpot.Model.Contacts.ContactList;
 
 namespace Tests.Contacts.Filters
 {
