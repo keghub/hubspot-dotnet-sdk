@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
-using HubSpot.Deals;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("Tests.HubSpot")]
+[assembly: InternalsVisibleTo("Tests.Integrations")]
+
 
 namespace HubSpot.Internal
 {
