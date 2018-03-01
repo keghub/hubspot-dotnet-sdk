@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoFixture.Kernel;
 using Moq;
 using Moq.Language;
+using Moq.Language.Flow;
 using NUnit.Framework;
 
 namespace Tests
@@ -11,6 +13,12 @@ namespace Tests
         public static bool IsSupersetOf<T>(this IEnumerable<T> superset, IEnumerable<T> subset)
         {
             CollectionAssert.IsSupersetOf(superset, subset);
+            return true;
+        }
+
+        public static bool IsEquivalentOf<T>(this IEnumerable<T> first, IEnumerable<T> second)
+        {
+            CollectionAssert.AreEquivalent(first, second);
             return true;
         }
 
@@ -32,6 +40,18 @@ namespace Tests
             }
 
             return setup;
+        }
+
+        public static IReturnsResult<TMock> ReturnsAsyncUsingFixture<TMock, TResult>(this IReturns<TMock, Task<TResult>> setup, ISpecimenBuilder fixture)
+            where TMock : class
+        {
+            var context = new SpecimenContext(fixture);
+
+            return setup.ReturnsAsync(() =>
+            {
+                var obj = context.Resolve(typeof(TResult));
+                return (TResult)obj;
+            });
         }
     }
 }
