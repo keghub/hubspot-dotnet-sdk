@@ -122,7 +122,7 @@ namespace Tests.Contacts
 
             var sut = CreateSystemUnderTest();
 
-            var result = await sut.FindContactsAsync<TestContact>(mockFilter.Object);
+            var result = await sut.FindAsync<TestContact>(mockFilter.Object);
 
             CollectionAssert.AreEquivalent(result, expected);
         }

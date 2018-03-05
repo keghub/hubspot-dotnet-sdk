@@ -22,46 +22,17 @@ namespace HubSpot.Contacts
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<TContact> GetByIdAsync<TContact>(long contactId)
+        public async Task<TContact> GetAsync<TContact>(IContactSelector selector)
             where TContact : Contact, new()
         {
-            var properties = _typeManager.GetCustomProperties<TContact>(TypeManager.AllProperties).Select(p => new Property(p.metadata.PropertyName)).ToArray();
-
-            var hubspotContact = await _client.Contacts.GetByIdAsync(contactId, properties, PropertyMode.ValueOnly, FormSubmissionMode.None, false).ConfigureAwait(false);
-
-            var contact = _typeManager.ConvertTo<TContact>(hubspotContact);
-
-            return contact;
-        }
-
-        public async Task<TContact> GetByEmailAsync<TContact>(string email)
-            where TContact : Contact, new()
-        {
-            if (email == null)
+            if (selector == null)
             {
-                throw new ArgumentNullException(nameof(email));
+                throw new ArgumentNullException(nameof(selector));
             }
 
             var properties = _typeManager.GetCustomProperties<TContact>(TypeManager.AllProperties).Select(p => new Property(p.metadata.PropertyName)).ToArray();
 
-            var hubspotContact = await _client.Contacts.GetByEmailAsync(email, properties, PropertyMode.ValueOnly, FormSubmissionMode.None, false).ConfigureAwait(false);
-
-            var contact = _typeManager.ConvertTo<TContact>(hubspotContact);
-
-            return contact;
-        }
-
-        public async Task<TContact> GetByUserTokenAsync<TContact>(string userToken)
-            where TContact : Contact, new()
-        {
-            if (userToken == null)
-            {
-                throw new ArgumentNullException(nameof(userToken));
-            }
-
-            var properties = _typeManager.GetCustomProperties<TContact>(TypeManager.AllProperties).Select(p => new Property(p.metadata.PropertyName)).ToArray();
-
-            var hubspotContact = await _client.Contacts.GetByUserTokenAsync(userToken, properties, PropertyMode.ValueOnly, FormSubmissionMode.None, false).ConfigureAwait(false);
+            var hubspotContact = await selector.GetContact(_client, properties).ConfigureAwait(false);
 
             var contact = _typeManager.ConvertTo<TContact>(hubspotContact);
 
@@ -89,7 +60,7 @@ namespace HubSpot.Contacts
                 else
                 {
                     await _client.Contacts.UpdateByIdAsync(contact.Id, modifiedProperties);
-                    var newContact = await GetByIdAsync<TContact>(contact.Id);
+                    var newContact = await GetAsync<TContact>(SelectContact.ById(contact.Id));
                     return newContact;
                 }
             }
@@ -102,7 +73,7 @@ namespace HubSpot.Contacts
             }
         }
 
-        public async Task<IReadOnlyList<TContact>> FindContactsAsync<TContact>(IContactFilter filter = null)
+        public async Task<IReadOnlyList<TContact>> FindAsync<TContact>(IContactFilter filter = null)
             where TContact : Contact, new()
         {
             filter = filter ?? FilterContacts.All;
