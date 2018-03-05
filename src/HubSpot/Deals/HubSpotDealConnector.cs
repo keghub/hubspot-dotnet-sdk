@@ -76,7 +76,7 @@ namespace HubSpot.Deals
             }
         }
 
-        public async Task<IReadOnlyList<TDeal>> FindDeals<TDeal>(IDealFilter filter = null)
+        public async Task<IReadOnlyList<TDeal>> FindAsync<TDeal>(IDealFilter filter = null)
             where TDeal : Deal, new()
         {
             filter = filter ?? FilterDeals.All;

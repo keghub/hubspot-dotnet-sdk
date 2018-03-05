@@ -11,7 +11,7 @@ namespace HubSpot.Deals
         Task<TDeal> SaveAsync<TDeal>(TDeal deal)
             where TDeal : Deal, new();
 
-        Task<IReadOnlyList<TDeal>> FindDeals<TDeal>(IDealFilter filter = null)
+        Task<IReadOnlyList<TDeal>> FindAsync<TDeal>(IDealFilter filter = null)
             where TDeal : Deal, new();
     }
 
@@ -21,7 +21,7 @@ namespace HubSpot.Deals
 
         public static Task<Deal> SaveAsync(this IHubSpotDealConnector connector, Deal deal) => connector.SaveAsync(deal);
 
-        public static Task<IReadOnlyList<Deal>> FindDeals(this IHubSpotDealConnector connector, IDealFilter filter) => connector.FindDeals<Deal>(filter);
+        public static Task<IReadOnlyList<Deal>> FindAsync(this IHubSpotDealConnector connector, IDealFilter filter) => connector.FindAsync<Deal>(filter);
     }
 
 }
