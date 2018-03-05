@@ -5,32 +5,22 @@ namespace HubSpot.Contacts
 {
     public interface IHubSpotContactConnector
     {
-        Task<TContact> GetByIdAsync<TContact>(long contactId)
-            where TContact : Contact, new();
-
-        Task<TContact> GetByEmailAsync<TContact>(string email)
-            where TContact : Contact, new();
-
-        Task<TContact> GetByUserTokenAsync<TContact>(string userToken)
+        Task<TContact> GetAsync<TContact>(IContactSelector selector)
             where TContact : Contact, new();
 
         Task<TContact> SaveAsync<TContact>(TContact contact)
             where TContact : Contact, new();
 
-        Task<IReadOnlyList<TContact>> FindContactsAsync<TContact>(IContactFilter filter = null)
+        Task<IReadOnlyList<TContact>> FindAsync<TContact>(IContactFilter filter = null)
             where TContact : Contact, new();
     }
 
     public static class HubSpotContactConnectorExtensions
     {
-        public static Task<Contact> GetByIdAsync(this IHubSpotContactConnector connector, long contactId) => connector.GetByIdAsync<Contact>(contactId);
-
-        public static Task<Contact> GetByEmailAsync(this IHubSpotContactConnector connector, string email) => connector.GetByEmailAsync<Contact>(email);
-
-        public static Task<Contact> GetByUserTokenAsync(this IHubSpotContactConnector connector, string userToken) => connector.GetByUserTokenAsync<Contact>(userToken);
+        public static Task<Contact> GetAsync(this IHubSpotContactConnector connector, IContactSelector selector) => connector.GetAsync<Contact>(selector);
 
         public static Task<Contact> SaveAsync(this IHubSpotContactConnector connector, Contact contact) => connector.SaveAsync(contact);
 
-        public static Task<IReadOnlyList<Contact>> FindContactsAsync(this IHubSpotContactConnector connector, IContactFilter filter = null) => connector.FindContactsAsync<Contact>(filter);
+        public static Task<IReadOnlyList<Contact>> FindAsync(this IHubSpotContactConnector connector, IContactFilter filter = null) => connector.FindAsync<Contact>(filter);
     }
 }

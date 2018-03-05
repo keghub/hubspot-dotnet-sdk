@@ -27,4 +27,28 @@ namespace HubSpot.Contacts
 
         public static IContactFilter ByCompanyId(long companyId) => new CompanyContactFilter(companyId);
     }
+
+    public static class FilterContactExtensions
+    {
+        public static Task<IReadOnlyList<TContact>> FindAllAsync<TContact>(this IHubSpotContactConnector connector) where TContact : Contact, new()
+            => connector.FindAsync<TContact>(FilterContacts.All);
+
+        public static Task<IReadOnlyList<TContact>> FindRecentlyModifiedAsync<TContact>(this IHubSpotContactConnector connector) where TContact : Contact, new()
+            => connector.FindAsync<TContact>(FilterContacts.RecentlyModified);
+
+        public static Task<IReadOnlyList<TContact>> FindRecentlyCreatedAsync<TContact>(this IHubSpotContactConnector connector) where TContact : Contact, new()
+            => connector.FindAsync<TContact>(FilterContacts.RecentlyCreated);
+
+        public static Task<IReadOnlyList<TContact>> FindByEmailAsync<TContact>(this IHubSpotContactConnector connector, params string[] emails) where TContact : Contact, new()
+            => connector.FindAsync<TContact>(FilterContacts.ByEmail(emails));
+
+        public static Task<IReadOnlyList<TContact>> FindByIdAsync<TContact>(this IHubSpotContactConnector connector, params long[] ids) where TContact : Contact, new()
+            => connector.FindAsync<TContact>(FilterContacts.ById(ids));
+
+        public static Task<IReadOnlyList<TContact>> FindByCompanyIdAsync<TContact>(this IHubSpotContactConnector connector, long companyId) where TContact : Contact, new()
+            => connector.FindAsync<TContact>(FilterContacts.ByCompanyId(companyId));
+
+        public static Task<IReadOnlyList<TContact>> FindAsync<TContact>(this IHubSpotContactConnector connector, string searchQuery) where TContact : Contact, new()
+            => connector.FindAsync<TContact>(FilterContacts.Query(searchQuery));
+    }
 }
