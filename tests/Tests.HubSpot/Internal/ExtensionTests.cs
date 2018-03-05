@@ -143,8 +143,7 @@ namespace Tests.Internal
         {
             var fixture = new Fixture();
             
-            fixture.Customize<ILookup<string, int>>(c => c.FromFactory((IDictionary<string, IEnumerable<int>> input) => input.SelectMany(i => i.Value, (item, value) => new { item, value })
-                                                                                                                             .ToLookup(k => k.item.Key, v => v.value)));
+            fixture.Customizations.Add(new LookupBuilder());
 
             return fixture;
         }
