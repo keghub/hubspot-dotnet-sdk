@@ -21,12 +21,16 @@ namespace HubSpot.Deals
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<TDeal> GetByIdAsync<TDeal>(long dealId)
-            where TDeal : Deal, new()
+        public async Task<TDeal> GetAsync<TDeal>(IDealSelector selector) where TDeal : Deal, new()
         {
-            var hubspotContact = await _client.Deals.GetByIdAsync(dealId, includePropertyVersions: false).ConfigureAwait(false);
+            if (selector == null)
+            {
+                throw new ArgumentNullException(nameof(selector));
+            }
 
-            var deal = _typeManager.ConvertTo<TDeal>(hubspotContact);
+            var hubspotDeal = await selector.GetDeal(_client).ConfigureAwait(false);
+
+            var deal = _typeManager.ConvertTo<TDeal>(hubspotDeal);
 
             return deal;
         }
@@ -62,9 +66,9 @@ namespace HubSpot.Deals
                     await _client.Deals.RemoveAssociationToContactsAsync(deal.Id, modifiedAssociations.GetValues(AssociationType.Contact, Operation.Removed)).ConfigureAwait(false);
                     await _client.Deals.RemoveAssociationToCompaniesAsync(deal.Id, modifiedAssociations.GetValues(AssociationType.Company, Operation.Removed)).ConfigureAwait(false);
 
-                    var updatedDeal = await _client.Deals.GetByIdAsync(deal.Id, includePropertyVersions: false).ConfigureAwait(false);
+                    var updatedDeal = await GetAsync<TDeal>(SelectDeal.ById(deal.Id)).ConfigureAwait(false);
 
-                    return _typeManager.ConvertTo<TDeal>(updatedDeal);
+                    return updatedDeal;
                 }
             }
 
