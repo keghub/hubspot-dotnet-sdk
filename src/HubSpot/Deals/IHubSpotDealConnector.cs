@@ -5,7 +5,7 @@ namespace HubSpot.Deals
 {
     public interface IHubSpotDealConnector
     {
-        Task<TDeal> GetByIdAsync<TDeal>(long dealId)
+        Task<TDeal> GetAsync<TDeal>(IDealSelector selector)
             where TDeal : Deal, new();
 
         Task<TDeal> SaveAsync<TDeal>(TDeal deal)
@@ -17,7 +17,7 @@ namespace HubSpot.Deals
 
     public static class HubSpotDealConnectorExtensions
     {
-        public static Task<Deal> GetByIdAsync(this IHubSpotDealConnector connector, long dealId) => connector.GetByIdAsync<Deal>(dealId);
+        public static Task<Deal> GetAsync(this IHubSpotDealConnector connector, IDealSelector selector) => connector.GetAsync<Deal>(selector);
 
         public static Task<Deal> SaveAsync(this IHubSpotDealConnector connector, Deal deal) => connector.SaveAsync(deal);
 
