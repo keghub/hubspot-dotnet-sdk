@@ -39,7 +39,37 @@ namespace HubSpot.Companies
 
         public async Task<TCompany> SaveAsync<TCompany>(TCompany company) where TCompany : Company, new()
         {
-            throw new System.NotImplementedException();
+            if (company == null)
+            {
+                throw new ArgumentNullException(nameof(company));
+            }
+
+            var modifiedProperties = (from property in _typeManager.GetModifiedProperties(company)
+                                      select new ValuedPropertyV2(property.name, property.value)).ToArray();
+
+            if (modifiedProperties.Any())
+            {
+                if (IsNew())
+                {
+                    var createdCompany = await _client.Companies.CreateAsync(modifiedProperties).ConfigureAwait(false);
+                    var newCompany = await _client.Companies.GetByIdAsync(createdCompany.Id).ConfigureAwait(false);
+                    return _typeManager.ConvertTo<TCompany>(newCompany);
+                }
+                else
+                {
+                    await _client.Companies.UpdateAsync(company.Id, modifiedProperties).ConfigureAwait(false);
+                    var modifiedCompany = await _client.Companies.GetByIdAsync(company.Id).ConfigureAwait(false);
+                    return _typeManager.ConvertTo<TCompany>(modifiedCompany);
+                }
+            }
+
+            return company;
+
+            bool IsNew()
+            {
+                return company.Id == 0 && company.Created == default;
+
+            }
         }
 
         public async Task<IReadOnlyList<TCompany>> FindAsync<TCompany>(ICompanyFilter filter = null) where TCompany : Company, new()
