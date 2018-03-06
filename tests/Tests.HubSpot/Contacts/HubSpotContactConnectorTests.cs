@@ -40,12 +40,8 @@ namespace Tests.Contacts
         }
 
         [Test, AutoData]
-        public async Task GetByIdAsync_forwards_to_client(HubSpotContact contact, TestContact expected)
+        public async Task GetAsync_forwards_to_selector(HubSpotContact contact, TestContact expected)
         {
-            mockContactClient.Setup(p => p.GetByIdAsync(contact.Id, It.IsAny<IReadOnlyList<IProperty>>(), PropertyMode.ValueOnly, FormSubmissionMode.None, false))
-                             .ReturnsAsync(contact)
-                             .Verifiable();
-
             mockTypeManager.Setup(p => p.ConvertTo<TestContact>(contact))
                            .Returns(expected)
                            .Verifiable();
@@ -53,59 +49,20 @@ namespace Tests.Contacts
             mockTypeManager.Setup(p => p.GetCustomProperties<TestContact>(TypeManager.AllProperties))
                            .Returns(Array.Empty<(string, PropertyInfo, CustomPropertyAttribute)>());
 
-            var sut = CreateSystemUnderTest();
-
-            var result = await sut.GetByIdAsync<TestContact>(contact.Id);
-
-            mockContactClient.Verify();
-
-            mockTypeManager.Verify();
-        }
-
-        [Test, AutoData]
-        public async Task GetByEmailAsync_forwards_to_client(string email, HubSpotContact contact, TestContact expected)
-        {
-            mockContactClient.Setup(p => p.GetByEmailAsync(email, It.IsAny<IReadOnlyList<IProperty>>(), PropertyMode.ValueOnly, FormSubmissionMode.None, false))
-                             .ReturnsAsync(contact)
-                             .Verifiable();
-
-            mockTypeManager.Setup(p => p.ConvertTo<TestContact>(contact))
-                           .Returns(expected)
-                           .Verifiable();
-
-            mockTypeManager.Setup(p => p.GetCustomProperties<TestContact>(TypeManager.AllProperties))
-                           .Returns(Array.Empty<(string, PropertyInfo, CustomPropertyAttribute)>());
+            var mockSelector = new Mock<IContactSelector>(MockBehavior.Strict);
+            mockSelector.Setup(p => p.GetContact(It.IsAny<IHubSpotClient>(), It.IsAny<IReadOnlyList<IProperty>>()))
+                        .ReturnsAsync(contact)
+                        .Verifiable();
 
             var sut = CreateSystemUnderTest();
 
-            var result = await sut.GetByEmailAsync<TestContact>(email);
+            var result = await sut.GetAsync<TestContact>(mockSelector.Object);
 
-            mockContactClient.Verify();
-
-            mockTypeManager.Verify();
-        }
-
-        [Test, AutoData]
-        public async Task GetByUserTokenAsync_forwards_to_client(string userToken, HubSpotContact contact, TestContact expected)
-        {
-            mockContactClient.Setup(p => p.GetByUserTokenAsync(userToken, It.IsAny<IReadOnlyList<IProperty>>(), PropertyMode.ValueOnly, FormSubmissionMode.None, false))
-                             .ReturnsAsync(contact)
-                             .Verifiable();
-
-            mockTypeManager.Setup(p => p.ConvertTo<TestContact>(contact))
-                           .Returns(expected)
-                           .Verifiable();
-
-            mockTypeManager.Setup(p => p.GetCustomProperties<TestContact>(TypeManager.AllProperties))
-                           .Returns(Array.Empty<(string, PropertyInfo, CustomPropertyAttribute)>());
-
-            var sut = CreateSystemUnderTest();
-
-            var result = await sut.GetByUserTokenAsync<TestContact>(userToken);
-
-            mockContactClient.Verify();
+            Assert.That(result, Is.SameAs(expected));
 
             mockTypeManager.Verify();
+
+            mockSelector.Verify();
         }
 
         [Test, AutoData]
