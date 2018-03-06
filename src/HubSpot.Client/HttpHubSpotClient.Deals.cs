@@ -12,7 +12,7 @@ namespace HubSpot
 {
     public partial class HttpHubSpotClient : IHubSpotDealClient
     {
-        async Task<Deal> IHubSpotDealClient.CreateAsync(IReadOnlyList<long> associatedContactIds, IReadOnlyList<long> associatedCompanyIds, IReadOnlyList<ValuedProperty> properties)
+        async Task<Deal> IHubSpotDealClient.CreateAsync(IReadOnlyList<long> associatedContactIds, IReadOnlyList<long> associatedCompanyIds, IReadOnlyList<ValuedPropertyV2> properties)
         {
             if (properties == null)
             {
@@ -34,20 +34,20 @@ namespace HubSpot
             return response;
         }
 
-        async Task<Deal> IHubSpotDealClient.UpdateAsync(long dealId, IReadOnlyList<ValuedProperty> propertiesToUpdate)
+        async Task<Deal> IHubSpotDealClient.UpdateAsync(long dealId, IReadOnlyList<ValuedPropertyV2> propertiesToUpdate)
         {
             if (propertiesToUpdate == null)
             {
                 throw new ArgumentNullException(nameof(propertiesToUpdate));
             }
 
-            var list = new PropertyList { Properties = propertiesToUpdate };
-            var result = await SendAsync<PropertyList, Deal>(HttpMethod.Put, $"/deals/v1/deal/{dealId}", list);
+            var list = new PropertyList<ValuedPropertyV2> { Properties = propertiesToUpdate };
+            var result = await SendAsync<PropertyList<ValuedPropertyV2>, Deal>(HttpMethod.Put, $"/deals/v1/deal/{dealId}", list);
 
             return result;
         }
 
-        async Task IHubSpotDealClient.UpdateManyAsync(IReadOnlyList<ObjectPropertyList> dealsToUpdate)
+        async Task IHubSpotDealClient.UpdateManyAsync(IReadOnlyList<ObjectPropertyList<ValuedPropertyV2>> dealsToUpdate)
         {
             if (dealsToUpdate == null)
             {

@@ -44,7 +44,7 @@ namespace HubSpot.Deals
             }
 
             var modifiedProperties = (from property in _typeManager.GetModifiedProperties(deal)
-                                      select new ValuedProperty(property.name, property.value)).ToArray();
+                                      select new ValuedPropertyV2(property.name, property.value)).ToArray();
 
             var modifiedAssociations = _typeManager.GetModifiedAssociations(deal).ToNestedLookup(o => o.type, o => o.operation, o => o.id);
 

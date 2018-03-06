@@ -7,11 +7,11 @@ namespace HubSpot.Model.Companies
     {
         Task<Company> GetByIdAsync(long companyId);
 
-        Task<Company> CreateAsync(IReadOnlyList<ValuedProperty> properties);
+        Task<Company> CreateAsync(IReadOnlyList<ValuedPropertyV2> properties);
 
-        Task<Company> UpdateAsync(long companyId, IReadOnlyList<ValuedProperty> propertiesToUpdate);
+        Task<Company> UpdateAsync(long companyId, IReadOnlyList<ValuedPropertyV2> propertiesToUpdate);
 
-        Task UpdateManyAsync(IReadOnlyList<ObjectPropertyList> companiesToUpdate);
+        Task UpdateManyAsync(IReadOnlyList<ObjectPropertyList<ValuedPropertyV2>> companiesToUpdate);
 
         Task<DeleteCompanyResponse> DeleteAsync(long companyId);
 

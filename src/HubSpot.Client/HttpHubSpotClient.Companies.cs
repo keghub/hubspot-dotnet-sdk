@@ -18,33 +18,33 @@ namespace HubSpot
             return result;
         }
 
-        async Task<Company> IHubSpotCompanyClient.CreateAsync(IReadOnlyList<ValuedProperty> properties)
+        async Task<Company> IHubSpotCompanyClient.CreateAsync(IReadOnlyList<ValuedPropertyV2> properties)
         {
             if (properties == null)
             {
                 throw new ArgumentNullException(nameof(properties));
             }
 
-            var list = new PropertyList { Properties = properties };
-            var result = await SendAsync<PropertyList, Company>(HttpMethod.Post, "/companies/v2/companies/", list);
+            var list = new PropertyList<ValuedPropertyV2> { Properties = properties };
+            var result = await SendAsync<PropertyList<ValuedPropertyV2>, Company>(HttpMethod.Post, "/companies/v2/companies/", list);
 
             return result;
         }
 
-        async Task<Company> IHubSpotCompanyClient.UpdateAsync(long companyId, IReadOnlyList<ValuedProperty> propertiesToUpdate)
+        async Task<Company> IHubSpotCompanyClient.UpdateAsync(long companyId, IReadOnlyList<ValuedPropertyV2> propertiesToUpdate)
         {
             if (propertiesToUpdate == null)
             {
                 throw new ArgumentNullException(nameof(propertiesToUpdate));
             }
 
-            var list = new PropertyList { Properties = propertiesToUpdate };
-            var result = await SendAsync<PropertyList, Company>(HttpMethod.Put, $"/companies/v2/companies/{companyId}", list);
+            var list = new PropertyList<ValuedPropertyV2> { Properties = propertiesToUpdate };
+            var result = await SendAsync<PropertyList<ValuedPropertyV2>, Company>(HttpMethod.Put, $"/companies/v2/companies/{companyId}", list);
 
             return result;
         }
 
-        async Task IHubSpotCompanyClient.UpdateManyAsync(IReadOnlyList<ObjectPropertyList> companiesToUpdate)
+        async Task IHubSpotCompanyClient.UpdateManyAsync(IReadOnlyList<ObjectPropertyList<ValuedPropertyV2>> companiesToUpdate)
         {
             if (companiesToUpdate == null)
             {
