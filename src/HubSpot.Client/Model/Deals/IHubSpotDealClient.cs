@@ -6,11 +6,11 @@ namespace HubSpot.Model.Deals
 {
     public interface IHubSpotDealClient
     {
-        Task<Deal> CreateAsync(IReadOnlyList<long> associatedContactIds, IReadOnlyList<long> associatedCompanyIds, IReadOnlyList<ValuedProperty> properties);
+        Task<Deal> CreateAsync(IReadOnlyList<long> associatedContactIds, IReadOnlyList<long> associatedCompanyIds, IReadOnlyList<ValuedPropertyV2> properties);
 
-        Task<Deal> UpdateAsync(long dealId, IReadOnlyList<ValuedProperty> propertiesToUpdate);
+        Task<Deal> UpdateAsync(long dealId, IReadOnlyList<ValuedPropertyV2> propertiesToUpdate);
 
-        Task UpdateManyAsync(IReadOnlyList<ObjectPropertyList> dealsToUpdate);
+        Task UpdateManyAsync(IReadOnlyList<ObjectPropertyList<ValuedPropertyV2>> dealsToUpdate);
 
         Task DeleteAsync(long dealId);
 

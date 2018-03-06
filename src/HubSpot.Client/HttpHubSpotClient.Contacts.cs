@@ -219,12 +219,12 @@ namespace HubSpot
 
         async Task<Contact> IHubSpotContactClient.CreateAsync(IReadOnlyList<ValuedProperty> properties)
         {
-            var propertyList = new PropertyList
+            var propertyList = new PropertyList<ValuedProperty>
             {
                 Properties = properties
             };
 
-            var contact = await SendAsync<PropertyList, Contact>(HttpMethod.Post, "/contacts/v1/contact", propertyList);
+            var contact = await SendAsync<PropertyList<ValuedProperty>, Contact>(HttpMethod.Post, "/contacts/v1/contact", propertyList);
 
             return contact;
         }
@@ -236,7 +236,7 @@ namespace HubSpot
                 return;
             }
 
-            var propertyList = new PropertyList
+            var propertyList = new PropertyList<ValuedProperty>
             {
                 Properties = properties
             };
@@ -251,7 +251,7 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(email));
             }
 
-            var propertyList = new PropertyList
+            var propertyList = new PropertyList<ValuedProperty>
             {
                 Properties = properties
             };
@@ -266,12 +266,12 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(email));
             }
 
-            var propertyList = new PropertyList
+            var propertyList = new PropertyList<ValuedProperty>
             {
                 Properties = properties
             };
 
-            var response = await SendAsync<PropertyList, CreateOrUpdateResponse>(HttpMethod.Post, $"/contacts/v1/contact/createOrUpdate/email/{email}", propertyList);
+            var response = await SendAsync<PropertyList<ValuedProperty>, CreateOrUpdateResponse>(HttpMethod.Post, $"/contacts/v1/contact/createOrUpdate/email/{email}", propertyList);
 
             return response;
         }

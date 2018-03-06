@@ -24,26 +24,28 @@ namespace HubSpot.Model
         public string Name { get; }
 
         public ValuedProperty Value(string value) => new ValuedProperty(Name, value);
-
-        public static implicit operator Property(string name) => new Property(name);
     }
 
-    public class PropertyList
+    public class PropertyList<TProperty> where TProperty : IValuedProperty
     {
         [JsonProperty("properties")]
-        public IReadOnlyList<ValuedProperty> Properties { get; set; }
+        public IReadOnlyList<TProperty> Properties { get; set; }
     }
 
-    public class ObjectPropertyList
+    public class ObjectPropertyList<TProperty> : PropertyList<TProperty> where TProperty : IValuedProperty
     {
         [JsonProperty("objectId")]
         public long ObjectId { get; set; }
-
-        [JsonProperty("properties")]
-        public IReadOnlyList<ValuedProperty> Properties { get; set; }
     }
 
-    public class ValuedProperty
+    public interface IValuedProperty
+    {
+        string Property { get; }
+
+        string Value { get; }
+    }
+
+    public class ValuedProperty : IValuedProperty
     {
         public ValuedProperty(string propertyName, string value)
         {
@@ -52,6 +54,21 @@ namespace HubSpot.Model
         }
 
         [JsonProperty("property")]
+        public string Property { get; set; }
+
+        [JsonProperty("value")]
+        public string Value { get; set; }
+    }
+
+    public class ValuedPropertyV2 : IValuedProperty
+    {
+        public ValuedPropertyV2(string propertyName, string value)
+        {
+            Property = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
+            Value = value;
+        }
+
+        [JsonProperty("name")]
         public string Property { get; set; }
 
         [JsonProperty("value")]
