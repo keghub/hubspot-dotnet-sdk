@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using HubSpot;
+using HubSpot.Companies;
 using HubSpot.Contacts;
 using HubSpot.Converters;
 using HubSpot.Deals;
@@ -20,7 +22,8 @@ namespace TestClient
             var loggerFactory = new LoggerFactory().AddConsole((s, l) => l >= LogLevel.Trace);
             var logger = loggerFactory.CreateLogger<Program>();
 
-            HubSpotAuthenticator authenticator = new ApiKeyHubSpotAuthenticator(Environment.GetEnvironmentVariable("HUBSPOT_APIKEY"));
+            LoggingHandler logging = new LoggingHandler(loggerFactory.CreateLogger<LoggingHandler>());
+            HubSpotAuthenticator authenticator = new ApiKeyHubSpotAuthenticator(Environment.GetEnvironmentVariable("HUBSPOT_APIKEY"));// { InnerHandler = logging };
             IHubSpotClient hubspot = new HttpHubSpotClient(authenticator, loggerFactory.CreateLogger<HttpHubSpotClient>());
 
             var registrations = new[]
@@ -37,21 +40,21 @@ namespace TestClient
             };
 
             var typeStore = new TypeStore(registrations);
-            var typeManager = new ContactTypeManager(typeStore);
+            var typeManager = new CompanyTypeManager(typeStore);
 
-            var connector = new HubSpotContactConnector(hubspot, typeManager, loggerFactory.CreateLogger<HubSpotContactConnector>());
+            var connector = new HubSpotCompanyConnector(hubspot, typeManager, loggerFactory.CreateLogger<HubSpotCompanyConnector>());
             
 
             try
             {
-                var me = await connector.GetByIdAsync(4448901);
+                var companies = await connector.FindByDomainAsync("educations.com");
 
-                var companyMembers = await connector.FindAsync(FilterContacts.ByCompanyId(me.AssociatedCompanyId));
+                var emg = companies.Single();
 
-                foreach (var member in companyMembers)
-                {
-                    Console.WriteLine($"{member.Id} {member.FirstName} {member.LastName} {member.Email}");
-                }
+                emg.Name = $"Educations Media Group";
+
+                var newEmg = await connector.SaveAsync(emg);
+
             }
             catch (Exception ex)
             {
@@ -59,8 +62,36 @@ namespace TestClient
             }
 
             logger.LogInformation("OK");
+        }
+    }
 
-            Console.ReadKey();
+    public class LoggingHandler : DelegatingHandler
+    {
+        private readonly ILogger<LoggingHandler> _logger;
+
+        public LoggingHandler(ILogger<LoggingHandler> logger)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            InnerHandler = new HttpClientHandler();
+        }
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            if (request.Content != null)
+            {
+                var requestBody = await request.Content.ReadAsStringAsync();
+                _logger.LogTrace(requestBody);
+            }
+
+            var response = await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+
+            if (response.Content != null)
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                _logger.LogTrace(responseBody);
+            }
+
+            return response;
         }
     }
 }
