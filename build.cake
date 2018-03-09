@@ -45,7 +45,8 @@ Task("Test")
     var testProjects = GetFiles(testFolder, "*.csproj", SearchOption.AllDirectories);
 
     var dotCoverSettings = new DotCoverCoverSettings()
-                                    .WithFilter("+:EMG.*")
+                                    .WithFilter("+:HubSpot*")
+									.WithFilter("+:EMG.*")
                                     .WithFilter("-:Tests.*");
 
     foreach (var project in testProjects)
