@@ -67,7 +67,18 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(builder));
             }
 
-            builder.Add("propertyMode", propertyMode == PropertyMode.ValueAndHistory ? "value_and_history" : "value_only");
+            if (propertyMode == PropertyMode.ValueAndHistory)
+            {
+                builder.Add("propertyMode", "value_and_history");
+            }
+            else if (propertyMode == PropertyMode.ValueOnly)
+            {
+                builder.Add("propertyMode", "value_only");
+            }
+            else
+            {
+                throw new ArgumentOutOfRangeException(nameof(propertyMode));
+            }
         }
     }
 }
