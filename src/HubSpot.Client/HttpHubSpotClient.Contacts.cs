@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using HubSpot.Model;
@@ -29,7 +30,7 @@ namespace HubSpot
                 var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", builder.BuildQuery());
                 return contact;
             }
-            catch (HttpRequestException ex) when (ex.Message.Contains("404"))
+            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
                 throw new NotFoundException("Contact not found", ex);
             }
@@ -54,7 +55,7 @@ namespace HubSpot
                 var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/email/{email}/profile", builder.BuildQuery());
                 return contact;
             }
-            catch (HttpRequestException ex) when (ex.Message.Contains("404"))
+            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
                 throw new NotFoundException("Contact not found", ex);
             }
@@ -79,7 +80,7 @@ namespace HubSpot
                 var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/utk/{userToken}/profile", builder.BuildQuery());
                 return contact;
             }
-            catch (HttpRequestException ex) when (ex.Message.Contains("404"))
+            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
                 throw new NotFoundException("Contact not found", ex);
             }
