@@ -30,7 +30,7 @@ namespace HubSpot.Contacts
                 throw new ArgumentNullException(nameof(selector));
             }
 
-            var properties = _typeManager.GetCustomProperties<TContact>(TypeManager.AllProperties).Select(p => new Property(p.metadata.PropertyName)).ToArray();
+            var properties = _typeManager.GetCustomProperties<TContact>(TypeManager.AllProperties).Select(p => new Property(p.FieldName)).ToArray();
 
             var hubspotContact = await selector.GetContact(_client, properties).ConfigureAwait(false);
 
@@ -78,7 +78,7 @@ namespace HubSpot.Contacts
         {
             filter = filter ?? FilterContacts.All;
 
-            var properties = _typeManager.GetCustomProperties<TContact>(TypeManager.AllProperties).Select(p => new Property(p.metadata.PropertyName)).ToArray();
+            var properties = _typeManager.GetCustomProperties<TContact>(TypeManager.AllProperties).Select(p => new Property(p.FieldName)).ToArray();
 
             var matchingContacts = await filter.GetContacts(_client, properties);
 

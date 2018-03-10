@@ -85,7 +85,7 @@ namespace HubSpot.Deals
         {
             filter = filter ?? FilterDeals.All;
 
-            var properties = _typeManager.GetCustomProperties<TDeal>(TypeManager.AllProperties).Select(p => new Property(p.metadata.PropertyName)).ToArray();
+            var properties = _typeManager.GetCustomProperties<TDeal>(TypeManager.AllProperties).Select(p => new Property(p.FieldName)).ToArray();
 
             var matchingDeals = await filter.GetDeals(_client, properties);
 

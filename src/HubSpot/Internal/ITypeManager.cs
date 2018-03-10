@@ -10,11 +10,24 @@ namespace HubSpot.Internal
         T ConvertTo<T>(THubSpot item)
             where T : class, TEntity, new();
 
-        IReadOnlyList<(string name, PropertyInfo property, CustomPropertyAttribute metadata)> GetCustomProperties<T>(Func<CustomPropertyAttribute, bool> filter)
+        IReadOnlyList<CustomPropertyInfo> GetCustomProperties<T>(Func<CustomPropertyAttribute, bool> filter)
             where T : class, TEntity, new();
 
         IReadOnlyList<(string name, string value)> GetModifiedProperties<T>(T item)
             where T : class, TEntity, new();
+    }
+
+    public class CustomPropertyInfo
+    {
+        public string PropertyName { get; set; }
+
+        public Type PropertyType { get; set; }
+
+        public Func<object, object> ValueAccessor { get; set; }
+
+        public string FieldName { get; set; }
+
+        public bool IsReadOnly { get; set; }
     }
 
     public static class TypeManager

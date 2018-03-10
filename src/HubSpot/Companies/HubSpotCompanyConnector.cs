@@ -28,7 +28,7 @@ namespace HubSpot.Companies
                 throw new ArgumentNullException(nameof(selector));
             }
 
-            var properties = _typeManager.GetCustomProperties<TCompany>(TypeManager.AllProperties).Select(p => new Property(p.metadata.PropertyName)).ToArray();
+            var properties = _typeManager.GetCustomProperties<TCompany>(TypeManager.AllProperties).Select(p => new Property(p.FieldName)).ToArray();
 
             var hubspot = await selector.GetCompany(_client, properties).ConfigureAwait(false);
 
@@ -79,7 +79,7 @@ namespace HubSpot.Companies
                 filter = FilterCompanies.All;
             }
 
-            var properties = _typeManager.GetCustomProperties<TCompany>(TypeManager.AllProperties).Select(p => new Property(p.metadata.PropertyName)).ToArray();
+            var properties = _typeManager.GetCustomProperties<TCompany>(TypeManager.AllProperties).Select(p => new Property(p.FieldName)).ToArray();
 
             var matchingCompanies = await filter.GetCompanies(_client, properties);
 

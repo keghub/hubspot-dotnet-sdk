@@ -84,11 +84,11 @@ namespace HubSpot.Internal
             }
         }
 
-        private static string GetPropertyName(PropertyInfo property) => property.GetCustomAttribute<CustomPropertyAttribute>().PropertyName;
+        private static string GetPropertyName(PropertyInfo property) => property.GetCustomAttribute<CustomPropertyAttribute>().FieldName;
 
         private static string GetDefaultPropertyName(PropertyInfo property) => property.GetCustomAttribute<DefaultPropertyAttribute>().PropertyName;
 
-        public IReadOnlyList<(string name, PropertyInfo property, CustomPropertyAttribute metadata)> GetCustomProperties<T>(Func<CustomPropertyAttribute, bool> filter)
+        public IReadOnlyList<CustomPropertyInfo> GetCustomProperties<T>(Func<CustomPropertyAttribute, bool> filter)
             where T : class, TEntity, new()
         {
             filter = filter ?? (a => true);
@@ -98,7 +98,14 @@ namespace HubSpot.Internal
             var items = from property in customProperties
                         let attribute = Attribute.GetCustomAttribute(property, typeof(CustomPropertyAttribute)) as CustomPropertyAttribute
                         where filter(attribute)
-                        select (property.Name, property, attribute);
+                        select new CustomPropertyInfo
+                        {
+                            PropertyName = property.Name,
+                            FieldName = attribute.FieldName,
+                            IsReadOnly = attribute.IsReadOnly,
+                            PropertyType = property.PropertyType,
+                            ValueAccessor = property.GetValue
+                        };
 
             return items.ToArray();
         }
@@ -113,10 +120,10 @@ namespace HubSpot.Internal
             var properties = GetCustomProperties<T>(TypeManager.ModifiableProperties);
 
             var data = from property in properties
-                       let value = property.property.GetValue(item)
+                       let value = property.ValueAccessor(item)
                        select new PropertyData
                        {
-                           PropertyName = property.metadata.PropertyName,
+                           PropertyName = property.FieldName,
                            Value = value
                        };
 
