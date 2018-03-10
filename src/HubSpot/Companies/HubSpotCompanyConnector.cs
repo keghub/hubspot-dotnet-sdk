@@ -30,11 +30,16 @@ namespace HubSpot.Companies
 
             var properties = _typeManager.GetCustomProperties<TCompany>(TypeManager.AllProperties).Select(p => new Property(p.FieldName)).ToArray();
 
-            var hubspot = await selector.GetCompany(_client, properties).ConfigureAwait(false);
-
-            var company = _typeManager.ConvertTo<TCompany>(hubspot);
-
-            return company;
+            try
+            {
+                var hubspot = await selector.GetCompany(_client, properties).ConfigureAwait(false);
+                var company = _typeManager.ConvertTo<TCompany>(hubspot);
+                return company;
+            }
+            catch (NotFoundException)
+            {
+                return null;
+            }
         }
 
         public async Task<TCompany> SaveAsync<TCompany>(TCompany company) where TCompany : Company, new()

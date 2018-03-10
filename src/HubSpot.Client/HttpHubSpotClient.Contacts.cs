@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using HubSpot.Model;
 using HubSpot.Model.Contacts;
 using HubSpot.Model.Contacts.Properties;
-using HubSpot.Utils;
 using Kralizek.Extensions.Http;
 
 namespace HubSpot
@@ -25,9 +24,15 @@ namespace HubSpot
             builder.AddFormSubmissionMode(formSubmissionMode);
             builder.AddShowListMemberships(showListMemberships);
 
-            var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", builder.BuildQuery());
-
-            return contact;
+            try
+            {
+                var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", builder.BuildQuery());
+                return contact;
+            }
+            catch (HttpRequestException ex) when (ex.Message.Contains("404"))
+            {
+                throw new NotFoundException("Contact not found", ex);
+            }
         }
 
         async Task<Contact> IHubSpotContactClient.GetByEmailAsync(string email, IReadOnlyList<IProperty> properties, PropertyMode propertyMode, FormSubmissionMode formSubmissionMode, bool showListMemberships)
@@ -44,9 +49,15 @@ namespace HubSpot
             builder.AddFormSubmissionMode(formSubmissionMode);
             builder.AddShowListMemberships(showListMemberships);
 
-            var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/email/{email}/profile", builder.BuildQuery());
-
-            return contact;
+            try
+            {
+                var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/email/{email}/profile", builder.BuildQuery());
+                return contact;
+            }
+            catch (HttpRequestException ex) when (ex.Message.Contains("404"))
+            {
+                throw new NotFoundException("Contact not found", ex);
+            }
         }
 
         async Task<Contact> IHubSpotContactClient.GetByUserTokenAsync(string userToken, IReadOnlyList<IProperty> properties, PropertyMode propertyMode, FormSubmissionMode formSubmissionMode, bool showListMemberships)
@@ -63,9 +74,15 @@ namespace HubSpot
             builder.AddFormSubmissionMode(formSubmissionMode);
             builder.AddShowListMemberships(showListMemberships);
 
-            var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/utk/{userToken}/profile", builder.BuildQuery());
-
-            return contact;
+            try
+            {
+                var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/utk/{userToken}/profile", builder.BuildQuery());
+                return contact;
+            }
+            catch (HttpRequestException ex) when (ex.Message.Contains("404"))
+            {
+                throw new NotFoundException("Contact not found", ex);
+            }
         }
 
         async Task<IReadOnlyDictionary<long, Contact>> IHubSpotContactClient.GetManyByIdAsync(IReadOnlyList<long> contactIds, IReadOnlyList<IProperty> properties, PropertyMode propertyMode, FormSubmissionMode formSubmissionMode, bool showListMemberships, bool includeDeletes)

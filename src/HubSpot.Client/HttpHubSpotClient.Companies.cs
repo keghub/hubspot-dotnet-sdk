@@ -14,8 +14,15 @@ namespace HubSpot
     {
         async Task<Company> IHubSpotCompanyClient.GetByIdAsync(long companyId)
         {
-            var result = await SendAsync<Company>(HttpMethod.Get, $"/companies/v2/companies/{companyId}");
-            return result;
+            try
+            {
+                var result = await SendAsync<Company>(HttpMethod.Get, $"/companies/v2/companies/{companyId}");
+                return result;
+            }
+            catch (HttpRequestException ex) when (ex.Message.Contains("404"))
+            {
+                throw new NotFoundException("Company not found", ex);
+            }
         }
 
         async Task<Company> IHubSpotCompanyClient.CreateAsync(IReadOnlyList<ValuedPropertyV2> properties)
