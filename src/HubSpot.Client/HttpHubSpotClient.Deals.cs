@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using HubSpot.Model;
@@ -72,7 +73,7 @@ namespace HubSpot
                 var result = await SendAsync<Deal>(HttpMethod.Get, $"/deals/v1/deal/{dealId}", builder.BuildQuery());
                 return result;
             }
-            catch (HttpRequestException ex) when (ex.Message.Contains("404"))
+            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
                 throw new NotFoundException("Deal not found", ex);
             }
