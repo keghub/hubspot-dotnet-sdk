@@ -39,15 +39,23 @@ namespace Tests.Contacts
             return new HubSpotContactConnector(mockHubSpotClient.Object, mockTypeManager.Object, Mock.Of<ILogger<HubSpotContactConnector>>());
         }
 
-        [Test, AutoData]
-        public async Task GetAsync_forwards_to_selector(HubSpotContact contact, TestContact expected)
+        [Test]
+        public void GetAsync_requires_a_selector()
+        {
+            var sut = CreateSystemUnderTest();
+
+            Assert.ThrowsAsync<ArgumentNullException>(() => sut.GetAsync<TestContact>(null));
+        }
+
+        [Test, ContactAutoData]
+        public async Task GetAsync_forwards_to_selector(HubSpotContact contact, TestContact expected, CustomPropertyInfo[] properties)
         {
             mockTypeManager.Setup(p => p.ConvertTo<TestContact>(contact))
                            .Returns(expected)
                            .Verifiable();
 
             mockTypeManager.Setup(p => p.GetCustomProperties<TestContact>(TypeManager.AllProperties))
-                           .Returns(Array.Empty<(string, PropertyInfo, CustomPropertyAttribute)>());
+                           .Returns(properties);
 
             var mockSelector = new Mock<IContactSelector>(MockBehavior.Strict);
             mockSelector.Setup(p => p.GetContact(It.IsAny<IHubSpotClient>(), It.IsAny<IReadOnlyList<IProperty>>()))
@@ -65,15 +73,15 @@ namespace Tests.Contacts
             mockSelector.Verify();
         }
 
-        [Test, AutoData]
-        public async Task FindContacts_forwards_to_filter(HubSpotContact[] contacts, TestContact[] expected)
+        [Test, ContactAutoData]
+        public async Task FindAsync_forwards_to_filter(HubSpotContact[] contacts, TestContact[] expected, CustomPropertyInfo[] properties)
         {
             var mockFilter = new Mock<IContactFilter>();
 
             mockTypeManager.SetupSequence(p => p.ConvertTo<TestContact>(It.IsAny<HubSpotContact>())).ReturnsSequence(expected);
 
             mockTypeManager.Setup(p => p.GetCustomProperties<TestContact>(TypeManager.AllProperties))
-                           .Returns(Array.Empty<(string, PropertyInfo, CustomPropertyAttribute)>());
+                           .Returns(properties);
 
             mockFilter.Setup(p => p.GetContacts(It.IsAny<IHubSpotClient>(), It.IsAny<IReadOnlyList<IProperty>>())).ReturnsAsync(contacts);
 
@@ -82,6 +90,14 @@ namespace Tests.Contacts
             var result = await sut.FindAsync<TestContact>(mockFilter.Object);
 
             CollectionAssert.AreEquivalent(result, expected);
+        }
+
+        [Test]
+        public void SaveAsync_requires_a_contact()
+        {
+            var sut = CreateSystemUnderTest();
+
+            Assert.ThrowsAsync<ArgumentNullException>(() => sut.SaveAsync<TestContact>(null));
         }
 
         [Test, AutoData]

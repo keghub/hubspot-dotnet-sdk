@@ -49,5 +49,11 @@ namespace Tests.Contacts
         {
             Assert.That(FilterContacts.Query(query), Is.InstanceOf<SearchContactFilter>());
         }
+
+        [Test, AutoData]
+        public void ByList_returns_proper_filter(long listId)
+        {
+            Assert.That(FilterContacts.ByListId(listId), Is.InstanceOf<ListContactFilter>());
+        }
     }
 }

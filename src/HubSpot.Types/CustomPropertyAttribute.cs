@@ -7,13 +7,13 @@ namespace HubSpot
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
     public class CustomPropertyAttribute : Attribute
     {
-        public string PropertyName { get; }
+        public string FieldName { get; }
 
         public bool IsReadOnly { get; set; }
 
-        public CustomPropertyAttribute(string propertyName)
+        public CustomPropertyAttribute(string fieldName)
         {
-            PropertyName = propertyName;
+            FieldName = fieldName;
         }
     }
 }

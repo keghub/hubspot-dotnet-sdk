@@ -26,6 +26,8 @@ namespace HubSpot.Contacts
         public static IContactFilter Query(string searchQuery) => new SearchContactFilter(searchQuery);
 
         public static IContactFilter ByCompanyId(long companyId) => new CompanyContactFilter(companyId);
+
+        public static IContactFilter ByListId(long listId) => new ListContactFilter(listId);
     }
 
     public static class FilterContactExtensions
@@ -50,5 +52,8 @@ namespace HubSpot.Contacts
 
         public static Task<IReadOnlyList<TContact>> FindAsync<TContact>(this IHubSpotContactConnector connector, string searchQuery) where TContact : Contact, new()
             => connector.FindAsync<TContact>(FilterContacts.Query(searchQuery));
+
+        public static Task<IReadOnlyList<TContact>> FindInListAsync<TContact>(this IHubSpotContactConnector connector, long listId) where TContact : Contact, new()
+            => connector.FindAsync<TContact>(FilterContacts.ByListId(listId));
     }
 }
