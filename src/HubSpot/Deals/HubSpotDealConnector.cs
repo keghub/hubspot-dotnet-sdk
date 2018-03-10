@@ -28,11 +28,16 @@ namespace HubSpot.Deals
                 throw new ArgumentNullException(nameof(selector));
             }
 
-            var hubspotDeal = await selector.GetDeal(_client).ConfigureAwait(false);
-
-            var deal = _typeManager.ConvertTo<TDeal>(hubspotDeal);
-
-            return deal;
+            try
+            {
+                var hubspotDeal = await selector.GetDeal(_client).ConfigureAwait(false);
+                var deal = _typeManager.ConvertTo<TDeal>(hubspotDeal);
+                return deal;
+            }
+            catch (NotFoundException)
+            {
+                return null;
+            }
         }
 
         public async Task<TDeal> SaveAsync<TDeal>(TDeal deal)

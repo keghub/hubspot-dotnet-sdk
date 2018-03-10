@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using HubSpot;
 using HubSpot.Model;
 using HubSpot.Model.Contacts;
 using Kralizek.Extensions.Http;
@@ -14,6 +15,24 @@ namespace Tests.Contacts
     [TestFixture]
     public class GetByIdAsyncTests : ContactTests
     {
+        [Test]
+        [AutoData]
+        public void NotFoundException_is_thrown_if_404(long contactId)
+        {
+            var options = new HttpMessageOptions
+            {
+                HttpMethod = HttpMethod.Get,
+                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.NotFound)
+                {
+                    Content = JsonContent.EmptyObject
+                }
+            };
+
+            var sut = CreateSystemUnderTest(options);
+
+            Assert.ThrowsAsync<NotFoundException>(() => sut.GetByIdAsync(contactId));
+        }
+
         [Test]
         [AutoData]
         public async Task Request_absolutePath_is_correct(long contactId)

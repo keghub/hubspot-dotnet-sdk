@@ -67,9 +67,15 @@ namespace HubSpot
             var builder = new HttpQueryStringBuilder();
             builder.Add("includePropertyVersions", includePropertyVersions);
 
-            var result = await SendAsync<Deal>(HttpMethod.Get, $"/deals/v1/deal/{dealId}", builder.BuildQuery());
-
-            return result;
+            try
+            {
+                var result = await SendAsync<Deal>(HttpMethod.Get, $"/deals/v1/deal/{dealId}", builder.BuildQuery());
+                return result;
+            }
+            catch (HttpRequestException ex) when (ex.Message.Contains("404"))
+            {
+                throw new NotFoundException("Deal not found", ex);
+            }
         }
 
         async Task IHubSpotDealClient.AssociateContactsAsync(long dealId, IReadOnlyList<long> ids)

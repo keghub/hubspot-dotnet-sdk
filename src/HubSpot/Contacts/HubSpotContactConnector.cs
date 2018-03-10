@@ -32,11 +32,16 @@ namespace HubSpot.Contacts
 
             var properties = _typeManager.GetCustomProperties<TContact>(TypeManager.AllProperties).Select(p => new Property(p.FieldName)).ToArray();
 
-            var hubspotContact = await selector.GetContact(_client, properties).ConfigureAwait(false);
-
-            var contact = _typeManager.ConvertTo<TContact>(hubspotContact);
-
-            return contact;
+            try
+            {
+                var hubspotContact = await selector.GetContact(_client, properties).ConfigureAwait(false);
+                var contact = _typeManager.ConvertTo<TContact>(hubspotContact);
+                return contact;
+            }
+            catch (NotFoundException)
+            {
+                return null;
+            }
         }
 
         public async Task<TContact> SaveAsync<TContact>(TContact contact)

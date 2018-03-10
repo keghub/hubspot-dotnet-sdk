@@ -74,6 +74,29 @@ namespace Tests.Contacts
         }
 
         [Test, ContactAutoData]
+        public async Task GetAsync_returns_null_if_NotFoundException(CustomPropertyInfo[] properties)
+        {
+            mockTypeManager.Setup(p => p.GetCustomProperties<TestContact>(TypeManager.AllProperties))
+                           .Returns(properties)
+                           .Verifiable();
+
+            var mockSelector = new Mock<IContactSelector>(MockBehavior.Strict);
+            mockSelector.Setup(p => p.GetContact(It.IsAny<IHubSpotClient>(), It.IsAny<IReadOnlyList<IProperty>>()))
+                        .Throws(new NotFoundException(It.IsAny<string>(), It.IsAny<Exception>()))
+                        .Verifiable();
+
+            var sut = CreateSystemUnderTest();
+
+            var result = await sut.GetAsync<TestContact>(mockSelector.Object);
+
+            Assert.That(result, Is.Null);
+
+            mockTypeManager.Verify();
+
+            mockSelector.Verify();
+        }
+
+        [Test, ContactAutoData]
         public async Task FindAsync_forwards_to_filter(HubSpotContact[] contacts, TestContact[] expected, CustomPropertyInfo[] properties)
         {
             var mockFilter = new Mock<IContactFilter>();
