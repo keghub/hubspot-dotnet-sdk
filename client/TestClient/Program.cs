@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using HubSpot;
+using HubSpot.Authentication;
 using HubSpot.Companies;
 using HubSpot.Contacts;
 using HubSpot.Converters;
@@ -12,6 +13,7 @@ using HubSpot.Internal;
 using HubSpot.Model;
 using HubSpot.Model.Contacts;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace TestClient
 {
@@ -23,7 +25,7 @@ namespace TestClient
             var logger = loggerFactory.CreateLogger<Program>();
 
             LoggingHandler logging = new LoggingHandler(loggerFactory.CreateLogger<LoggingHandler>());
-            HubSpotAuthenticator authenticator = new ApiKeyHubSpotAuthenticator(Environment.GetEnvironmentVariable("HUBSPOT_APIKEY"));// { InnerHandler = logging };
+            HubSpotAuthenticator authenticator = GetAuthenticator();// { InnerHandler = logging };
             IHubSpotClient hubspot = new HttpHubSpotClient(authenticator, loggerFactory.CreateLogger<HttpHubSpotClient>());
 
             var registrations = new[]
@@ -40,20 +42,34 @@ namespace TestClient
             };
 
             var typeStore = new TypeStore(registrations);
-            var typeManager = new CompanyTypeManager(typeStore);
 
-            var connector = new HubSpotCompanyConnector(hubspot, typeManager, loggerFactory.CreateLogger<HubSpotCompanyConnector>());
-            
+            var companyTypeManager = new CompanyTypeManager(typeStore);
+
+            var companyConnector = new HubSpotCompanyConnector(hubspot, companyTypeManager, loggerFactory.CreateLogger<HubSpotCompanyConnector>());
+
+            var contactTypeManager = new ContactTypeManager(typeStore);
+
+            var contactConnector = new HubSpotContactConnector(hubspot, contactTypeManager, loggerFactory.CreateLogger<HubSpotContactConnector>());
+
+            var dealTypeManager = new DealTypeManager(typeStore);
+
+            var dealConnector = new HubSpotDealConnector(hubspot, dealTypeManager, loggerFactory.CreateLogger<HubSpotDealConnector>());
+
 
             try
             {
-                var companies = await connector.FindByDomainAsync("educations.com");
+                var companies = await companyConnector.FindByDomainAsync("educations.com");
 
                 var emg = companies.Single();
 
                 emg.Name = $"Educations Media Group";
 
-                var newEmg = await connector.SaveAsync(emg);
+                var members = await contactConnector.FindByCompanyIdAsync<HubSpot.Contacts.Contact>(emg.Id);
+
+                foreach (var member in members)
+                {
+                    Console.WriteLine($"{member.FirstName} {member.LastName} {member.Email}");
+                }
 
             }
             catch (Exception ex)
@@ -62,6 +78,21 @@ namespace TestClient
             }
 
             logger.LogInformation("OK");
+         }
+
+        private static HubSpotAuthenticator GetAuthenticator()
+        {
+            var options = new OptionsWrapper<OAuthOptions>(new OAuthOptions
+            {
+                ClientId = "clientId",
+                SecretKey = "secretKey",
+                RedirectUri = new Uri("https://www.hubspot.com"),
+                RefreshToken = "refreshToken"
+            });
+
+            return new OAuthHubSpotAuthenticator(options);
+
+            //return new ApiKeyHubSpotAuthenticator(Environment.GetEnvironmentVariable("HUBSPOT_APIKEY"));
         }
     }
 
