@@ -46,7 +46,7 @@ Task("Test")
 
     var dotCoverSettings = new DotCoverCoverSettings()
                                     .WithFilter("+:HubSpot*")
-									.WithFilter("+:EMG.*")
+                                    .WithFilter("+:EMG.*")
                                     .WithFilter("-:Tests.*");
 
     foreach (var project in testProjects)
