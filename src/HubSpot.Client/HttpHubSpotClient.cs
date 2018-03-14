@@ -4,6 +4,7 @@ using HubSpot.Model.Companies;
 using HubSpot.Model.Contacts;
 using HubSpot.Model.Deals;
 using HubSpot.Model.Lists;
+using HubSpot.Model.Owners;
 using HubSpot.Utils;
 using Kralizek.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -45,5 +46,7 @@ namespace HubSpot
         public IHubSpotDealClient Deals => this;
 
         public IHubSpotListClient Lists => this;
+
+        public IHubSpotOwnerClient Owners => this;
     }
 }
