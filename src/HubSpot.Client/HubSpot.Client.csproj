@@ -35,6 +35,9 @@
     <Compile Update="HttpHubSpotClient.Lists.cs">
       <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
     </Compile>
+    <Compile Update="HttpHubSpotClient.Owners.cs">
+      <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
 
 </Project>
