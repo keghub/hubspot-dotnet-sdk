@@ -18,7 +18,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\HubSpot.Client\HubSpot.Client.csproj" />
     <ProjectReference Include="..\..\src\HubSpot.NetCore.Setup\HubSpot.NetCore.Setup.csproj" />
-    <ProjectReference Include="..\..\src\HubSpot.Types\HubSpot.Types.csproj" />
     <ProjectReference Include="..\..\src\HubSpot\HubSpot.csproj" />
   </ItemGroup>
 
