@@ -8,11 +8,11 @@
     <PackageId>EMG.HubSpot</PackageId>
     <Authors>EMG</Authors>
     <Company>EMG</Company>
+    <VersionPrefix>0.1.0</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\HubSpot.Client\HubSpot.Client.csproj" />
-    <ProjectReference Include="..\HubSpot.Types\HubSpot.Types.csproj" />
   </ItemGroup>
 
 </Project>
