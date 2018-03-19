@@ -19,14 +19,14 @@ namespace Tests.Contacts
     public class HubSpotContactConnectorTests
     {
         private Mock<IHubSpotContactClient> mockContactClient;
-        private Mock<ITypeManager<HubSpotContact, HubSpot.Contacts.Contact>> mockTypeManager;
+        private Mock<IContactTypeManager> mockTypeManager;
 
         private Mock<IHubSpotClient> mockHubSpotClient;
 
         [SetUp]
         public void Initialize()
         {
-            mockTypeManager = new Mock<ITypeManager<HubSpotContact, HubSpot.Contacts.Contact>>();
+            mockTypeManager = new Mock<IContactTypeManager>();
 
             mockContactClient = new Mock<IHubSpotContactClient>();
 

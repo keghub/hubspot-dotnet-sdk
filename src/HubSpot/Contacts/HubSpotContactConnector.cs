@@ -15,7 +15,7 @@ namespace HubSpot.Contacts
         private readonly ITypeManager<Model.Contacts.Contact, Contact> _typeManager;
         private readonly ILogger<HubSpotContactConnector> _logger;
 
-        public HubSpotContactConnector(IHubSpotClient client, ITypeManager<Model.Contacts.Contact, Contact> typeManager, ILogger<HubSpotContactConnector> logger)
+        public HubSpotContactConnector(IHubSpotClient client, IContactTypeManager typeManager, ILogger<HubSpotContactConnector> logger)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _typeManager = typeManager ?? throw new ArgumentNullException(nameof(typeManager));

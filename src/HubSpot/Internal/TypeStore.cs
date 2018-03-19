@@ -18,7 +18,7 @@ namespace HubSpot.Internal
         bool TryGetTypeConverter(Type type, out ITypeConverter converter);
     }
 
-    public struct TypeConverterRegistration
+    public class TypeConverterRegistration
     {
         public Type Type { get; set; }
 
