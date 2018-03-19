@@ -1,19 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using HubSpot;
-using HubSpot.Authentication;
 using HubSpot.Companies;
 using HubSpot.Contacts;
-using HubSpot.Converters;
 using HubSpot.Deals;
-using HubSpot.Internal;
-using HubSpot.Model;
-using HubSpot.Model.Contacts;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace TestClient
 {
@@ -21,40 +18,51 @@ namespace TestClient
     {
         static async Task Main(string[] args)
         {
-            var loggerFactory = new LoggerFactory().AddConsole((s, l) => l >= LogLevel.Trace);
+            var configurationBuilder = new ConfigurationBuilder();
+
+            configurationBuilder.AddInMemoryCollection(new Dictionary<string, string>
+            {
+                ["HubSpot:ClientId"] = "<client id>",
+                ["HubSpot:SecretKey"] = "<secret key>",
+                ["HubSpot:RedirectUri"] = "https://www.hubspot.com",
+                ["HubSpot:RefreshToken"] = "<refresh token>"
+            });
+
+            configurationBuilder.AddEnvironmentVariables();
+
+            var configuration = configurationBuilder.Build();
+
+            IServiceCollection services = new ServiceCollection();
+
+            services.AddLogging(b => b.AddConsole().SetMinimumLevel(LogLevel.Trace));
+
+            services.AddHubSpot(c =>
+            {
+                //c.UseApiKey(configuration);
+
+                c.UseOAuth(configuration.GetSection("HubSpot"));
+
+                c.RegisterDefaultConverters();
+
+                c.UseCompanyConnector();
+
+                c.UseDealConnector();
+
+                c.UseContactConnector();
+            });
+
+            IServiceProvider serviceProvider = services.BuildServiceProvider();
+
+            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+
             var logger = loggerFactory.CreateLogger<Program>();
 
-            LoggingHandler logging = new LoggingHandler(loggerFactory.CreateLogger<LoggingHandler>());
-            HubSpotAuthenticator authenticator = GetAuthenticator();// { InnerHandler = logging };
-            IHubSpotClient hubspot = new HttpHubSpotClient(authenticator, loggerFactory.CreateLogger<HttpHubSpotClient>());
 
-            var registrations = new[]
-            {
-                new TypeConverterRegistration { Converter = new StringTypeConverter(), Type = typeof(string) },
-                new TypeConverterRegistration { Converter = new LongTypeConverter(), Type = typeof(long) },
-                new TypeConverterRegistration { Converter = new LongTypeConverter(), Type = typeof(long?) },
-                new TypeConverterRegistration { Converter = new DateTimeTypeConverter(), Type = typeof(DateTimeOffset) },
-                new TypeConverterRegistration { Converter = new DateTimeTypeConverter(), Type = typeof(DateTimeOffset?) },
-                new TypeConverterRegistration { Converter = new IntTypeConverter(), Type = typeof(int) },
-                new TypeConverterRegistration { Converter = new IntTypeConverter(), Type = typeof(int?) },
-                new TypeConverterRegistration { Converter = new DecimalTypeConverter(), Type = typeof(decimal) },
-                new TypeConverterRegistration { Converter = new DecimalTypeConverter(), Type = typeof(decimal?) },
-            };
+            var companyConnector = serviceProvider.GetRequiredService<IHubSpotCompanyConnector>();
 
-            var typeStore = new TypeStore(registrations);
+            var contactConnector = serviceProvider.GetRequiredService<IHubSpotContactConnector>();
 
-            var companyTypeManager = new CompanyTypeManager(typeStore);
-
-            var companyConnector = new HubSpotCompanyConnector(hubspot, companyTypeManager, loggerFactory.CreateLogger<HubSpotCompanyConnector>());
-
-            var contactTypeManager = new ContactTypeManager(typeStore);
-
-            var contactConnector = new HubSpotContactConnector(hubspot, contactTypeManager, loggerFactory.CreateLogger<HubSpotContactConnector>());
-
-            var dealTypeManager = new DealTypeManager(typeStore);
-
-            var dealConnector = new HubSpotDealConnector(hubspot, dealTypeManager, loggerFactory.CreateLogger<HubSpotDealConnector>());
-
+            var dealConnector = serviceProvider.GetRequiredService<IHubSpotDealConnector>();
 
             try
             {
@@ -62,9 +70,7 @@ namespace TestClient
 
                 var emg = companies.Single();
 
-                emg.Name = $"Educations Media Group";
-
-                var members = await contactConnector.FindByCompanyIdAsync<HubSpot.Contacts.Contact>(emg.Id);
+                var members = await contactConnector.FindByCompanyIdAsync<Contact>(emg.Id);
 
                 foreach (var member in members)
                 {
@@ -78,21 +84,6 @@ namespace TestClient
             }
 
             logger.LogInformation("OK");
-         }
-
-        private static HubSpotAuthenticator GetAuthenticator()
-        {
-            var options = new OptionsWrapper<OAuthOptions>(new OAuthOptions
-            {
-                ClientId = "clientId",
-                SecretKey = "secretKey",
-                RedirectUri = new Uri("https://www.hubspot.com"),
-                RefreshToken = "refreshToken"
-            });
-
-            return new OAuthHubSpotAuthenticator(options);
-
-            //return new ApiKeyHubSpotAuthenticator(Environment.GetEnvironmentVariable("HUBSPOT_APIKEY"));
         }
     }
 

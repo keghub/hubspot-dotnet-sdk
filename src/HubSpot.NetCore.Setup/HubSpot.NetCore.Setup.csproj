@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>7.2</LangVersion>
+    <RootNamespace>HubSpot</RootNamespace>
+    <AssemblyName>HubSpot.NetCore.Setup</AssemblyName>
+    <PackageId>EMG.HubSpot.NetCore.Setup</PackageId>
+    <Authors>EMG</Authors>
+    <Company>EMG</Company>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HubSpot\HubSpot.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="2.0.0" />
+  </ItemGroup>
+
+</Project>
