@@ -21,7 +21,17 @@ Setup(context =>
 Task("Restore")
     .Does(() =>
 {
-    DotNetCoreRestore(SolutionFile.FullPath);
+    var apiKey = EnvironmentVariable("EMGPrivateApiKey") ?? throw new ArgumentNullException("EMGPrivateApiKey");
+    
+    var settings = new DotNetCoreRestoreSettings {
+        Sources = new []{
+            "https://api.nuget.org/v3/index.json",
+            "https://www.myget.org/F/emg/api/v3/index.json",
+            $"https://www.myget.org/F/emgprivate/auth/{apiKey}/api/v3/index.json"
+        }
+    };
+
+    DotNetCoreRestore(SolutionFile.FullPath, settings);
 });
 
 Task("Build")
