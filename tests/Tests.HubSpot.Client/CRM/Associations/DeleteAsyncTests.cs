@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
@@ -27,6 +28,14 @@ namespace Tests.CRM.Associations
 
             Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.AbsolutePath, Contains.Substring("/crm-associations/v1/associations/delete"));
 
+        }
+
+        [Test]
+        public void Item_to_delete_cant_be_null()
+        {
+            var sut = CreateSystemUnderTest();
+
+            Assert.ThrowsAsync<ArgumentNullException>(() => sut.DeleteAsync(null));
         }
     }
 }

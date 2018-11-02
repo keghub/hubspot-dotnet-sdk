@@ -41,5 +41,48 @@ namespace Tests.CRM.Associations
             Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => sut.GetAllAsync(objectId, associationTypeId, limit: 100 + limit));
 
         }
+
+        [Test]
+        [AutoData]
+        public async Task Limit_is_correctly_added_to_queryString(long objectId, int associationTypeId, [System.ComponentModel.DataAnnotations.Range(1, 100)] int limit, AssociationIdList result)
+        {
+            Assume.That(limit <= 100);
+        
+            var options = new HttpMessageOptions
+            {
+                HttpMethod = HttpMethod.Get,
+                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = Object(result)
+                }
+            };
+
+            var sut = CreateSystemUnderTest(options);
+
+            var response = await sut.GetAllAsync(objectId, associationTypeId, limit);
+
+            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.Query, Contains.Substring($"limit={limit}"));
+
+        }
+
+        [Test]
+        [AutoData]
+        public async Task Offset_is_correctly_added_to_queryString(long objectId, int associationTypeId, long offset, AssociationIdList result)
+        {
+            var options = new HttpMessageOptions
+            {
+                HttpMethod = HttpMethod.Get,
+                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = Object(result)
+                }
+            };
+
+            var sut = CreateSystemUnderTest(options);
+
+            var response = await sut.GetAllAsync(objectId, associationTypeId, offset: offset);
+
+            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.Query, Contains.Substring($"offset={offset}"));
+        }
     }
 }

@@ -77,11 +77,11 @@ namespace HubSpot.Model.CRM.Associations
         {
             if (CanConvert(objectType))
             {
-                var value = reader.ReadAsInt32();
+                var value = reader.Value;
 
-                if (value.HasValue)
+                if (value is long v)
                 {
-                    return new AssociationType(value.Value);
+                    return new AssociationType((int)v);
                 }
             }
 

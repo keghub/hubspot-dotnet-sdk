@@ -11,7 +11,7 @@ namespace HubSpot.Model.CRM.Associations
         public long ToId { get; set; }
 
         [JsonProperty("definitionId")]
-        [JsonConverter(typeof(AssociationTypeConverter))]
+        //[JsonConverter(typeof(AssociationTypeConverter))]
         public AssociationType AssociationType { get; set; }
 
         [JsonProperty("category")]
