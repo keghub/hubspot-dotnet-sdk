@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading.Tasks;
 using HubSpot.Model.Companies;
 using HubSpot.Model.Contacts;
+using HubSpot.Model.CRM.Associations;
 using HubSpot.Model.Deals;
 using HubSpot.Model.Lists;
 using HubSpot.Model.Owners;
@@ -48,5 +51,7 @@ namespace HubSpot
         public IHubSpotListClient Lists => this;
 
         public IHubSpotOwnerClient Owners => this;
+
+        public IHubSpotCrmClient Crm => this;
     }
 }

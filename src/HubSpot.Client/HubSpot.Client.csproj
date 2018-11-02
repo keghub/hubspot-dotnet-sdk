@@ -28,7 +28,7 @@
       <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
     </Compile>    
     <Compile Update="HttpHubSpotClient.Contacts.Properties.cs">
-      <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
+      <DependentUpon>HttpHubSpotClient.Contacts.cs</DependentUpon>
     </Compile>
     <Compile Update="HttpHubSpotClient.Deals.cs">
       <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
@@ -38,6 +38,12 @@
     </Compile>
     <Compile Update="HttpHubSpotClient.Owners.cs">
       <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
+    </Compile>
+    <Compile Update="HttpHubSpotClient.Crm.cs">
+      <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
+    </Compile>
+    <Compile Update="HttpHubSpotClient.Crm.Associations.cs">
+      <DependentUpon>HttpHubSpotClient.Crm.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 
