@@ -1,37 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using AutoFixture.NUnit3;
 using HubSpot.Model.CRM.Associations;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace Tests.CRM.Associations
 {
-    [TestFixture]
-    public class AssociationSerializationTests
-    {
-        [Test]
-        [AutoData]
-        public void Association_is_correctly_serialized(Association testAssociation)
-        {
-            var json = JsonConvert.SerializeObject(testAssociation);
-
-            Assert.That(json, Contains.Substring($"\"definitionId\":{testAssociation.AssociationType.Id}"));
-        }
-
-        [Test]
-        [AutoData]
-        public void Association_is_correctly_deserialized(Association testAssociation)
-        {
-            var json = $@"{{""fromObjectId"":{testAssociation.FromId},""toObjectId"":{testAssociation.ToId},""definitionId"":{testAssociation.AssociationType.Id},""category"":""HUBSPOT_DEFINED""}}";
-
-            var obj = JsonConvert.DeserializeObject<Association>(json);
-
-            Assert.That(obj.AssociationType.Id, Is.EqualTo(testAssociation.AssociationType.Id));
-        }
-    }
-
     [TestFixture]
     public class AssociationTypeConverterTests
     {
@@ -52,26 +28,31 @@ namespace Tests.CRM.Associations
         [Test, AutoData]
         public void ReadJson_can_deserialize_an_integer_as_AssociationType(AssociationTypeConverter sut, int testValue)
         {
-            JsonReader reader = new JTokenReader(JToken.Parse($"{testValue}"));
+            var json = $"{testValue}";
 
-            var result = sut.ReadJson(reader, typeof(AssociationType), null, JsonSerializer.CreateDefault()) as AssociationType;
+            JsonReader reader = new JsonTextReader(new StringReader(json));
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(result, Is.Not.Null);
-                Assert.That(result, Is.InstanceOf<AssociationType>());
-                Assert.That(result.Id,Is.EqualTo(testValue));
-            });
+            var obj = sut.ReadJson(reader, typeof(AssociationType), null, JsonSerializer.CreateDefault());
+
+            var result = obj as AssociationType;
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.InstanceOf<AssociationType>());
+            Assert.That(result.Id, Is.EqualTo(testValue));
         }
 
         [Test, AutoData]
-        public void ReadJson_ignores_if_wrong_type_is_requested(AssociationTypeConverter sut, int testValue, Type type)
+        public void ReadJson_can_deserialize_an_array_of_integers_as_AssociationType(AssociationTypeConverter sut, int[] values)
         {
-            JsonReader reader = new JTokenReader(JToken.Parse($"{testValue}"));
+            var json = JsonConvert.SerializeObject(values);
 
-            var result = sut.ReadJson(reader, type, null, JsonSerializer.CreateDefault()) as AssociationType;
+            Console.WriteLine(json);
 
-            Assert.That(result, Is.Null);
+            JsonReader reader = new JsonTextReader(new StringReader(json));
+
+            var result = JsonConvert.DeserializeObject(json, typeof(AssociationType[]), sut);
+
+            Assert.That(result, Has.Some.Matches<AssociationType>(at => values.Contains(at.Id)));
         }
 
         [Test, AutoData]
@@ -85,22 +66,6 @@ namespace Tests.CRM.Associations
             var json = stringWriter.ToString();
 
             Assert.That(json, Is.EqualTo($"{testValue.Id}"));
-        }
-
-        [Test]
-        [InlineAutoData(123)]
-        [InlineAutoData("hello-world")]
-        public void WriteJson_ignores_item_if_not_AssociationType(object testValue, AssociationTypeConverter sut)
-        {
-            var stringWriter = new StringWriter();
-            var writer = new JsonTextWriter(stringWriter);
-
-            sut.WriteJson(writer, testValue, JsonSerializer.CreateDefault());
-
-            var json = stringWriter.ToString();
-
-            Assert.That(json, Is.Empty);
-
         }
     }
 }

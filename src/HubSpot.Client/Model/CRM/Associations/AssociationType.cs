@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace HubSpot.Model.CRM.Associations
 {
@@ -67,25 +68,19 @@ namespace HubSpot.Model.CRM.Associations
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            if (value is AssociationType associationType)
-            {
-                writer.WriteValue(associationType.Id);
-            }
+            writer.WriteValue(((AssociationType)value).Id);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            if (CanConvert(objectType))
-            {
-                var value = reader.Value;
+            var id = serializer.Deserialize<int?>(reader);
 
-                if (value is long v)
-                {
-                    return new AssociationType((int)v);
-                }
+            if (id == null)
+            {
+                return null;
             }
 
-            return null;
+            return new AssociationType(id.Value);
         }
 
         public override bool CanConvert(Type objectType) => objectType == typeof(AssociationType);
