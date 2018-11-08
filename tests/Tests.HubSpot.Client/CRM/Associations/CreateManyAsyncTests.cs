@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -48,6 +49,16 @@ namespace Tests.CRM.Associations
             await sut.CreateManyAsync(new Association[0]);
 
             Assert.That(options.NumberOfTimesCalled, Is.EqualTo(0));
+        }
+
+        [Test, AutoData]
+        public void Batch_size_cant_be_greater_than_100([MinLength(101)] Association[] associations)
+        {
+            var options = new HttpMessageOptions();
+
+            var sut = CreateSystemUnderTest(options);
+
+            Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => sut.CreateManyAsync(associations));
         }
     }
 }

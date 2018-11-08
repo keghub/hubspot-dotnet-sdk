@@ -52,6 +52,11 @@ namespace HubSpot
                 return;
             }
 
+            if (associations.Count > 100)
+            {
+                throw new ArgumentOutOfRangeException(nameof(associations), "Up to 100 items can be created in the same request");
+            }
+
             await SendAsync(HttpMethod.Put, "/crm-associations/v1/associations/create-batch", associations);
         }
 
