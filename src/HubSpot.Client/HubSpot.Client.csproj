@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -8,7 +8,7 @@
     <PackageId>EMG.HubSpot.Client</PackageId>
     <Authors>EMG</Authors>
     <Company>EMG</Company>
-    <VersionPrefix>0.1.0</VersionPrefix>
+    <VersionPrefix>0.2.0</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,7 +28,7 @@
       <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
     </Compile>    
     <Compile Update="HttpHubSpotClient.Contacts.Properties.cs">
-      <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
+      <DependentUpon>HttpHubSpotClient.Contacts.cs</DependentUpon>
     </Compile>
     <Compile Update="HttpHubSpotClient.Deals.cs">
       <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
@@ -38,6 +38,12 @@
     </Compile>
     <Compile Update="HttpHubSpotClient.Owners.cs">
       <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
+    </Compile>
+    <Compile Update="HttpHubSpotClient.Crm.cs">
+      <DependentUpon>HttpHubSpotClient.cs</DependentUpon>
+    </Compile>
+    <Compile Update="HttpHubSpotClient.Crm.Associations.cs">
+      <DependentUpon>HttpHubSpotClient.Crm.cs</DependentUpon>
     </Compile>
   </ItemGroup>
 
