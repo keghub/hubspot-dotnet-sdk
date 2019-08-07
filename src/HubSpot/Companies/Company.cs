@@ -7,7 +7,7 @@ namespace HubSpot.Companies
     public class Company : IHubSpotEntity
     {
         [DefaultProperty("companyId")]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [DefaultProperty("portalId")]
         public int PortalId { get; set; }

@@ -7,7 +7,7 @@ namespace HubSpot.Model.Companies
     public class Company
     {
         [JsonProperty("companyId")]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [JsonProperty("portalId")]
         public int PortalId { get; set; }
