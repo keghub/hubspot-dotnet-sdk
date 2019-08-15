@@ -1,5 +1,4 @@
-#addin "Cake.ExtendedNuGet"
-#addin "nuget:?package=NuGet.Protocol&version=5.0.2.0"
+#addin "nuget:?package=Cake.ExtendedNuGet&version=1.0.0.27"
 #addin "nuget:?package=NuGet.Core&version=2.14.0"
 #tool "nuget:?package=JetBrains.dotCover.CommandLineTools"
 
