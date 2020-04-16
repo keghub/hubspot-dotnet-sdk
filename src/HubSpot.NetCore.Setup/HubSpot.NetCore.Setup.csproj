@@ -8,7 +8,7 @@
     <PackageId>EMG.HubSpot.NetCore.Setup</PackageId>
     <Authors>EMG</Authors>
     <Company>EMG</Company>
-    <VersionPrefix>0.2.1</VersionPrefix>
+    <VersionPrefix>0.3.0</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>

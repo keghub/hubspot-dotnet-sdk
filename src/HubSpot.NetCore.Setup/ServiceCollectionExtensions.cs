@@ -92,6 +92,8 @@ namespace HubSpot
             configurator.RegisterConverter(new DateTimeTypeConverter(), typeof(DateTimeOffset), typeof(DateTimeOffset?));
             configurator.RegisterConverter(new IntTypeConverter(), typeof(int), typeof(int?));
             configurator.RegisterConverter(new DecimalTypeConverter(), typeof(decimal), typeof(decimal?));
+            configurator.RegisterConverter(new StringListConverter(), typeof(List<string>), typeof(IList<string>), typeof(IEnumerable<string>), typeof(IReadOnlyList<string>));
+            configurator.RegisterConverter(new StringArrayConverter(), typeof(string[]));
         }
 
         public static void RegisterConverter<TConverter>(this HubSpotConfigurator configurator, TConverter converter, params Type[] types) where TConverter : ITypeConverter

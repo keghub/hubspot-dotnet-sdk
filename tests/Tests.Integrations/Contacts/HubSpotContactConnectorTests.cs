@@ -48,6 +48,11 @@ namespace Tests.Contacts
                 new TypeConverterRegistration { Converter = new IntTypeConverter(), Type = typeof(int?) },
                 new TypeConverterRegistration { Converter = new DecimalTypeConverter(), Type = typeof(decimal) },
                 new TypeConverterRegistration { Converter = new DecimalTypeConverter(), Type = typeof(decimal?) },
+                new TypeConverterRegistration { Converter = new StringListConverter(), Type = typeof(List<string>) },
+                new TypeConverterRegistration { Converter = new StringListConverter(), Type = typeof(IList<string>) },
+                new TypeConverterRegistration { Converter = new StringListConverter(), Type = typeof(IEnumerable<string>) },
+                new TypeConverterRegistration { Converter = new StringListConverter(), Type = typeof(IReadOnlyList<string>) },
+                new TypeConverterRegistration { Converter = new StringArrayConverter(), Type = typeof(string[]) },
             };
             var typeStore = new TypeStore(registrations);
             var typeManager = new ContactTypeManager(typeStore);
@@ -58,7 +63,8 @@ namespace Tests.Contacts
         }
 
         [Test, ContactAutoData]
-        public async Task Custom_contacts_can_be_retrieved_by_id(long contactId, string firstName, string lastName, string email, DateTimeOffset createdDate, string custom)
+        public async Task Custom_contacts_can_be_retrieved_by_id(long contactId, string firstName, string lastName, string email, DateTimeOffset createdDate, string custom,
+            List<string> stringList, string[] stringArray, IList<string> stringIList, IEnumerable<string> stringIEnumerable, IReadOnlyList<string> stringIReadOnlyList)
         {
             var fromApi = new HubSpotContact
             {
@@ -69,7 +75,12 @@ namespace Tests.Contacts
                     ["lastname"] = new VersionedProperty { Value = lastName },
                     ["email"] = new VersionedProperty { Value = email },
                     ["createdate"] = new VersionedProperty { Value = createdDate.ToUnixTimeMilliseconds().ToString("D") },
-                    ["customProperty"] = new VersionedProperty { Value = custom }
+                    ["customProperty"] = new VersionedProperty { Value = custom },
+                    ["stringListProperty"] = new VersionedProperty { Value = string.Join(";", stringList) },
+                    ["stringArrayProperty"] = new VersionedProperty { Value = string.Join(";", stringArray) },
+                    ["stringIListProperty"] = new VersionedProperty { Value = string.Join(";", stringIList) },
+                    ["stringIEnumerableProperty"] = new VersionedProperty { Value = string.Join(";", stringIEnumerable) },
+                    ["stringIReadOnlyListProperty"] = new VersionedProperty { Value = string.Join(";", stringIReadOnlyList) }
                 }
             };
 
@@ -102,6 +113,11 @@ namespace Tests.Contacts
             Assert.That(result.LastName, Is.EqualTo(lastName));
             Assert.That(result.Created, Is.EqualTo(createdDate).Within(TimeSpan.FromMilliseconds(100)));
             Assert.That(result.CustomProperty, Is.EqualTo(custom));
+            Assert.That(result.StringListProperty, Is.EqualTo(stringList));
+            Assert.That(result.StringArrayProperty, Is.EqualTo(stringArray));
+            Assert.That(result.StringIListProperty, Is.EqualTo(stringIList));
+            Assert.That(result.StringIEnumerableProperty, Is.EqualTo(stringIEnumerable));
+            Assert.That(result.StringIReadOnlyListProperty, Is.EqualTo(stringIReadOnlyList));
         }
 
         [Test, ContactAutoData]
@@ -330,7 +346,12 @@ namespace Tests.Contacts
                     ["email"] = new VersionedProperty { Value = contact.Email },
                     ["createdate"] = new VersionedProperty { Value = contact.Created.ToUnixTimeMilliseconds().ToString("D") },
                     ["associatedcompanyid"] = new VersionedProperty() { Value = contact.AssociatedCompanyId.ToString("D") },
-                    ["customProperty"] = new VersionedProperty() { Value = contact.CustomProperty }
+                    ["customProperty"] = new VersionedProperty() { Value = contact.CustomProperty },
+                    ["stringListProperty"] = new VersionedProperty() { Value = string.Join(";", contact.StringListProperty) },
+                    ["stringArrayProperty"] = new VersionedProperty() { Value = string.Join(";", contact.StringArrayProperty) },
+                    ["stringIListProperty"] = new VersionedProperty() { Value = string.Join(";", contact.StringIListProperty) },
+                    ["stringIEnumerableProperty"] = new VersionedProperty() { Value = string.Join(";", contact.StringIEnumerableProperty) },
+                    ["stringIReadOnlyListProperty"] = new VersionedProperty() { Value = string.Join(";", contact.StringIReadOnlyListProperty) }
                 }
             };
 
@@ -346,7 +367,12 @@ namespace Tests.Contacts
                 ["email"] = testContact.Email,
                 ["createdate"] = testContact.Created,
                 ["associatedcompanyid"] = testContact.AssociatedCompanyId,
-                ["customProperty"] = testContact.CustomProperty
+                ["customProperty"] = testContact.CustomProperty,
+                ["stringListProperty"] = testContact.StringListProperty,
+                ["stringArrayProperty"] = testContact.StringArrayProperty,
+                ["stringIListProperty"] = testContact.StringIListProperty,
+                ["stringIEnumerableProperty"] = testContact.StringIEnumerableProperty,
+                ["stringIReadOnlyListProperty"] = testContact.StringIReadOnlyListProperty
             };
         }
     }
@@ -355,24 +381,17 @@ namespace Tests.Contacts
     {
         public ContactAutoDataAttribute() : base(CreateFixture)
         {
-            
+
         }
 
         public static IFixture CreateFixture()
         {
             IFixture fixture = new Fixture();
 
-            //fixture.Customize<TestContact>(c => c.WithAutoProperties().Do(contact =>
-            //{
-            //    ((IHubSpotEntity)contact).Properties = new Dictionary<string, object>
-            //    {
-            //        ["firstname"] = contact.FirstName,
-            //        ["lastname"] = contact.LastName,
-            //        ["email"] = contact.Email,
-            //        ["createdate"] = contact.Created,
-            //        ["associatedcompanyid"] = contact.AssociatedCompanyId
-            //    };
-            //}));
+            fixture.Customize<TestContact>(hp =>
+                hp.With(i => i.StringIEnumerableProperty, fixture.CreateMany<string>().ToArray().AsEnumerable()).With(
+                    i => i.StringIReadOnlyListProperty,
+                    (IReadOnlyList<string>) fixture.CreateMany<string>().ToArray()));
 
             return fixture;
         }

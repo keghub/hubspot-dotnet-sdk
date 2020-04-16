@@ -103,6 +103,11 @@ namespace Tests {
         [InlineAutoData(typeof(decimal?))]
         [InlineAutoData(typeof(DateTimeOffset))]
         [InlineAutoData(typeof(DateTimeOffset?))]
+        [InlineAutoData(typeof(List<string>))]
+        [InlineAutoData(typeof(string[]))]
+        [InlineAutoData(typeof(IList<string>))]
+        [InlineAutoData(typeof(IEnumerable<string>))]
+        [InlineAutoData(typeof(IReadOnlyList<string>))]
         public void RegisterDefaultConverters_registers_basic_type_converters(Type typeToConvert, HubSpotConfigurator sut)
         {
             HubSpotConfiguratorExtensions.RegisterDefaultConverters(sut);
