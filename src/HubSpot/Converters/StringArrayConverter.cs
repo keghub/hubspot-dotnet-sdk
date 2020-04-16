@@ -13,9 +13,7 @@ namespace HubSpot.Converters
                 return true;
             }
 
-            var array = value.Split(';').Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
-
-            result = array;
+            result = value.Split(';').Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()).ToArray();
             return true;
         }
 
@@ -29,7 +27,7 @@ namespace HubSpot.Converters
 
             if (value is string[] array)
             {
-                result = string.Join(";", array.Where(s => !string.IsNullOrWhiteSpace(s)));
+                result = string.Join(";", array.Where(s => !string.IsNullOrWhiteSpace(s)).Select(s => s.Trim()));
                 return true;
             }
 

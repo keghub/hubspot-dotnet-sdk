@@ -101,6 +101,18 @@ namespace Tests.Converters
         }
 
         [Test, AutoData]
+        public void TryConvertTo_result_array_with_trimmed_items(StringArrayConverter sut, string[] values)
+        {
+            var valuesWithWhitespace = values.Select(s => $"  {s}  ").ToArray();
+
+            var value = string.Join(";", valuesWithWhitespace);
+
+            var canConvert = sut.TryConvertTo(value, out object result);
+
+            Assert.That(result, Is.EquivalentTo(values));
+        }
+
+        [Test, AutoData]
         public void TryConvertTo_result_array_without_empty_items(StringArrayConverter sut, string[] values)
         {
             var valuesWithWhitespace = values.Concat(new[] { string.Empty, "" });
@@ -228,6 +240,16 @@ namespace Tests.Converters
         public void TryConvertFrom_result_is_semicolon_separated_string_without_null_values(StringArrayConverter sut, string[] value)
         {
             var valuesWithWhitespace = value.Concat(new string[] { null, null }).ToArray();
+
+            var canConvert = sut.TryConvertFrom(valuesWithWhitespace, out string result);
+
+            Assert.AreEqual(result, string.Join(";", value));
+        }
+
+        [Test, AutoData]
+        public void TryConvertFrom_result_is_semicolon_separated_string_with_trimmed_values(StringArrayConverter sut, string[] value)
+        {
+            var valuesWithWhitespace = value.Select(s => $"  {s}  ").ToArray();
 
             var canConvert = sut.TryConvertFrom(valuesWithWhitespace, out string result);
 

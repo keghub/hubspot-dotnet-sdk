@@ -51,6 +51,7 @@ namespace Tests.Contacts
                 new TypeConverterRegistration { Converter = new StringListConverter(), Type = typeof(List<string>) },
                 new TypeConverterRegistration { Converter = new StringListConverter(), Type = typeof(IList<string>) },
                 new TypeConverterRegistration { Converter = new StringListConverter(), Type = typeof(IEnumerable<string>) },
+                new TypeConverterRegistration { Converter = new StringListConverter(), Type = typeof(IReadOnlyList<string>) },
                 new TypeConverterRegistration { Converter = new StringArrayConverter(), Type = typeof(string[]) },
             };
             var typeStore = new TypeStore(registrations);
@@ -63,7 +64,7 @@ namespace Tests.Contacts
 
         [Test, ContactAutoData]
         public async Task Custom_contacts_can_be_retrieved_by_id(long contactId, string firstName, string lastName, string email, DateTimeOffset createdDate, string custom,
-            List<string> stringList, string[] stringArray, IList<string> stringIList, IEnumerable<string> stringIEnumerable)
+            List<string> stringList, string[] stringArray, IList<string> stringIList, IEnumerable<string> stringIEnumerable, IReadOnlyList<string> stringIReadOnlyList)
         {
             var fromApi = new HubSpotContact
             {
@@ -78,7 +79,8 @@ namespace Tests.Contacts
                     ["stringListProperty"] = new VersionedProperty { Value = string.Join(";", stringList) },
                     ["stringArrayProperty"] = new VersionedProperty { Value = string.Join(";", stringArray) },
                     ["stringIListProperty"] = new VersionedProperty { Value = string.Join(";", stringIList) },
-                    ["stringIEnumerableProperty"] = new VersionedProperty { Value = string.Join(";", stringIEnumerable) }
+                    ["stringIEnumerableProperty"] = new VersionedProperty { Value = string.Join(";", stringIEnumerable) },
+                    ["stringIReadOnlyListProperty"] = new VersionedProperty { Value = string.Join(";", stringIReadOnlyList) }
                 }
             };
 
@@ -115,6 +117,7 @@ namespace Tests.Contacts
             Assert.That(result.StringArrayProperty, Is.EqualTo(stringArray));
             Assert.That(result.StringIListProperty, Is.EqualTo(stringIList));
             Assert.That(result.StringIEnumerableProperty, Is.EqualTo(stringIEnumerable));
+            Assert.That(result.StringIReadOnlyListProperty, Is.EqualTo(stringIReadOnlyList));
         }
 
         [Test, ContactAutoData]
@@ -347,7 +350,8 @@ namespace Tests.Contacts
                     ["stringListProperty"] = new VersionedProperty() { Value = string.Join(";", contact.StringListProperty) },
                     ["stringArrayProperty"] = new VersionedProperty() { Value = string.Join(";", contact.StringArrayProperty) },
                     ["stringIListProperty"] = new VersionedProperty() { Value = string.Join(";", contact.StringIListProperty) },
-                    ["stringIEnumerableProperty"] = new VersionedProperty() { Value = string.Join(";", contact.StringIEnumerableProperty) }
+                    ["stringIEnumerableProperty"] = new VersionedProperty() { Value = string.Join(";", contact.StringIEnumerableProperty) },
+                    ["stringIReadOnlyListProperty"] = new VersionedProperty() { Value = string.Join(";", contact.StringIReadOnlyListProperty) }
                 }
             };
 
@@ -367,7 +371,8 @@ namespace Tests.Contacts
                 ["stringListProperty"] = testContact.StringListProperty,
                 ["stringArrayProperty"] = testContact.StringArrayProperty,
                 ["stringIListProperty"] = testContact.StringIListProperty,
-                ["stringIEnumerableProperty"] = testContact.StringIEnumerableProperty
+                ["stringIEnumerableProperty"] = testContact.StringIEnumerableProperty,
+                ["stringIReadOnlyListProperty"] = testContact.StringIReadOnlyListProperty
             };
         }
     }
@@ -383,7 +388,10 @@ namespace Tests.Contacts
         {
             IFixture fixture = new Fixture();
 
-            fixture.Customize<TestContact>(hp => hp.With(i => i.StringIEnumerableProperty, fixture.CreateMany<string>().ToArray().AsEnumerable()));
+            fixture.Customize<TestContact>(hp =>
+                hp.With(i => i.StringIEnumerableProperty, fixture.CreateMany<string>().ToArray().AsEnumerable()).With(
+                    i => i.StringIReadOnlyListProperty,
+                    (IReadOnlyList<string>) fixture.CreateMany<string>().ToArray()));
 
             return fixture;
         }

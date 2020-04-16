@@ -45,6 +45,7 @@ namespace Tests.Internal
         [TestCase(typeof(string[]))]
         [TestCase(typeof(IList<string>))]
         [TestCase(typeof(IEnumerable<string>))]
+        [TestCase(typeof(IReadOnlyList<string>))]
         public void IsDefaultValue_should_return_false_when_value_is_valid(Type type)
         {
             var context = new SpecimenContext(fixture);

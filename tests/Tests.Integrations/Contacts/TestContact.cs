@@ -20,5 +20,8 @@ namespace Tests.Contacts
         [CustomProperty("stringIEnumerableProperty")]
         public IEnumerable<string> StringIEnumerableProperty { get; set; }
 
+        [CustomProperty("stringIReadOnlyListProperty")]
+        public IReadOnlyList<string> StringIReadOnlyListProperty { get; set; }
+
     }
 }

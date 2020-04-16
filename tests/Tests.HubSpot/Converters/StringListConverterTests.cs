@@ -110,9 +110,31 @@ namespace Tests.Converters
         }
 
         [Test, AutoData]
+        public void TryConvertTo_result_list_is_of_type_string_IReadOnlyList(StringListConverter sut, List<string> values)
+        {
+            var value = string.Join(";", values);
+
+            var canConvert = sut.TryConvertTo(value, out object result);
+
+            Assert.True(result is IReadOnlyList<string>);
+        }
+
+        [Test, AutoData]
         public void TryConvertTo_result_list_without_whitespace_items(StringListConverter sut, List<string> values)
         {
             var valuesWithWhitespace = values.Concat(new[] {" ", "  ", "   "});
+
+            var value = string.Join(";", valuesWithWhitespace);
+
+            var canConvert = sut.TryConvertTo(value, out object result);
+
+            Assert.That(result, Is.EquivalentTo(values));
+        }
+
+        [Test, AutoData]
+        public void TryConvertTo_result_array_with_trimmed_items(StringListConverter sut, List<string> values)
+        {
+            var valuesWithWhitespace = values.Select(s => $"  {s}  ");
 
             var value = string.Join(";", valuesWithWhitespace);
 
@@ -160,22 +182,6 @@ namespace Tests.Converters
 
             Assert.IsNull(result);
         }
-
-        //[Test, AutoData]
-        //public void TryConvertFrom_returns_false_if_value_is_string_array(StringListConverter sut, string[] value)
-        //{
-        //    var canConvert = sut.TryConvertFrom(value, out string result);
-
-        //    Assert.IsFalse(canConvert);
-        //}
-
-        //[Test, AutoData]
-        //public void TryConvertFrom_result_is_null_if_value_is_string_array(StringListConverter sut, string[] value)
-        //{
-        //    var canConvert = sut.TryConvertFrom(value, out string result);
-
-        //    Assert.IsNull(result);
-        //}
 
         [Test, AutoData]
         public void TryConvertFrom_returns_false_if_value_is_string(StringListConverter sut, string value)
@@ -236,6 +242,16 @@ namespace Tests.Converters
         }
 
         [Test, AutoData]
+        public void TryConvertFrom_returns_true_if_value_is_string_IReadOnlyList(StringListConverter sut, string[] value)
+        {
+            IReadOnlyList<string> iReadOnlyListValue = value;
+
+            var canConvert = sut.TryConvertFrom(iReadOnlyListValue, out string result);
+
+            Assert.IsTrue(canConvert);
+        }
+
+        [Test, AutoData]
         public void TryConvertFrom_result_is_semicolon_separated_string_if_value_is_string_list(StringListConverter sut, List<string> value)
         {
             var canConvert = sut.TryConvertFrom(value, out string result);
@@ -267,6 +283,16 @@ namespace Tests.Converters
         public void TryConvertFrom_result_is_semicolon_separated_string_without_null_values(StringListConverter sut, List<string> value)
         {
             var valuesWithWhitespace = value.Concat(new string[] { null, null }).ToList();
+
+            var canConvert = sut.TryConvertFrom(valuesWithWhitespace, out string result);
+
+            Assert.AreEqual(result, string.Join(";", value));
+        }
+
+        [Test, AutoData]
+        public void TryConvertFrom_result_is_semicolon_separated_string_with_trimmed_values(StringListConverter sut, List<string> value)
+        {
+            var valuesWithWhitespace = value.Select(s => $"  {s}  ").ToList();
 
             var canConvert = sut.TryConvertFrom(valuesWithWhitespace, out string result);
 
