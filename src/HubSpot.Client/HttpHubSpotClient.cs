@@ -16,31 +16,41 @@ using Newtonsoft.Json.Converters;
 
 namespace HubSpot
 {
-    public partial class HttpHubSpotClient : HttpRestClient, IHubSpotClient
+    public partial class HttpHubSpotClient : IHubSpotClient
     {
-        private readonly ILogger<HttpHubSpotClient> _logger;
+        // TODO: Remove this code!
+        // private readonly ILogger<HttpHubSpotClient> _logger;
 
-        public HttpHubSpotClient(HubSpotAuthenticator authenticator, ILogger<HttpHubSpotClient> logger) : base(CreateClient(authenticator), SerializerSettings, logger)
+        // public HttpHubSpotClient(HubSpotAuthenticator authenticator, ILogger<HttpHubSpotClient> logger) : base(CreateClient(authenticator), SerializerSettings, logger)
+        // {
+        //     if (authenticator == null) throw new ArgumentNullException(nameof(authenticator));
+        //     _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        // }
+
+        // private static HttpClient CreateClient(HubSpotAuthenticator authenticator)
+        // {
+        //     return new HttpClient(authenticator) { BaseAddress = authenticator.ServiceUri };
+        // }
+
+        // public static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
+        // {
+        //     DefaultValueHandling = DefaultValueHandling.Ignore,
+        //     DateFormatHandling = DateFormatHandling.IsoDateFormat,
+        //     Converters = new JsonConverter[]
+        //     {
+        //         new UnixEpochConverter(),
+        //         new StringEnumConverter()
+        //     }
+        // };
+
+        private readonly ILogger<HttpHubSpotClient> _logger;
+        private readonly IHttpRestClient _client;
+
+        public HttpHubSpotClient(IHttpRestClient client, ILogger<HttpHubSpotClient> logger)
         {
-            if (authenticator == null) throw new ArgumentNullException(nameof(authenticator));
+            _client = client ?? throw new ArgumentNullException(nameof(client));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-
-        private static HttpClient CreateClient(HubSpotAuthenticator authenticator)
-        {
-            return new HttpClient(authenticator) { BaseAddress = authenticator.ServiceUri };
-        }
-
-        public static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
-        {
-            DefaultValueHandling = DefaultValueHandling.Ignore,
-            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            Converters = new JsonConverter[]
-            {
-                new UnixEpochConverter(),
-                new StringEnumConverter()
-            }
-        };
 
         public IHubSpotContactClient Contacts => this;
 
@@ -53,5 +63,13 @@ namespace HubSpot
         public IHubSpotOwnerClient Owners => this;
 
         public IHubSpotCrmClient Crm => this;
+
+        protected Task<TResponse> SendAsync<TRequest, TResponse>(HttpMethod method, string path, TRequest content, IQueryString query = null) => _client.SendAsync<TRequest, TResponse>(method, path, content, query);
+
+        protected Task<TResponse> SendAsync<TResponse>(HttpMethod method, string path, IQueryString query = null) => _client.SendAsync<TResponse>(method, path, query);
+
+        protected Task SendAsync<TRequest>(HttpMethod method, string path, TRequest content, IQueryString query = null) => _client.SendAsync<TRequest>(method, path, content, query);
+
+        protected Task SendAsync(HttpMethod method, string path, IQueryString query = null) => _client.SendAsync(method, path, query);
     }
 }
