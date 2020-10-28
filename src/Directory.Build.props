@@ -1,10 +1,12 @@
 <Project>
   <PropertyGroup>
     <RootNamespace>HubSpot</RootNamespace>
-    <Authors>EMG</Authors>
-    <Owners>EMG</Owners>
-    <Company>EMG</Company>
     <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>EMG</Authors>
+    <Company>EMG - Educations Media Group AB</Company>
   </PropertyGroup>
 
   <PropertyGroup Label="SourceLink properties">
@@ -22,9 +24,9 @@
   <PropertyGroup Label="Package properties">
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/Kralizek/HttpExtensions</PackageProjectUrl>
-    <NoWarn>NU5105,NU5125</NoWarn>
+    <PackageProjectUrl>https://github.com/emgdev/hubspot-dotnet-sdk</PackageProjectUrl>
+    <PackageIconUrl>http://static.emg-services.net/masterpages/pics/logos/emg-icon-64.png</PackageIconUrl>
+    <NoWarn>NU5105,NU5125,NU5048</NoWarn>
   </PropertyGroup>
-
 
 </Project>
