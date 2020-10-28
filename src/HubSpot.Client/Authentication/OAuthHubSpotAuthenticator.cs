@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using EMG.Common;
+using EMG.Utilities;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 
