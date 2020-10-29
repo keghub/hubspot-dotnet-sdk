@@ -50,36 +50,34 @@ namespace HubSpot.Authentication
         {
             var requestUri = new Uri(ServiceUri, "/oauth/v1/token");
 
-            using (var request = new HttpRequestMessage(HttpMethod.Post, requestUri))
+            using var request = new HttpRequestMessage(HttpMethod.Post, requestUri);
+
+            var form = new Dictionary<string, string>
             {
-                var form = new Dictionary<string, string>
-                {
-                    ["grant_type"] = "refresh_token",
-                    ["client_id"] = _options.ClientId,
-                    ["client_secret"] = _options.SecretKey,
-                    ["redirect_uri"] = _options.RedirectUri.ToString(),
-                    ["refresh_token"] = _options.RefreshToken
-                };
+                ["grant_type"] = "refresh_token",
+                ["client_id"] = _options.ClientId,
+                ["client_secret"] = _options.SecretKey,
+                ["redirect_uri"] = _options.RedirectUri.ToString(),
+                ["refresh_token"] = _options.RefreshToken
+            };
 
-                request.Content = new FormUrlEncodedContent(form);
+            request.Content = new FormUrlEncodedContent(form);
 
-                using (var response = await base.SendAsync(request, cancellationToken))
-                {
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        return null;
-                    }
+            using var response = await base.SendAsync(request, cancellationToken);
 
-                    var content = await response.Content.ReadAsStringAsync();
-
-                    var jobj = JObject.Parse(content);
-
-                    var token = (string)jobj.GetValue("access_token");
-                    var expiresIn = (long)jobj.GetValue("expires_in");
-
-                    return new AuthToken(token, Clock.Default.UtcNow.AddSeconds(expiresIn));
-                }
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
             }
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            var jobj = JObject.Parse(content);
+
+            var token = (string)jobj.GetValue("access_token");
+            var expiresIn = (long)jobj.GetValue("expires_in");
+
+            return new AuthToken(token, Clock.Default.UtcNow.AddSeconds(expiresIn));
         }
 
         private bool IsTokenValid(AuthToken token)

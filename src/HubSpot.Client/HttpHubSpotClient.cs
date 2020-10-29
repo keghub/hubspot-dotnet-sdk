@@ -32,16 +32,16 @@ namespace HubSpot
         //     return new HttpClient(authenticator) { BaseAddress = authenticator.ServiceUri };
         // }
 
-        // public static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
-        // {
-        //     DefaultValueHandling = DefaultValueHandling.Ignore,
-        //     DateFormatHandling = DateFormatHandling.IsoDateFormat,
-        //     Converters = new JsonConverter[]
-        //     {
-        //         new UnixEpochConverter(),
-        //         new StringEnumConverter()
-        //     }
-        // };
+        public static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
+        {
+            DefaultValueHandling = DefaultValueHandling.Ignore,
+            DateFormatHandling = DateFormatHandling.IsoDateFormat,
+            Converters = new JsonConverter[]
+            {
+                new UnixEpochConverter(),
+                new StringEnumConverter()
+            }
+        };
 
         private readonly ILogger<HttpHubSpotClient> _logger;
         private readonly IHttpRestClient _client;
@@ -64,12 +64,32 @@ namespace HubSpot
 
         public IHubSpotCrmClient Crm => this;
 
-        protected Task<TResponse> SendAsync<TRequest, TResponse>(HttpMethod method, string path, TRequest content, IQueryString query = null) => _client.SendAsync<TRequest, TResponse>(method, path, content, query);
+        protected Task<TResponse> SendAsync<TRequest, TResponse>(HttpMethod method, string path, TRequest content, IQueryString query = null)
+        {
+            _logger.LogDebug($"Invoking {nameof(HttpRestClient.SendAsync)}");
 
-        protected Task<TResponse> SendAsync<TResponse>(HttpMethod method, string path, IQueryString query = null) => _client.SendAsync<TResponse>(method, path, query);
+            return _client.SendAsync<TRequest, TResponse>(method, path, content, query);
+        }
 
-        protected Task SendAsync<TRequest>(HttpMethod method, string path, TRequest content, IQueryString query = null) => _client.SendAsync<TRequest>(method, path, content, query);
+        protected Task<TResponse> SendAsync<TResponse>(HttpMethod method, string path, IQueryString query = null)
+        {
+            _logger.LogDebug($"Invoking {nameof(HttpRestClient.SendAsync)}");
 
-        protected Task SendAsync(HttpMethod method, string path, IQueryString query = null) => _client.SendAsync(method, path, query);
+            return _client.SendAsync<TResponse>(method, path, query);
+        }
+
+        protected Task SendAsync<TRequest>(HttpMethod method, string path, TRequest content, IQueryString query = null)
+        {
+            _logger.LogDebug($"Invoking {nameof(HttpRestClient.SendAsync)}");
+
+            return _client.SendAsync<TRequest>(method, path, content, query);
+        }
+
+        protected Task SendAsync(HttpMethod method, string path, IQueryString query = null)
+        {
+            _logger.LogDebug($"Invoking {nameof(HttpRestClient.SendAsync)}");
+
+            return _client.SendAsync(method, path, query);
+        }
     }
 }
