@@ -1,54 +1,39 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
-using HubSpot;
 using HubSpot.Model.Owners;
 using Kralizek.Extensions.Http;
+using Moq;
 using NUnit.Framework;
-using WorldDomination.Net.Http;
 
 namespace Tests.Owners
 {
     [TestFixture]
-    public class GetManyAsyncTests : OwnerTests
+    public class GetManyAsyncTests
     {
-        [Test, AutoData]
-        public async Task Email_address_is_appended_to_query_to_filter_by_email(Owner owner)
+        [Test, CustomAutoData]
+        public async Task Email_address_is_appended_to_query_to_filter_by_email([Frozen] IHttpRestClient client, IHubSpotOwnerClient sut, Owner owner)
         {
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = JsonContent.FromObject(new[] { owner }, HttpHubSpotClient.SerializerSettings)
-                }
-            };
-
-            var sut = CreateSystemUnderTest(options);
+            Mock.Get(client)
+                .Setup(p => p.SendAsync<IReadOnlyList<Owner>>(HttpMethod.Get, "/owners/v2/owners/", It.IsAny<IQueryString>()))
+                .ReturnsAsync(new[]{owner});
 
             var response = await sut.GetManyAsync(owner.Email);
 
-            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.Query, Contains.Substring($"email={owner.Email}"));
+            Mock.Get(client).Verify(p => p.SendAsync<IReadOnlyList<Owner>>(HttpMethod.Get, "/owners/v2/owners/", QueryStringMatcher.That(Contains.Substring($"email={owner.Email}"))));
         }
 
-        [Test, AutoData]
-        public async Task Several_contacts_are_returned(Owner[] owners)
+        [Test, CustomAutoData]
+        public async Task Several_contacts_are_returned([Frozen] IHttpRestClient client, IHubSpotOwnerClient sut, Owner[] owners)
         {
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = JsonContent.FromObject(owners, HttpHubSpotClient.SerializerSettings)
-                }
-            };
-
-            var sut = CreateSystemUnderTest(options);
+            Mock.Get(client)
+                .Setup(p => p.SendAsync<IReadOnlyList<Owner>>(HttpMethod.Get, "/owners/v2/owners/", It.IsAny<IQueryString>()))
+                .ReturnsAsync(owners);
 
             var response = await sut.GetManyAsync();
 
-            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.Query, Does.Not.Contain("email"));
+            Mock.Get(client).Verify(p => p.SendAsync<IReadOnlyList<Owner>>(HttpMethod.Get, "/owners/v2/owners/", QueryStringMatcher.That(Does.Not.Contain("email"))));
         }
     }
 }

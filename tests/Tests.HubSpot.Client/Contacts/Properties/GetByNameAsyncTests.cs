@@ -2,32 +2,24 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using HubSpot.Model.Contacts.Properties;
 using Kralizek.Extensions.Http;
+using Moq;
 using NUnit.Framework;
-using WorldDomination.Net.Http;
+
 
 namespace Tests.Contacts.Properties
 {
     [TestFixture]
-    public class GetByNameAsyncTests : ContactPropertyTests
+    public class GetByNameAsyncTests
     {
-        [Test, AutoData]
-        public async Task Request_is_correct(string propertyName)
+        [Test, CustomAutoData]
+        public async Task Request_is_correct([Frozen] IHttpRestClient client, IHubSpotContactPropertyClient sut, string propertyName)
         {
-            var option = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = JsonContent.EmptyObject
-                }
-            };
-
-            var sut = CreateSystemUnderTest(option);
-
             var response = await sut.GetByNameAsync(propertyName);
 
-            Assert.That(option.HttpResponseMessage.RequestMessage.RequestUri.AbsolutePath, Contains.Substring($"/properties/v1/contacts/properties/named/{propertyName}"));
+            Mock.Get(client)
+                .Verify(p => p.SendAsync<ContactProperty>(HttpMethod.Get, $"/properties/v1/contacts/properties/named/{propertyName}", null));
         }
     }
 }

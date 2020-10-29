@@ -2,32 +2,33 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using HubSpot.Model.Contacts;
 using Kralizek.Extensions.Http;
+using Moq;
 using NUnit.Framework;
-using WorldDomination.Net.Http;
+
 
 namespace Tests.Contacts
 {
     [TestFixture]
-    public class SearchAsyncTests : ContactTests
+    public class SearchAsyncTests
     {
-        [Test, AutoData]
-        public async Task Request_is_correct(string query)
+        [Test, CustomAutoData]
+        public async Task Request_is_correct([Frozen] IHttpRestClient client, IHubSpotContactClient sut, string query)
         {
-            var option = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = JsonContent.EmptyObject
-                }
-            };
-
-            var sut = CreateSystemUnderTest(option);
-
             var response = await sut.SearchAsync(query);
 
-            Assert.That(option.HttpResponseMessage.RequestMessage.RequestUri.AbsolutePath, Contains.Substring("/contacts/v1/search/query"));
+            Mock.Get(client)
+                .Verify(p => p.SendAsync<SearchResponse>(HttpMethod.Get, "/contacts/v1/search/query", It.IsAny<IQueryString>()));
+        }
+
+        [Test, CustomAutoData]
+        public async Task Query_is_attached_to_request([Frozen] IHttpRestClient client, IHubSpotContactClient sut, string query)
+        {
+            var response = await sut.SearchAsync(query);
+
+            Mock.Get(client)
+                .Verify(p => p.SendAsync<SearchResponse>(HttpMethod.Get, "/contacts/v1/search/query", QueryStringMatcher.That(Does.Contain($"q={query}"))));
         }
     }
 }
