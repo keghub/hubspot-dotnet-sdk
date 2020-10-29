@@ -31,12 +31,12 @@ namespace Tests.Contacts.Filters
             mockClient.SetupGet(p => p.Contacts).Returns(mockContactClient.Object);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task Single_page_of_contacts_is_fetched(SearchContactFilter sut, IReadOnlyList<Property> properties)
         {
             var list = fixture.Build<SearchResponse>()
                               .With(p => p.HasMore, false)
-                              .With(p => p.Offset, null)
+                              .Without(p => p.Offset)
                               .Create();
 
             mockContactClient.Setup(p => p.SearchAsync(It.IsAny<string>(), It.IsAny<IReadOnlyList<IProperty>>(), It.IsAny<int>(), It.IsAny<long?>()))
@@ -49,7 +49,7 @@ namespace Tests.Contacts.Filters
             mockContactClient.Verify(p => p.SearchAsync(It.IsAny<string>(), It.IsAny<IReadOnlyList<IProperty>>(), It.IsAny<int>(), null), Times.Once);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task Multiple_pages_of_contacts_are_fetched(SearchContactFilter sut, IReadOnlyList<Property> properties)
         {
             var listBuilder = fixture.Build<SearchResponse>();

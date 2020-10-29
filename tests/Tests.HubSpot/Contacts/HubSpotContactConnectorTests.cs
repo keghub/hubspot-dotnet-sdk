@@ -123,7 +123,7 @@ namespace Tests.Contacts
             Assert.ThrowsAsync<ArgumentNullException>(() => sut.SaveAsync<TestContact>(null));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task SaveAsync_persists_a_new_contact(TestContact contact, (string, string)[] properties)
         {
             contact.Id = 0;

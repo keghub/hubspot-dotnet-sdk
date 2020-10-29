@@ -9,7 +9,7 @@ namespace Tests.Converters
     [TestFixture]
     public class StringArrayConverterTests
     {
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertTo_returns_true_if_value_is_null(StringArrayConverter sut)
         {
             var canConvert = sut.TryConvertTo(null, out object result);
@@ -17,7 +17,7 @@ namespace Tests.Converters
             Assert.IsTrue(canConvert);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertTo_result_is_default_if_value_is_null(StringArrayConverter sut)
         {
             var canConvert = sut.TryConvertTo(null, out object result);
@@ -25,7 +25,7 @@ namespace Tests.Converters
             Assert.That(result, Is.EqualTo(default));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertTo_returns_true_if_value_is_empty_string(StringArrayConverter sut)
         {
             var canConvert = sut.TryConvertTo(string.Empty, out object result);
@@ -34,7 +34,7 @@ namespace Tests.Converters
         }
 
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertTo_result_is_default_if_value_is_empty_string(StringArrayConverter sut)
         {
             var canConvert = sut.TryConvertTo(string.Empty, out object result);
@@ -42,7 +42,7 @@ namespace Tests.Converters
             Assert.That(result, Is.EqualTo(default));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertTo_returns_true_if_value_is_whitespace(StringArrayConverter sut)
         {
             var canConvert = sut.TryConvertTo("   ", out object result);
@@ -50,7 +50,7 @@ namespace Tests.Converters
             Assert.IsTrue(canConvert);
         }
         
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertTo_result_is_default_if_value_is_whitespace(StringArrayConverter sut)
         {
             var canConvert = sut.TryConvertTo("  ", out object result);
@@ -58,7 +58,7 @@ namespace Tests.Converters
             Assert.That(result, Is.EqualTo(default));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertTo_returns_true_if_value_is_semicolon_separated_string(StringArrayConverter sut, string[] values)
         {
             var value = string.Join(";", values);
@@ -68,7 +68,7 @@ namespace Tests.Converters
             Assert.IsTrue(canConvert);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertTo_result_array_if_value_is_semicolon_separated_string(StringArrayConverter sut, string[] values)
         {
             var value = string.Join(";", values);
@@ -78,7 +78,7 @@ namespace Tests.Converters
             Assert.That(result, Is.EquivalentTo(values));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertTo_result_array_is_of_type_string_array(StringArrayConverter sut, string[] values)
         {
             var value = string.Join(";", values);
@@ -88,7 +88,7 @@ namespace Tests.Converters
             Assert.That(result, Is.TypeOf<string[]>());
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertTo_result_array_without_whitespace_items(StringArrayConverter sut, string[] values)
         {
             var valuesWithWhitespace = values.Concat(new[] { " ", "  ", "   " });
@@ -100,7 +100,7 @@ namespace Tests.Converters
             Assert.That(result, Is.EquivalentTo(values));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertTo_result_array_with_trimmed_items(StringArrayConverter sut, string[] values)
         {
             var valuesWithWhitespace = values.Select(s => $"  {s}  ").ToArray();
@@ -112,7 +112,7 @@ namespace Tests.Converters
             Assert.That(result, Is.EquivalentTo(values));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertTo_result_array_without_empty_items(StringArrayConverter sut, string[] values)
         {
             var valuesWithWhitespace = values.Concat(new[] { string.Empty, "" });
@@ -124,7 +124,7 @@ namespace Tests.Converters
             Assert.That(result, Is.EquivalentTo(values));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertTo_result_array_without_null_items(StringArrayConverter sut, string[] values)
         {
             var valuesWithWhitespace = values.Concat(new string[] { null, null });
@@ -136,7 +136,7 @@ namespace Tests.Converters
             Assert.That(result, Is.EquivalentTo(values));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertFrom_returns_true_if_value_is_null(StringArrayConverter sut)
         {
             var canConvert = sut.TryConvertFrom(null, out string result);
@@ -144,7 +144,7 @@ namespace Tests.Converters
             Assert.IsTrue(canConvert);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertFrom_result_is_null_if_value_is_null(StringArrayConverter sut)
         {
             var canConvert = sut.TryConvertFrom(null, out string result);
@@ -152,7 +152,7 @@ namespace Tests.Converters
             Assert.IsNull(result);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertFrom_returns_false_if_value_is_string_list(StringArrayConverter sut, List<string> value)
         {
             var canConvert = sut.TryConvertFrom(value, out string result);
@@ -160,7 +160,7 @@ namespace Tests.Converters
             Assert.IsFalse(canConvert);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertFrom_result_is_null_if_value_is_string_list(StringArrayConverter sut, List<string> value)
         {
             var canConvert = sut.TryConvertFrom(value, out string result);
@@ -168,7 +168,7 @@ namespace Tests.Converters
             Assert.IsNull(result);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertFrom_returns_false_if_value_is_string(StringArrayConverter sut, string value)
         {
             var canConvert = sut.TryConvertFrom(value, out string result);
@@ -176,7 +176,7 @@ namespace Tests.Converters
             Assert.IsFalse(canConvert);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertFrom_result_is_null_if_value_is_string(StringArrayConverter sut, string value)
         {
             var canConvert = sut.TryConvertFrom(value, out string result);
@@ -184,7 +184,7 @@ namespace Tests.Converters
             Assert.IsNull(result);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertFrom_returns_false_if_value_is_object(StringArrayConverter sut, object value)
         {
             var canConvert = sut.TryConvertFrom(value, out string result);
@@ -192,7 +192,7 @@ namespace Tests.Converters
             Assert.IsFalse(canConvert);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertFrom_result_is_null_if_value_is_object(StringArrayConverter sut, object value)
         {
             var canConvert = sut.TryConvertFrom(value, out string result);
@@ -200,7 +200,7 @@ namespace Tests.Converters
             Assert.IsNull(result);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertFrom_returns_true_if_value_is_string_array(StringArrayConverter sut, string[] value)
         {
             var canConvert = sut.TryConvertFrom(value, out string result);
@@ -208,7 +208,7 @@ namespace Tests.Converters
             Assert.IsTrue(canConvert);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertFrom_result_is_semicolon_separated_string_if_value_is_string_array(StringArrayConverter sut, string[] value)
         {
             var canConvert = sut.TryConvertFrom(value, out string result);
@@ -216,7 +216,7 @@ namespace Tests.Converters
             Assert.AreEqual(result, string.Join(";", value));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertFrom_result_is_semicolon_separated_string_without_empty_values(StringArrayConverter sut, string[] value)
         {
             var valuesWithWhitespace = value.Concat(new[] { string.Empty, "" }).ToArray();
@@ -226,7 +226,7 @@ namespace Tests.Converters
             Assert.AreEqual(result, string.Join(";", value));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertFrom_result_is_semicolon_separated_string_without_whitespace_values(StringArrayConverter sut, string[] value)
         {
             var valuesWithWhitespace = value.Concat(new[] { "  ", " " }).ToArray();
@@ -236,7 +236,7 @@ namespace Tests.Converters
             Assert.AreEqual(result, string.Join(";", value));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertFrom_result_is_semicolon_separated_string_without_null_values(StringArrayConverter sut, string[] value)
         {
             var valuesWithWhitespace = value.Concat(new string[] { null, null }).ToArray();
@@ -246,7 +246,7 @@ namespace Tests.Converters
             Assert.AreEqual(result, string.Join(";", value));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void TryConvertFrom_result_is_semicolon_separated_string_with_trimmed_values(StringArrayConverter sut, string[] value)
         {
             var valuesWithWhitespace = value.Select(s => $"  {s}  ").ToArray();

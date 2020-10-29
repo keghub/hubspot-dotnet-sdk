@@ -18,7 +18,7 @@ namespace Tests.Contacts {
             mockConnector = new Mock<IHubSpotContactConnector>(MockBehavior.Strict);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task FindAllAsync_forwards_with_filter(Contact[] expected)
         {
             mockConnector.Setup(p => p.FindAsync<Contact>(It.IsAny<IContactFilter>()))
@@ -31,7 +31,7 @@ namespace Tests.Contacts {
             mockConnector.Verify(p => p.FindAsync<Contact>(It.IsAny<AllContactFilter>()));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task FindRecentlyModifiedAsync_forwards_with_filter(Contact[] expected)
         {
             mockConnector.Setup(p => p.FindAsync<Contact>(It.IsAny<IContactFilter>()))
@@ -44,7 +44,7 @@ namespace Tests.Contacts {
             mockConnector.Verify(p => p.FindAsync<Contact>(It.IsAny<RecentlyUpdatedContactFilter>()));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task FindRecentlyCreatedAsync_forwards_with_filter(Contact[] expected)
         {
             mockConnector.Setup(p => p.FindAsync<Contact>(It.IsAny<IContactFilter>()))
@@ -57,7 +57,7 @@ namespace Tests.Contacts {
             mockConnector.Verify(p => p.FindAsync<Contact>(It.IsAny<RecentlyCreatedContactFilter>()));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task FindByEmailAsync_forwards_with_filter(Contact[] expected, string[] emails)
         {
             mockConnector.Setup(p => p.FindAsync<Contact>(It.IsAny<IContactFilter>()))
@@ -70,7 +70,7 @@ namespace Tests.Contacts {
             mockConnector.Verify(p => p.FindAsync<Contact>(It.IsAny<EmailContactFilter>()));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task FindByIdAsync_forwards_with_filter(Contact[] expected, long[] contactIds)
         {
             mockConnector.Setup(p => p.FindAsync<Contact>(It.IsAny<IContactFilter>()))
@@ -83,7 +83,7 @@ namespace Tests.Contacts {
             mockConnector.Verify(p => p.FindAsync<Contact>(It.IsAny<IdContactFilter>()));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task FindByCompanyIdAsync_forwards_with_filter(Contact[] expected, long companyId)
         {
             mockConnector.Setup(p => p.FindAsync<Contact>(It.IsAny<IContactFilter>()))
@@ -96,7 +96,7 @@ namespace Tests.Contacts {
             mockConnector.Verify(p => p.FindAsync<Contact>(It.IsAny<CompanyContactFilter>()));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task FindInListAsync_forwards_with_filter(Contact[] expected, long listId)
         {
             mockConnector.Setup(p => p.FindAsync<Contact>(It.IsAny<IContactFilter>()))
@@ -109,7 +109,7 @@ namespace Tests.Contacts {
             mockConnector.Verify(p => p.FindAsync<Contact>(It.IsAny<ListContactFilter>()));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task FindAsync_forwards_with_filter(Contact[] expected, string query)
         {
             mockConnector.Setup(p => p.FindAsync<Contact>(It.IsAny<IContactFilter>()))
@@ -134,7 +134,7 @@ namespace Tests.Contacts {
             mockConnector = new Mock<IHubSpotContactConnector>(MockBehavior.Strict);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task GetAsync_forwards_to_connector(Contact expected)
         {
             mockConnector.Setup(p => p.GetAsync<Contact>(It.IsAny<IContactSelector>()))
@@ -146,7 +146,7 @@ namespace Tests.Contacts {
             mockConnector.Verify();
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task SaveAsync_forwards_to_connector(Contact testContact)
         {
             mockConnector.Setup(p => p.SaveAsync(It.IsAny<Contact>()))
@@ -158,7 +158,7 @@ namespace Tests.Contacts {
             mockConnector.Verify();
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task FindAsync_forwards_to_connector(Contact[] expected)
         {
             mockConnector.Setup(p => p.FindAsync<Contact>(It.IsAny<IContactFilter>()))

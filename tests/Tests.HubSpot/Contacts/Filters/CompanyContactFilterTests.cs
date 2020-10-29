@@ -37,12 +37,12 @@ namespace Tests.Contacts.Filters
             mockClient.SetupGet(p => p.Companies).Returns(mockCompanyClient.Object);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task A_single_page_of_contact_ids_is_fetched(CompanyContactFilter sut, IReadOnlyList<Property> properties)
         {
             var list = fixture.Build<ContactIdList>()
                               .With(p => p.HasMore, false)
-                              .With(p => p.Offset, null)
+                              .Without(p => p.Offset)
                               .Create();
 
             mockCompanyClient.Setup(p => p.GetContactIdsInCompanyAsync(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<long?>())).ReturnsAsync(list);
@@ -59,7 +59,7 @@ namespace Tests.Contacts.Filters
             mockCompanyClient.Verify(p => p.GetContactIdsInCompanyAsync(It.IsAny<long>(), It.IsAny<int>(), It.IsAny<long?>()), Times.Once);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task Multiple_pages_of_contact_ids_are_fetched(CompanyContactFilter sut, IReadOnlyList<Property> properties)
         {
             var listBuilder = fixture.Build<ContactIdList>();
@@ -83,7 +83,7 @@ namespace Tests.Contacts.Filters
             mockCompanyClient.Verify(p => p.GetContactIdsInCompanyAsync(It.IsAny<long>(), It.IsAny<int>(), lists.First().Offset), Times.Once);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task Multiple_pages_of_contacts_are_fetched_if_too_many(CompanyContactFilter sut, IReadOnlyList<Property> properties)
         {
             var batchSize = sut.BatchSize;
@@ -104,7 +104,7 @@ namespace Tests.Contacts.Filters
 
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task Single_page_of_contacts_is_requested(CompanyContactFilter sut, IReadOnlyList<Property> properties)
         {
             var ids = fixture.CreateMany<long>().ToArray();
@@ -125,7 +125,7 @@ namespace Tests.Contacts.Filters
             mockContactClient.Verify(p => p.GetManyByIdAsync(ids, It.IsAny<IReadOnlyList<IProperty>>(), It.IsAny<PropertyMode>(), It.IsAny<FormSubmissionMode>(), It.IsAny<bool>(), It.IsAny<bool>()), Times.Once);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task Single_page_of_contacts_is_fetched(CompanyContactFilter sut, IReadOnlyList<Property> properties)
         {
             var ids = fixture.CreateMany<long>().ToArray();
@@ -146,7 +146,7 @@ namespace Tests.Contacts.Filters
             Assert.That(response, Is.EquivalentTo(contacts.Take(1).SelectMany(c => c.Values)));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task Multiple_pages_of_contacts_are_requested_if_too_many(CompanyContactFilter sut, IReadOnlyList<Property> properties)
         {
             var batchSize = sut.BatchSize;

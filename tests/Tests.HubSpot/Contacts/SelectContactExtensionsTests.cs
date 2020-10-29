@@ -19,7 +19,7 @@ namespace Tests.Contacts
             mockConnector = new Mock<IHubSpotContactConnector>(MockBehavior.Strict);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task GetByIdAsync_forwards_with_selector(long contactId, Contact expected)
         {
             mockConnector.Setup(p => p.GetAsync<Contact>(It.IsAny<IContactSelector>()))
@@ -32,7 +32,7 @@ namespace Tests.Contacts
             mockConnector.Verify(p => p.GetAsync<Contact>(It.IsAny<IdContactSelector>()), Times.Once);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task GetByEmailAsync_forwards_with_selector(string email, Contact expected)
         {
             mockConnector.Setup(p => p.GetAsync<Contact>(It.IsAny<IContactSelector>()))
@@ -45,7 +45,7 @@ namespace Tests.Contacts
             mockConnector.Verify(p => p.GetAsync<Contact>(It.IsAny<EmailContactSelector>()), Times.Once);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task GetByUserTokenAsync_forwards_with_selector(string userToken, Contact expected)
         {
             mockConnector.Setup(p => p.GetAsync<Contact>(It.IsAny<IContactSelector>()))
