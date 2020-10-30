@@ -32,12 +32,10 @@ namespace RawApiKey
 
             services.AddSingleton<IConfiguration>(configuration);
 
-            services.AddHubSpotClient(client => 
-            {
-                client.UseApiKeyAuthentication(configuration.GetSection("HubSpot"));
-            });
+            services.AddHubSpotClient(client => client
+                    .UseApiKeyAuthentication(configuration.GetSection("HubSpot")));
 
-            services.AddLogging(b => b.AddConsole().SetMinimumLevel(LogLevel.Trace));
+            services.AddLogging(b => b.AddConsole());
 
             var serviceProvider = services.BuildServiceProvider();
 

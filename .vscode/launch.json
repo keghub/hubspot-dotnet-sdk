@@ -38,7 +38,7 @@
             "stopAtEntry": false
         },
         {
-            "name": "Raw ApiKey",
+            "name": "ApiKey",
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
