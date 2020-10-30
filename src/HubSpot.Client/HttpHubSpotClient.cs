@@ -18,20 +18,6 @@ namespace HubSpot
 {
     public partial class HttpHubSpotClient : IHubSpotClient
     {
-        // TODO: Remove this code!
-        // private readonly ILogger<HttpHubSpotClient> _logger;
-
-        // public HttpHubSpotClient(HubSpotAuthenticator authenticator, ILogger<HttpHubSpotClient> logger) : base(CreateClient(authenticator), SerializerSettings, logger)
-        // {
-        //     if (authenticator == null) throw new ArgumentNullException(nameof(authenticator));
-        //     _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        // }
-
-        // private static HttpClient CreateClient(HubSpotAuthenticator authenticator)
-        // {
-        //     return new HttpClient(authenticator) { BaseAddress = authenticator.ServiceUri };
-        // }
-
         public static readonly Uri DefaultApiEndpoint = new Uri("https://api.hubapi.com");
 
         public static void ConfigureJsonSerializer(JsonSerializerSettings settings)
