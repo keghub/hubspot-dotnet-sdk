@@ -13,6 +13,8 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static IServiceCollection AddHubSpotClient(this IServiceCollection services, Action<IHubSpotClientConfigurator> configuration = null)
         {
+            _ = services ?? throw new ArgumentNullException(nameof(services));
+
             var configurator = new HubSpotClientConfigurator();
 
             configuration?.Invoke(configurator);
@@ -38,11 +40,15 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static HttpClient CreateRawHubSpotHttpClient(this IHttpClientFactory factory)
         {
+            _ = factory ?? throw new ArgumentNullException(nameof(factory));
+
             return factory.CreateClient(HttpClientConfigurationName);
         }
 
         public static HttpClient GetRawHubSpotHttpClient(this IServiceProvider serviceProvider)
         {
+            _ = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+
             return serviceProvider.GetRequiredService<IHttpClientFactory>().CreateRawHubSpotHttpClient();
         }
     }
