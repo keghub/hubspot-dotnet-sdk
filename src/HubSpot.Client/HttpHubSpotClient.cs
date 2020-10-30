@@ -32,16 +32,18 @@ namespace HubSpot
         //     return new HttpClient(authenticator) { BaseAddress = authenticator.ServiceUri };
         // }
 
-        public static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
+        public static readonly Uri DefaultApiEndpoint = new Uri("https://api.hubapi.com");
+
+        public static void ConfigureJsonSerializer(JsonSerializerSettings settings)
         {
-            DefaultValueHandling = DefaultValueHandling.Ignore,
-            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            Converters = new JsonConverter[]
+            settings.DefaultValueHandling = DefaultValueHandling.Ignore;
+            settings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+            settings.Converters = new JsonConverter[]
             {
                 new UnixEpochConverter(),
                 new StringEnumConverter()
-            }
-        };
+            };
+        }
 
         private readonly ILogger<HttpHubSpotClient> _logger;
         private readonly IHttpRestClient _client;

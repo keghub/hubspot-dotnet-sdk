@@ -3,16 +3,17 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Kralizek.Extensions.Http;
+using Microsoft.Extensions.Options;
 
 namespace HubSpot.Authentication
 {
-    public class ApiKeyHubSpotAuthenticator : HubSpotAuthenticator
+    public class ApiKeyHubSpotAuthenticator : DelegatingHandler
     {
-        private readonly string _apiKey;
+        private readonly ApiKeyOptions _options;
 
-        public ApiKeyHubSpotAuthenticator(string apiKey)
+        public ApiKeyHubSpotAuthenticator(IOptions<ApiKeyOptions> options)
         {
-            _apiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
+            _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -22,12 +23,17 @@ namespace HubSpot.Authentication
 
             var queryStringBuilder = HttpQueryStringBuilder.ParseQuery(uriBuilder.Query);
 
-            queryStringBuilder.Add("hapikey", _apiKey);
+            queryStringBuilder.Add("hapikey", _options.ApiKey);
 
             uriBuilder.Query = queryStringBuilder.BuildQuery();
             request.RequestUri = uriBuilder.Uri;
 
             return base.SendAsync(request, cancellationToken);
         }
+    }
+
+    public class ApiKeyOptions
+    {
+        public string ApiKey { get; set; }
     }
 }

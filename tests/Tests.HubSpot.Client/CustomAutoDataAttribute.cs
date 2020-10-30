@@ -3,6 +3,7 @@ using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoFixture.NUnit3;
 using HubSpot;
+using Newtonsoft.Json;
 
 namespace Tests
 {
@@ -30,7 +31,12 @@ namespace Tests
                 ConfigureMembers = true
             });
 
-            fixture.Inject(HttpHubSpotClient.SerializerSettings);
+            fixture.Register(() => 
+            {
+                var settings = new JsonSerializerSettings();
+                HttpHubSpotClient.ConfigureJsonSerializer(settings);
+                return settings;
+            });
 
             fixture.Register((HttpHubSpotClient client) => client.Companies);
 

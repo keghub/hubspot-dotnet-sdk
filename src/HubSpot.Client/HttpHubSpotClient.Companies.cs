@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using HubSpot.Model;
 using HubSpot.Model.Companies;
-using HubSpot.Utils;
 using Kralizek.Extensions.Http;
 
 namespace HubSpot
@@ -121,7 +120,7 @@ namespace HubSpot
                 limit,
                 requestOptions = new
                 {
-                    properties = properties.Select(p => p.Name).ToArray()
+                    properties = properties?.Select(p => p.Name).ToArray() ?? Array.Empty<string>()
                 },
                 offset = new SearchResponse.SearchResponseOffset
                 {

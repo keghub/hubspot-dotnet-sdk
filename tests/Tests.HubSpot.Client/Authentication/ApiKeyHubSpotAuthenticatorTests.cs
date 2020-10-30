@@ -10,50 +10,53 @@ using AutoFixture.NUnit3;
 using HubSpot;
 using HubSpot.Authentication;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
-
+using WorldDomination.Net.Http;
 
 namespace Tests.Authentication
 {
-    // [TestFixture]
-    // public class ApiKeyHubSpotAuthenticatorTests
-    // {
-    //     private HttpClient CreateClient(string apiKey, HttpMessageOptions options)
-    //     {
-    //         var handler = new FakeHttpMessageHandler(options);
+    [TestFixture]
+    public class ApiKeyHubSpotAuthenticatorTests
+    {
+        private HttpClient CreateClient(ApiKeyOptions options, HttpMessageOptions httpOptions)
+        {
+            var handler = new FakeHttpMessageHandler(httpOptions);
 
-    //         var authenticator = new ApiKeyHubSpotAuthenticator(apiKey) { InnerHandler = handler };
+            var wrapper = new OptionsWrapper<ApiKeyOptions>(options);
 
-    //         var client = new HttpClient(authenticator);
+            var authenticator = new ApiKeyHubSpotAuthenticator(wrapper) { InnerHandler = handler };
 
-    //         return client;
-    //     }
+            var client = new HttpClient(authenticator);
 
-    //     [Test]
-    //     [InlineAutoData("GET")]
-    //     [InlineAutoData("POST")]
-    //     [InlineAutoData("DELETE")]
-    //     [InlineAutoData("PUT")]
-    //     public async Task ApiKey_is_attached_to_request_in_querystring(string methodName, string apiKey, Uri requestUri)
-    //     {
-    //         var method = new HttpMethod(methodName);
+            return client;
+        }
 
-    //         var options = new HttpMessageOptions
-    //         {
-    //             HttpMethod = method,
-    //             HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-    //         };
+        [Test]
+        [InlineAutoData("GET")]
+        [InlineAutoData("POST")]
+        [InlineAutoData("DELETE")]
+        [InlineAutoData("PUT")]
+        public async Task ApiKey_is_attached_to_request_in_querystring(string methodName, ApiKeyOptions options, Uri requestUri)
+        {
+            var method = new HttpMethod(methodName);
 
-    //         var client = CreateClient(apiKey, options);
+            var httpOptions = new HttpMessageOptions
+            {
+                HttpMethod = method,
+                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
+            };
 
-    //         using (var testRequest = new HttpRequestMessage(method, requestUri))
-    //         {
-    //             var response = await client.SendAsync(testRequest);
-    //         }
+            var client = CreateClient(options, httpOptions);
 
-    //         Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.Query, Contains.Substring($"hapikey={apiKey}"));
-    //     }
-    // }
+            using (var testRequest = new HttpRequestMessage(method, requestUri))
+            {
+                var response = await client.SendAsync(testRequest);
+            }
+
+            Assert.That(httpOptions.HttpResponseMessage.RequestMessage.RequestUri.Query, Contains.Substring($"hapikey={options.ApiKey}"));
+        }
+    }
 }
