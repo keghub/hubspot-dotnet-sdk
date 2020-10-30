@@ -11,7 +11,7 @@ namespace OAuth
 {
     class Program
     {
-        static async Task Main(string[] args)
+        static async Task Main()
         {
             var configurationBuilder = new ConfigurationBuilder();
 

@@ -91,7 +91,7 @@ namespace HubSpot.Internal
         public IReadOnlyList<CustomPropertyInfo> GetCustomProperties<T>(Func<CustomPropertyAttribute, bool> filter)
             where T : class, TEntity, new()
         {
-            filter = filter ?? (a => true);
+            filter ??= (a => true);
 
             var customProperties = _typeStore.GetCustomProperties<THubSpot, T>();
 

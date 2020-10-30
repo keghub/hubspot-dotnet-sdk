@@ -33,7 +33,7 @@ namespace Tests.CRM.Associations
 
         [Test]
         [CustomAutoData]
-        public async Task Limit_is_correctly_added_to_queryString([Frozen] IHttpRestClient client, IHubSpotCrmAssociationClient sut, long objectId, int associationTypeId, [System.ComponentModel.DataAnnotations.Range(1, 100)] int limit, AssociationIdList result)
+        public async Task Limit_is_correctly_added_to_queryString([Frozen] IHttpRestClient client, IHubSpotCrmAssociationClient sut, long objectId, int associationTypeId, [System.ComponentModel.DataAnnotations.Range(1, 100)] int limit)
         {
             Assume.That(limit <= 100);
 
@@ -45,7 +45,7 @@ namespace Tests.CRM.Associations
 
         [Test]
         [CustomAutoData]
-        public async Task Offset_is_correctly_added_to_queryString([Frozen] IHttpRestClient client, IHubSpotCrmAssociationClient sut, long objectId, int associationTypeId, long offset, AssociationIdList result)
+        public async Task Offset_is_correctly_added_to_queryString([Frozen] IHttpRestClient client, IHubSpotCrmAssociationClient sut, long objectId, int associationTypeId, long offset)
         {
             var response = await sut.GetAllAsync(objectId, associationTypeId, offset: offset);
 

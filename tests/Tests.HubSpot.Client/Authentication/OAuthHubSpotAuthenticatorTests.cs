@@ -131,7 +131,7 @@ namespace Tests.Authentication
             for (int i = 0; i < 2; i++)
             {
                 var testRequest = new HttpRequestMessage(method, requestUri);
-                var response = await client.SendAsync(testRequest);
+                await client.SendAsync(testRequest);
             }
 
             Assert.That(refreshTokenOptions.NumberOfTimesCalled, Is.EqualTo(1));
@@ -205,7 +205,7 @@ namespace Tests.Authentication
             async Task MakeARequest()
             {
                 var request = new HttpRequestMessage(method, requestUri);
-                var response = await client.SendAsync(request);
+                await client.SendAsync(request);
             }
         }
 
@@ -214,7 +214,7 @@ namespace Tests.Authentication
         [InlineAutoData("POST")]
         [InlineAutoData("DELETE")]
         [InlineAutoData("PUT")]
-        public async Task Token_is_not_attached_if_request_fails(string methodName, OAuthOptions options, Uri requestUri, string accessToken, long expiresIn, TestClock clock)
+        public async Task Token_is_not_attached_if_request_fails(string methodName, OAuthOptions options, Uri requestUri, TestClock clock)
         {
             Clock.Set(clock);
 

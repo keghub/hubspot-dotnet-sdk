@@ -89,37 +89,35 @@ namespace HubSpot.Internal
 
                 var count = 0;
 
-                using (var enumerator = items.GetEnumerator())
+                using var enumerator = items.GetEnumerator();
+                
+                while (enumerator.MoveNext())
                 {
+                    var item = enumerator.Current;
 
-                    while (enumerator.MoveNext())
+                    if (bucket == null)
                     {
-                        var item = enumerator.Current;
-
-                        if (bucket == null)
-                        {
-                            bucket = new TSource[size];
-                        }
-
-                        bucket[count++] = item;
-
-                        if (count != size)
-                        {
-                            continue;
-                        }
-
-                        yield return selector(bucket);
-
-                        bucket = null;
-
-                        count = 0;
+                        bucket = new TSource[size];
                     }
 
-                    if (bucket != null && count > 0)
+                    bucket[count++] = item;
+
+                    if (count != size)
                     {
-                        Array.Resize(ref bucket, count);
-                        yield return selector(bucket);
+                        continue;
                     }
+
+                    yield return selector(bucket);
+
+                    bucket = null;
+
+                    count = 0;
+                }
+
+                if (bucket != null && count > 0)
+                {
+                    Array.Resize(ref bucket, count);
+                    yield return selector(bucket);
                 }
             }
         }
