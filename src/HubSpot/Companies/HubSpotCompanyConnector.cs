@@ -12,13 +12,11 @@ namespace HubSpot.Companies
     {
         private readonly IHubSpotClient _client;
         private readonly ICompanyTypeManager _typeManager;
-        private readonly ILogger<HubSpotCompanyConnector> _logger;
 
-        public HubSpotCompanyConnector(IHubSpotClient client, ICompanyTypeManager typeManager, ILogger<HubSpotCompanyConnector> logger)
+        public HubSpotCompanyConnector(IHubSpotClient client, ICompanyTypeManager typeManager)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _typeManager = typeManager ?? throw new ArgumentNullException(nameof(typeManager));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<TCompany> GetAsync<TCompany>(ICompanySelector selector) where TCompany : Company, new()

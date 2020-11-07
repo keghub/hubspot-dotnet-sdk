@@ -16,31 +16,29 @@ using Newtonsoft.Json.Converters;
 
 namespace HubSpot
 {
-    public partial class HttpHubSpotClient : HttpRestClient, IHubSpotClient
+    public partial class HttpHubSpotClient : IHubSpotClient
     {
-        private readonly ILogger<HttpHubSpotClient> _logger;
+        public static readonly Uri DefaultApiEndpoint = new Uri("https://api.hubapi.com");
 
-        public HttpHubSpotClient(HubSpotAuthenticator authenticator, ILogger<HttpHubSpotClient> logger) : base(CreateClient(authenticator), SerializerSettings, logger)
+        public static void ConfigureJsonSerializer(JsonSerializerSettings settings)
         {
-            if (authenticator == null) throw new ArgumentNullException(nameof(authenticator));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        private static HttpClient CreateClient(HubSpotAuthenticator authenticator)
-        {
-            return new HttpClient(authenticator) { BaseAddress = authenticator.ServiceUri };
-        }
-
-        public static readonly JsonSerializerSettings SerializerSettings = new JsonSerializerSettings
-        {
-            DefaultValueHandling = DefaultValueHandling.Ignore,
-            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            Converters = new JsonConverter[]
+            settings.DefaultValueHandling = DefaultValueHandling.Ignore;
+            settings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+            settings.Converters = new JsonConverter[]
             {
                 new UnixEpochConverter(),
                 new StringEnumConverter()
-            }
-        };
+            };
+        }
+
+        private readonly ILogger<HttpHubSpotClient> _logger;
+        private readonly IHttpRestClient _client;
+
+        public HttpHubSpotClient(IHttpRestClient client, ILogger<HttpHubSpotClient> logger)
+        {
+            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
 
         public IHubSpotContactClient Contacts => this;
 

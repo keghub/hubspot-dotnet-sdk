@@ -4,38 +4,28 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using HubSpot.Model.CRM.Associations;
+using Kralizek.Extensions.Http;
+using Moq;
 using NUnit.Framework;
-using WorldDomination.Net.Http;
+
 
 namespace Tests.CRM.Associations
 {
     [TestFixture]
-    public class CreateAsyncTests : AssociationTests
+    public class CreateAsyncTests
     {
-        [Test]
-        [AutoData]
-        public async Task Request_is_correct(Association associationToCreate)
+        [Test, CustomAutoData]
+        public async Task Request_is_correct([Frozen] IHttpRestClient client, IHubSpotCrmAssociationClient sut, Association associationToCreate)
         {
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Put,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.NoContent)
-            };
-
-            var sut = CreateSystemUnderTest(options);
-
             await sut.CreateAsync(associationToCreate);
 
-            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.AbsolutePath, Contains.Substring("/crm-associations/v1/associations"));
-
+            Mock.Get(client).Verify(p => p.SendAsync(HttpMethod.Put, "/crm-associations/v1/associations", associationToCreate, null));
         }
 
-        [Test]
-        public void Item_to_create_cant_be_null()
+        [Test, CustomAutoData]
+        public void Item_to_create_cant_be_null(IHubSpotCrmAssociationClient sut)
         {
-            var sut = CreateSystemUnderTest();
-
-            Assert.ThrowsAsync<ArgumentNullException>(() => sut.CreateAsync(null));
+            Assert.That(() => sut.CreateAsync(null), Throws.ArgumentNullException);
         }
     }
 }

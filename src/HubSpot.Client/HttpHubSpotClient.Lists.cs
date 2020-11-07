@@ -20,7 +20,7 @@ namespace HubSpot
                 filters
             };
 
-            var response = await SendAsync<object, List>(HttpMethod.Post, "/contacts/v1/lists", request);
+            var response = await _client.PostAsync<object, List>("/contacts/v1/lists", request);
 
             return response;
         }
@@ -36,14 +36,14 @@ namespace HubSpot
             builder.Add("count", count);
             builder.Add("offset", offset);
 
-            var response = await SendAsync<ListList>(HttpMethod.Get, "/contacts/v1/lists", builder.BuildQuery());
+            var response = await _client.GetAsync<ListList>("/contacts/v1/lists", builder.BuildQuery());
 
             return response;
         }
 
         async Task<List> IHubSpotListClient.GetByIdAsync(long listId)
         {
-            var response = await SendAsync<List>(HttpMethod.Get, $"/contacts/v1/lists/{listId}");
+            var response = await _client.GetAsync<List>($"/contacts/v1/lists/{listId}");
 
             return response;
         }
@@ -57,14 +57,14 @@ namespace HubSpot
                 filters
             };
 
-            var response = await SendAsync<object, List>(HttpMethod.Post, $"/contacts/v1/lists/{listId}", request);
+            var response = await _client.PostAsync<object, List>($"/contacts/v1/lists/{listId}", request);
 
             return response;
         }
 
         async Task IHubSpotListClient.DeleteAsync(long listId)
         {
-            await SendAsync(HttpMethod.Delete, $"/contacts/v1/lists/{listId}");
+            await _client.DeleteAsync($"/contacts/v1/lists/{listId}");
         }
 
         async Task<ListList> IHubSpotListClient.GetManyByIdAsync(IReadOnlyList<long> listIds)
@@ -81,7 +81,7 @@ namespace HubSpot
                 builder.Add("listId", id);
             }
 
-            var response = await SendAsync<ListList>(HttpMethod.Get, "/contacts/v1/lists/batch", builder.BuildQuery());
+            var response = await _client.GetAsync<ListList>("/contacts/v1/lists/batch", builder.BuildQuery());
 
             return response;
         }
@@ -97,7 +97,7 @@ namespace HubSpot
             builder.Add("count", count);
             builder.Add("offset", offset);
 
-            var response = await SendAsync<ListList>(HttpMethod.Get, "/contacts/v1/lists/static", builder.BuildQuery());
+            var response = await _client.GetAsync<ListList>("/contacts/v1/lists/static", builder.BuildQuery());
 
             return response;
         }
@@ -113,7 +113,7 @@ namespace HubSpot
             builder.Add("count", count);
             builder.Add("offset", offset);
 
-            var response = await SendAsync<ListList>(HttpMethod.Get, "/contacts/v1/lists/dynamic", builder.BuildQuery());
+            var response = await _client.GetAsync<ListList>("/contacts/v1/lists/dynamic", builder.BuildQuery());
 
             return response;
         }
@@ -134,7 +134,7 @@ namespace HubSpot
             builder.Add("count", count.ToString());
             builder.Add("vidOffset", contactOffset);
 
-            var list = await SendAsync<ContactList>(HttpMethod.Get, $"/contacts/v1/lists/{listId}/contacts/all", builder.BuildQuery());
+            var list = await _client.GetAsync<ContactList>($"/contacts/v1/lists/{listId}/contacts/all", builder.BuildQuery());
 
             return list;
         }
@@ -160,7 +160,7 @@ namespace HubSpot
                 builder.Add("timeOffset", timeOffset.Value.ToUnixTimeMilliseconds().ToString());
             }
 
-            var list = await SendAsync<ContactList>(HttpMethod.Get, $"/contacts/v1/lists/{listId}/contacts/recent", builder.BuildQuery());
+            var list = await _client.GetAsync<ContactList>($"/contacts/v1/lists/{listId}/contacts/recent", builder.BuildQuery());
 
             return list;
         }
@@ -173,7 +173,7 @@ namespace HubSpot
                 emails = contactEmails
             };
 
-            var response = await SendAsync<object, ContactListResponse>(HttpMethod.Post, $"/contacts/v1/lists/{listId}/add", request);
+            var response = await _client.PostAsync<object, ContactListResponse>($"/contacts/v1/lists/{listId}/add", request);
 
             return response;
         }
@@ -185,7 +185,7 @@ namespace HubSpot
                 vids = new[] { contactId }
             };
 
-            var response = await SendAsync<object, ContactListResponse>(HttpMethod.Post, $"/contacts/v1/lists/{listId}/remove", request);
+            var response = await _client.PostAsync<object, ContactListResponse>($"/contacts/v1/lists/{listId}/remove", request);
 
             return response;
         }

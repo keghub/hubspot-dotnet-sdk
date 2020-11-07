@@ -4,85 +4,53 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using HubSpot.Model.CRM.Associations;
+using Kralizek.Extensions.Http;
+using Moq;
 using NUnit.Framework;
-using WorldDomination.Net.Http;
+
 
 namespace Tests.CRM.Associations
 {
     [TestFixture]
-    public class GetAllAsyncTests : AssociationTests
+    public class GetAllAsyncTests
     {
         [Test]
-        [AutoData]
-        public async Task Request_is_correct(long objectId, int associationTypeId, AssociationIdList result)
+        [CustomAutoData]
+        public async Task Request_is_correct([Frozen] IHttpRestClient client, IHubSpotCrmAssociationClient sut, long objectId, int associationTypeId)
         {
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = Object(result)
-                }
-            };
-
-            var sut = CreateSystemUnderTest(options);
-
             var response = await sut.GetAllAsync(objectId, associationTypeId);
 
-            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.AbsolutePath, Contains.Substring($"/crm-associations/v1/associations/{objectId}/HUBSPOT_DEFINED/{associationTypeId}"));
+            Mock.Get(client)
+                .Verify(p => p.SendAsync<AssociationIdList>(HttpMethod.Get, $"/crm-associations/v1/associations/{objectId}/HUBSPOT_DEFINED/{associationTypeId}", It.IsAny<IQueryString>()));
         }
 
         [Test]
-        [AutoData]
-        public void Limit_cant_be_greater_than_100(long objectId, int associationTypeId, int limit)
+        [CustomAutoData]
+        public void Limit_cant_be_greater_than_100(IHubSpotCrmAssociationClient sut, long objectId, int associationTypeId, int limit)
         {
-            var sut = CreateSystemUnderTest();
-
             Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => sut.GetAllAsync(objectId, associationTypeId, limit: 100 + limit));
-
         }
 
         [Test]
-        [AutoData]
-        public async Task Limit_is_correctly_added_to_queryString(long objectId, int associationTypeId, [System.ComponentModel.DataAnnotations.Range(1, 100)] int limit, AssociationIdList result)
+        [CustomAutoData]
+        public async Task Limit_is_correctly_added_to_queryString([Frozen] IHttpRestClient client, IHubSpotCrmAssociationClient sut, long objectId, int associationTypeId, [System.ComponentModel.DataAnnotations.Range(1, 100)] int limit)
         {
             Assume.That(limit <= 100);
-        
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = Object(result)
-                }
-            };
-
-            var sut = CreateSystemUnderTest(options);
 
             var response = await sut.GetAllAsync(objectId, associationTypeId, limit);
 
-            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.Query, Contains.Substring($"limit={limit}"));
-
+            Mock.Get(client)
+                .Verify(p => p.SendAsync<AssociationIdList>(HttpMethod.Get, $"/crm-associations/v1/associations/{objectId}/HUBSPOT_DEFINED/{associationTypeId}", QueryStringMatcher.That(Contains.Substring($"limit={limit}"))));
         }
 
         [Test]
-        [AutoData]
-        public async Task Offset_is_correctly_added_to_queryString(long objectId, int associationTypeId, long offset, AssociationIdList result)
+        [CustomAutoData]
+        public async Task Offset_is_correctly_added_to_queryString([Frozen] IHttpRestClient client, IHubSpotCrmAssociationClient sut, long objectId, int associationTypeId, long offset)
         {
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = Object(result)
-                }
-            };
-
-            var sut = CreateSystemUnderTest(options);
-
             var response = await sut.GetAllAsync(objectId, associationTypeId, offset: offset);
 
-            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.Query, Contains.Substring($"offset={offset}"));
+            Mock.Get(client)
+                .Verify(p => p.SendAsync<AssociationIdList>(HttpMethod.Get, $"/crm-associations/v1/associations/{objectId}/HUBSPOT_DEFINED/{associationTypeId}", QueryStringMatcher.That(Contains.Substring($"offset={offset}"))));
         }
     }
 }

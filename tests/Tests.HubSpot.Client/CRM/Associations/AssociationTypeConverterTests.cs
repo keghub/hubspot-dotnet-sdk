@@ -11,13 +11,13 @@ namespace Tests.CRM.Associations
     [TestFixture]
     public class AssociationTypeConverterTests
     {
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void CanConvert_returns_true_if_AssociationType(AssociationTypeConverter sut)
         {
             Assert.That(sut.CanConvert(typeof(AssociationType)), Is.True);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void CanConvert_returns_false_if_not_AssociationType(AssociationTypeConverter sut, Type type)
         {
             Assume.That(type, Is.Not.EqualTo(typeof(AssociationType)));
@@ -25,7 +25,7 @@ namespace Tests.CRM.Associations
             Assert.That(sut.CanConvert(type), Is.False);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void ReadJson_can_deserialize_an_integer_as_AssociationType(AssociationTypeConverter sut, int testValue)
         {
             var json = $"{testValue}";
@@ -41,7 +41,7 @@ namespace Tests.CRM.Associations
             Assert.That(result.Id, Is.EqualTo(testValue));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void ReadJson_can_deserialize_an_array_of_integers_as_AssociationType(AssociationTypeConverter sut, int[] values)
         {
             var json = JsonConvert.SerializeObject(values);
@@ -55,7 +55,7 @@ namespace Tests.CRM.Associations
             Assert.That(result, Has.Some.Matches<AssociationType>(at => values.Contains(at.Id)));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void WriteJson_writes_item_as_integer(AssociationTypeConverter sut, AssociationType testValue)
         {
             var stringWriter = new StringWriter();

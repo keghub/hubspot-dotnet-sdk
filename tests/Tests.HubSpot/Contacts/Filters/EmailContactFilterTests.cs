@@ -31,7 +31,7 @@ namespace Tests.Contacts.Filters
             mockClient.SetupGet(p => p.Contacts).Returns(mockContactClient.Object);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task Contacts_are_fetched_by_email(EmailContactFilter sut, IReadOnlyList<Property> properties)
         {
             var contacts = fixture.CreateMany<Contact>().ToArray();

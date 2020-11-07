@@ -24,8 +24,10 @@ namespace HubSpot
             {
                 builder.Add("offset", offset.Value);
             }
-            
-            var list = await SendAsync<AssociationIdList>(HttpMethod.Get, $"/crm-associations/v1/associations/{objectId}/HUBSPOT_DEFINED/{associationType.Id}", builder.BuildQuery());
+
+            string path = $"/crm-associations/v1/associations/{objectId}/HUBSPOT_DEFINED/{associationType.Id}";
+            IQueryString query = builder.BuildQuery();
+            var list = await _client.SendAsync<AssociationIdList>(HttpMethod.Get, path, query);
 
             return list;
         }
@@ -37,7 +39,7 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(association));
             }
 
-            await SendAsync(HttpMethod.Put, "/crm-associations/v1/associations", association);
+            await _client.SendAsync<Association>(HttpMethod.Put, "/crm-associations/v1/associations", association, null);
         }
 
         async Task IHubSpotCrmAssociationClient.CreateManyAsync(IReadOnlyList<Association> associations)
@@ -57,7 +59,7 @@ namespace HubSpot
                 throw new ArgumentOutOfRangeException(nameof(associations), "Up to 100 items can be created in the same request");
             }
 
-            await SendAsync(HttpMethod.Put, "/crm-associations/v1/associations/create-batch", associations);
+            await _client.SendAsync<IReadOnlyList<Association>>(HttpMethod.Put, "/crm-associations/v1/associations/create-batch", associations, null);
         }
 
         async Task IHubSpotCrmAssociationClient.DeleteAsync(Association association)
@@ -67,7 +69,7 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(association));
             }
 
-            await SendAsync(HttpMethod.Put, "/crm-associations/v1/associations/delete", association);
+            await _client.SendAsync<Association>(HttpMethod.Put, "/crm-associations/v1/associations/delete", association, null);
 
         }
 
@@ -88,7 +90,7 @@ namespace HubSpot
                 throw new ArgumentOutOfRangeException(nameof(associations), "Up to 100 items can be deleted in the same request");
             }
 
-            await SendAsync(HttpMethod.Put, "/crm-associations/v1/associations/delete-batch", associations);
+            await _client.SendAsync<IReadOnlyList<Association>>(HttpMethod.Put, "/crm-associations/v1/associations/delete-batch", associations, null);
         }
     }
 }

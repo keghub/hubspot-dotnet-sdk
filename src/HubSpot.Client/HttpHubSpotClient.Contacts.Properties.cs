@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using HubSpot.Model.Contacts.Properties;
+using Kralizek.Extensions.Http;
 
 namespace HubSpot
 {
@@ -10,7 +11,7 @@ namespace HubSpot
     {
         async Task<IReadOnlyList<ContactPropertyGroup>> IHubSpotContactPropertyGroupClient.GetAllAsync()
         {
-            return await SendAsync<ContactPropertyGroup[]>(HttpMethod.Get, "/properties/v1/contacts/groups");
+            return await _client.SendAsync<ContactPropertyGroup[]>(HttpMethod.Get, "/properties/v1/contacts/groups", null);
         }
 
         async Task<ContactPropertyGroup> IHubSpotContactPropertyGroupClient.CreateAsync(ContactPropertyGroup group)
@@ -30,7 +31,7 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(group.DisplayName));
             }
 
-            return await SendAsync<ContactPropertyGroup, ContactPropertyGroup>(HttpMethod.Post, "/properties/v1/contacts/groups", group);
+            return await _client.SendAsync<ContactPropertyGroup, ContactPropertyGroup>(HttpMethod.Post, "/properties/v1/contacts/groups", @group, null);
         }
 
         async Task<ContactPropertyGroup> IHubSpotContactPropertyGroupClient.UpdateAsync(string groupName, ContactPropertyGroup group)
@@ -55,7 +56,8 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(group.DisplayName));
             }
 
-            return await SendAsync<ContactPropertyGroup, ContactPropertyGroup>(HttpMethod.Put, $" /properties/v1/contacts/groups/named/{groupName}", group);
+            string path = $" /properties/v1/contacts/groups/named/{groupName}";
+            return await _client.SendAsync<ContactPropertyGroup, ContactPropertyGroup>(HttpMethod.Put, path, @group, null);
         }
 
         async Task IHubSpotContactPropertyGroupClient.DeleteAsync(string groupName)
@@ -65,12 +67,13 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(groupName));
             }
 
-            await SendAsync(HttpMethod.Delete, $"/properties/v1/contacts/groups/named/{groupName}");
+            string path = $"/properties/v1/contacts/groups/named/{groupName}";
+            await _client.SendAsync(HttpMethod.Delete, path, null);
         }
 
         async Task<IReadOnlyList<ContactProperty>> IHubSpotContactPropertyClient.GetAllAsync()
         {
-            return await SendAsync<ContactProperty[]>(HttpMethod.Get, "/properties/v1/contacts/properties");
+            return await _client.SendAsync<ContactProperty[]>(HttpMethod.Get, "/properties/v1/contacts/properties", null);
         }
 
         async Task<ContactProperty> IHubSpotContactPropertyClient.GetByNameAsync(string propertyName)
@@ -80,7 +83,8 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(propertyName));
             }
 
-            return await SendAsync<ContactProperty>(HttpMethod.Get, $"/properties/v1/contacts/properties/named/{propertyName}");
+            string path = $"/properties/v1/contacts/properties/named/{propertyName}";
+            return await _client.SendAsync<ContactProperty>(HttpMethod.Get, path, null);
         }
 
         async Task<ContactProperty> IHubSpotContactPropertyClient.CreateAsync(ContactProperty propertyToCreate)
@@ -105,7 +109,7 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(propertyToCreate.GroupName));
             }
 
-            var property = await SendAsync<ContactProperty, ContactProperty>(HttpMethod.Post, "/properties/v1/contacts/properties", propertyToCreate);
+            var property = await _client.SendAsync<ContactProperty, ContactProperty>(HttpMethod.Post, "/properties/v1/contacts/properties", propertyToCreate, null);
 
             return property;
         }
@@ -127,7 +131,8 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(updatedProperty.Name));
             }
 
-            var property = await SendAsync<ContactProperty, ContactProperty>(HttpMethod.Put, $"/properties/v1/contacts/properties/named/{propertyName}", updatedProperty);
+            string path = $"/properties/v1/contacts/properties/named/{propertyName}";
+            var property = await _client.SendAsync<ContactProperty, ContactProperty>(HttpMethod.Put, path, updatedProperty, null);
 
             return property;
         }
@@ -139,7 +144,8 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(propertyName));
             }
 
-            await SendAsync(HttpMethod.Delete, $"/properties/v1/contacts/properties/named/{propertyName}");
+            string path = $"/properties/v1/contacts/properties/named/{propertyName}";
+            await _client.SendAsync(HttpMethod.Delete, path, null);
         }
     }
 }

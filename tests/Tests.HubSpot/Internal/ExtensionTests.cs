@@ -96,13 +96,13 @@ namespace Tests.Internal
             Assert.That(values, Is.Empty);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void NotIn_should_return_first_set_if_disgiunted(int[] first, int[] second)
         {
             Assert.That(Extensions.NotIn(first, second), Is.EquivalentTo(first));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void NotIn_should_return_extra_items(int[] original, int[] extra)
         {
             var added = original.Concat(extra);

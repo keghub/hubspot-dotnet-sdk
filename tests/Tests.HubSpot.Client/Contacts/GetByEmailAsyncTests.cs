@@ -3,43 +3,29 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using HubSpot.Model.Contacts;
 using Kralizek.Extensions.Http;
+using Moq;
 using NUnit.Framework;
-using WorldDomination.Net.Http;
+
 
 namespace Tests.Contacts
 {
     [TestFixture]
-    public class GetByEmailAsyncTests : ContactTests
+    public class GetByEmailAsyncTests
     {
-        [Test]
-        public void Email_is_required()
+        [Test, CustomAutoData]
+        public void Email_is_required(IHubSpotContactClient sut)
         {
-            var option = new HttpMessageOptions();
-
-            var sut = CreateSystemUnderTest(option);
-
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.GetByEmailAsync(null));
+            Assert.That(() => sut.GetByEmailAsync(null), Throws.ArgumentNullException);
         }
 
-        [Test]
-        [AutoData]
-        public async Task Request_is_correct(string email)
+        [Test, CustomAutoData]
+        public async Task Request_is_correct([Frozen] IHttpRestClient client, IHubSpotContactClient sut, string email)
         {
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = JsonContent.EmptyObject
-                }
-            };
-
-            var sut = CreateSystemUnderTest(options);
-
             var response = await sut.GetByEmailAsync(email);
 
-            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.AbsolutePath, Contains.Substring($"/contacts/v1/contact/email/{email}/profile"));
+            Mock.Get(client).Verify(p => p.SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/email/{email}/profile", It.IsAny<IQueryString>()));
         }
     }
 }

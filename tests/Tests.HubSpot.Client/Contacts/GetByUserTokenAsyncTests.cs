@@ -3,41 +3,36 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
+using HubSpot.Model.Contacts;
 using Kralizek.Extensions.Http;
+using Moq;
 using NUnit.Framework;
-using WorldDomination.Net.Http;
+
 
 namespace Tests.Contacts
 {
     [TestFixture]
-    public class GetByUserTokenAsyncTests : ContactTests
+    public class GetByUserTokenAsyncTests
     {
         [Test]
-        [AutoData]
-        public async Task Request_is_correct(string userToken)
+        [CustomAutoData]
+        public async Task Request_is_correct([Frozen] IHttpRestClient client, IHubSpotContactClient sut, string userToken, Contact contact)
         {
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = JsonContent.EmptyObject
-                }
-            };
-
-            var sut = CreateSystemUnderTest(options);
+            Mock.Get(client)
+                .Setup(p => p.SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/utk/{userToken}/profile", It.IsAny<IQueryString>()))
+                .ReturnsAsync(contact)
+                .Verifiable();
 
             var response = await sut.GetByUserTokenAsync(userToken);
 
-            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.AbsolutePath, Contains.Substring($"/contacts/v1/contact/utk/{userToken}/profile"));
+            Mock.Verify();
         }
 
         [Test]
-        public void UserToken_is_required()
+        [CustomAutoData]
+        public void UserToken_is_required(IHubSpotContactClient sut)
         {
-            var sut = CreateSystemUnderTest();
-
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.GetByUserTokenAsync(null));
+            Assert.That(() => sut.GetByUserTokenAsync(null), Throws.ArgumentNullException);
         }
     }
 }

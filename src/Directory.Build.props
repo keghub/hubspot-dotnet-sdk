@@ -1,0 +1,32 @@
+<Project>
+  <PropertyGroup>
+    <RootNamespace>HubSpot</RootNamespace>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>EMG</Authors>
+    <Company>EMG - Educations Media Group AB</Company>
+  </PropertyGroup>
+
+  <PropertyGroup Label="SourceLink properties">
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup Label="SourceLink packages">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
+    <PackageReference Include="SourceLink.Copy.PdbFiles" Version="2.8.3" PrivateAssets="All" /> 
+  </ItemGroup>
+
+  <PropertyGroup Label="Package properties">
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/emgdev/hubspot-dotnet-sdk</PackageProjectUrl>
+    <PackageIconUrl>http://static.emg-services.net/masterpages/pics/logos/emg-icon-64.png</PackageIconUrl>
+    <NoWarn>NU5105,NU5125,NU5048</NoWarn>
+  </PropertyGroup>
+
+</Project>

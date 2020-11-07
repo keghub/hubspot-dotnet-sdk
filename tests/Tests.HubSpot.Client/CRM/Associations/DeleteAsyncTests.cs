@@ -4,37 +4,30 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
 using HubSpot.Model.CRM.Associations;
+using Kralizek.Extensions.Http;
+using Moq;
 using NUnit.Framework;
-using WorldDomination.Net.Http;
+
 
 namespace Tests.CRM.Associations
 {
     [TestFixture]
-    public class DeleteAsyncTests : AssociationTests
+    public class DeleteAsyncTests
     {
         [Test]
-        [AutoData]
-        public async Task Request_is_correct(Association associationToCreate)
+        [CustomAutoData]
+        public async Task Request_is_correct([Frozen] IHttpRestClient client, IHubSpotCrmAssociationClient sut, Association associationToDelete)
         {
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Put,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.NoContent)
-            };
+            await sut.DeleteAsync(associationToDelete);
 
-            var sut = CreateSystemUnderTest(options);
-
-            await sut.DeleteAsync(associationToCreate);
-
-            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.AbsolutePath, Contains.Substring("/crm-associations/v1/associations/delete"));
+            Mock.Get(client)
+                .Verify(p => p.SendAsync(HttpMethod.Put, "/crm-associations/v1/associations/delete", associationToDelete, null));
 
         }
 
-        [Test]
-        public void Item_to_delete_cant_be_null()
+        [Test, CustomAutoData]
+        public void Item_to_delete_cant_be_null(IHubSpotCrmAssociationClient sut)
         {
-            var sut = CreateSystemUnderTest();
-
             Assert.ThrowsAsync<ArgumentNullException>(() => sut.DeleteAsync(null));
         }
     }
