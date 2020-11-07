@@ -27,7 +27,7 @@ namespace HubSpot
 
             try
             {
-                var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", builder.BuildQuery());
+                var contact = await _client.GetAsync<Contact>($"/contacts/v1/contact/vid/{contactId}/profile", builder.BuildQuery());
                 return contact;
             }
             catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -52,7 +52,7 @@ namespace HubSpot
 
             try
             {
-                var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/email/{email}/profile", builder.BuildQuery());
+                var contact = await _client.GetAsync<Contact>($"/contacts/v1/contact/email/{email}/profile", builder.BuildQuery());
                 return contact;
             }
             catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -77,7 +77,7 @@ namespace HubSpot
 
             try
             {
-                var contact = await SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/utk/{userToken}/profile", builder.BuildQuery());
+                var contact = await _client.GetAsync<Contact>($"/contacts/v1/contact/utk/{userToken}/profile", builder.BuildQuery());
                 return contact;
             }
             catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -110,7 +110,7 @@ namespace HubSpot
             builder.AddFormSubmissionMode(formSubmissionMode);
             builder.AddShowListMemberships(showListMemberships);
 
-            var contacts = await SendAsync<Dictionary<long, Contact>>(HttpMethod.Get, "/contacts/v1/contact/vids/batch/", builder.BuildQuery());
+            var contacts = await _client.GetAsync<Dictionary<long, Contact>>("/contacts/v1/contact/vids/batch/", builder.BuildQuery());
 
             return contacts;
         }
@@ -139,7 +139,7 @@ namespace HubSpot
             builder.AddFormSubmissionMode(formSubmissionMode);
             builder.AddShowListMemberships(showListMemberships);
 
-            var contacts = await SendAsync<Dictionary<long, Contact>>(HttpMethod.Get, "/contacts/v1/contact/emails/batch/", builder.BuildQuery());
+            var contacts = await _client.GetAsync<Dictionary<long, Contact>>("/contacts/v1/contact/emails/batch/", builder.BuildQuery());
 
             return contacts;
         }
@@ -164,7 +164,7 @@ namespace HubSpot
                 builder.Add("vidOffset", contactOffset.Value.ToString());
             }
 
-            var list = await SendAsync<ContactList>(HttpMethod.Get, "/contacts/v1/lists/all/contacts/all", builder.BuildQuery());
+            var list = await _client.GetAsync<ContactList>("/contacts/v1/lists/all/contacts/all", builder.BuildQuery());
 
             return list;
         }
@@ -194,7 +194,7 @@ namespace HubSpot
                 builder.Add("timeOffset", timeOffset.Value.ToUnixTimeMilliseconds().ToString());
             }
 
-            var list = await SendAsync<ContactList>(HttpMethod.Get, "/contacts/v1/lists/recently_updated/contacts/recent", builder.BuildQuery());
+            var list = await _client.GetAsync<ContactList>("/contacts/v1/lists/recently_updated/contacts/recent", builder.BuildQuery());
 
             return list;
         }
@@ -224,14 +224,14 @@ namespace HubSpot
                 builder.Add("timeOffset", timeOffset.Value.ToUnixTimeMilliseconds().ToString());
             }
 
-            var list = await SendAsync<ContactList>(HttpMethod.Get, "/contacts/v1/lists/all/contacts/recent", builder.BuildQuery());
+            var list = await _client.GetAsync<ContactList>("/contacts/v1/lists/all/contacts/recent", builder.BuildQuery());
 
             return list;
         }
 
         async Task<DeleteContactResponse> IHubSpotContactClient.DeleteAsync(long contactId)
         {
-            var response = await SendAsync<DeleteContactResponse>(HttpMethod.Delete, $"/contacts/v1/contact/vid/{contactId}");
+            var response = await _client.DeleteAsync<DeleteContactResponse>($"/contacts/v1/contact/vid/{contactId}");
             return response;
         }
 
@@ -242,7 +242,7 @@ namespace HubSpot
                 Properties = properties
             };
 
-            var contact = await SendAsync<PropertyList<ValuedProperty>, Contact>(HttpMethod.Post, "/contacts/v1/contact", propertyList);
+            var contact = await _client.PostAsync<PropertyList<ValuedProperty>, Contact>("/contacts/v1/contact", propertyList);
 
             return contact;
         }
@@ -259,7 +259,7 @@ namespace HubSpot
                 Properties = properties
             };
 
-            await SendAsync(HttpMethod.Post, $"/contacts/v1/contact/vid/{contactId}/profile", propertyList);
+            await _client.PostAsync<PropertyList<ValuedProperty>>($"/contacts/v1/contact/vid/{contactId}/profile", propertyList);
         }
 
         async Task IHubSpotContactClient.UpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties)
@@ -274,7 +274,7 @@ namespace HubSpot
                 Properties = properties
             };
 
-            await SendAsync(HttpMethod.Post, $"/contacts/v1/contact/email/{email}/profile", propertyList);
+            await _client.PostAsync<PropertyList<ValuedProperty>>($"/contacts/v1/contact/email/{email}/profile", propertyList);
         }
 
         async Task<CreateOrUpdateResponse> IHubSpotContactClient.CreateOrUpdateByEmailAsync(string email, IReadOnlyList<ValuedProperty> properties)
@@ -289,7 +289,7 @@ namespace HubSpot
                 Properties = properties
             };
 
-            var response = await SendAsync<PropertyList<ValuedProperty>, CreateOrUpdateResponse>(HttpMethod.Post, $"/contacts/v1/contact/createOrUpdate/email/{email}", propertyList);
+            var response = await _client.PostAsync<PropertyList<ValuedProperty>, CreateOrUpdateResponse>($"/contacts/v1/contact/createOrUpdate/email/{email}", propertyList);
 
             return response;
         }
@@ -316,7 +316,7 @@ namespace HubSpot
                 builder.Add("offset", contactOffset.Value.ToString());
             }
 
-            var response = await SendAsync<SearchResponse>(HttpMethod.Get, "/contacts/v1/search/query", builder.BuildQuery());
+            var response = await _client.GetAsync<SearchResponse>("/contacts/v1/search/query", builder.BuildQuery());
 
             return response;
         }
@@ -328,7 +328,7 @@ namespace HubSpot
                 vidToMerge = secondaryContactId
             };
 
-            await SendAsync<object>(HttpMethod.Post, $"/contacts/v1/contact/merge-vids/{primaryContactId}/", payload);
+            await _client.PostAsync<object>($"/contacts/v1/contact/merge-vids/{primaryContactId}/", payload);
         }
     }
 }

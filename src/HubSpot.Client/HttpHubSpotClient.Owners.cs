@@ -17,7 +17,7 @@ namespace HubSpot
                 builder.Add("email", email);
             }
 
-            var response = await SendAsync<IReadOnlyList<Owner>>(HttpMethod.Get, "/owners/v2/owners/", builder.BuildQuery()).ConfigureAwait(false);
+            var response = await _client.GetAsync<IReadOnlyList<Owner>>("/owners/v2/owners/", builder.BuildQuery()).ConfigureAwait(false);
 
             return response;
         }

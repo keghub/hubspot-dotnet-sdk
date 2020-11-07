@@ -16,7 +16,7 @@ namespace HubSpot
         {
             try
             {
-                var result = await SendAsync<Company>(HttpMethod.Get, $"/companies/v2/companies/{companyId}");
+                var result = await _client.GetAsync<Company>($"/companies/v2/companies/{companyId}");
                 return result;
             }
             catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -33,7 +33,7 @@ namespace HubSpot
             }
 
             var list = new PropertyList<ValuedPropertyV2> { Properties = properties };
-            var result = await SendAsync<PropertyList<ValuedPropertyV2>, Company>(HttpMethod.Post, "/companies/v2/companies/", list);
+            var result = await _client.PostAsync<PropertyList<ValuedPropertyV2>, Company>("/companies/v2/companies/", list);
 
             return result;
         }
@@ -46,7 +46,7 @@ namespace HubSpot
             }
 
             var list = new PropertyList<ValuedPropertyV2> { Properties = propertiesToUpdate };
-            var result = await SendAsync<PropertyList<ValuedPropertyV2>, Company>(HttpMethod.Put, $"/companies/v2/companies/{companyId}", list);
+            var result = await _client.PutAsync<PropertyList<ValuedPropertyV2>, Company>($"/companies/v2/companies/{companyId}", list);
 
             return result;
         }
@@ -58,12 +58,12 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(companiesToUpdate));
             }
 
-            await SendAsync(HttpMethod.Post, "/companies/v1/batch-async/update", companiesToUpdate);
+            await _client.PostAsync<IReadOnlyList<ObjectPropertyList<ValuedPropertyV2>>>("/companies/v1/batch-async/update", companiesToUpdate);
         }
 
         async Task<DeleteCompanyResponse> IHubSpotCompanyClient.DeleteAsync(long companyId)
         {
-            var result = await SendAsync<DeleteCompanyResponse>(HttpMethod.Delete, $"/companies/v2/companies/{companyId}");
+            var result = await _client.DeleteAsync<DeleteCompanyResponse>($"/companies/v2/companies/{companyId}");
             return result;
         }
 
@@ -77,7 +77,7 @@ namespace HubSpot
             if (companyOffset.HasValue)
                 builder.Add("offset", companyOffset.Value.ToString());
 
-            var result = await SendAsync<CompanyList>(HttpMethod.Get, "/companies/v2/companies/paged", builder.BuildQuery());
+            var result = await _client.GetAsync<CompanyList>("/companies/v2/companies/paged", builder.BuildQuery());
 
             return result;
         }
@@ -90,7 +90,7 @@ namespace HubSpot
             if (offset.HasValue)
                 builder.Add("offset", offset.Value.ToString());
 
-            var result = await SendAsync<PagedList<Company>>(HttpMethod.Get, "/companies/v2/companies/recent/created", builder.BuildQuery());
+            var result = await _client.GetAsync<PagedList<Company>>("/companies/v2/companies/recent/created", builder.BuildQuery());
 
             return result;
         }
@@ -103,7 +103,7 @@ namespace HubSpot
             if (offset.HasValue)
                 builder.Add("offset", offset.Value.ToString());
 
-            var result = await SendAsync<PagedList<Company>>(HttpMethod.Get, "/companies/v2/companies/recent/modified", builder.BuildQuery());
+            var result = await _client.GetAsync<PagedList<Company>>("/companies/v2/companies/recent/modified", builder.BuildQuery());
 
             return result;
         }
@@ -129,7 +129,7 @@ namespace HubSpot
                 }
             };
 
-            var response = await SendAsync<object, SearchResponse>(HttpMethod.Post, $"/companies/v2/domains/{domain}/companies", request);
+            var response = await _client.PostAsync<object, SearchResponse>($"/companies/v2/domains/{domain}/companies", request);
 
             return response;
         }
@@ -142,7 +142,7 @@ namespace HubSpot
             if (companyOffset.HasValue)
                 builder.Add("vidOffset", companyOffset.Value.ToString());
 
-            var result = await SendAsync<ContactList>(HttpMethod.Get, $"/companies/v2/companies/{companyId}/contacts", builder.BuildQuery());
+            var result = await _client.GetAsync<ContactList>($"/companies/v2/companies/{companyId}/contacts", builder.BuildQuery());
 
             return result;
         }
@@ -155,21 +155,21 @@ namespace HubSpot
             if (companyOffset.HasValue)
                 builder.Add("vidOffset", companyOffset.Value.ToString());
 
-            var result = await SendAsync<ContactIdList>(HttpMethod.Get, $"/companies/v2/companies/{companyId}/vids", builder.BuildQuery());
+            var result = await _client.GetAsync<ContactIdList>($"/companies/v2/companies/{companyId}/vids", builder.BuildQuery());
 
             return result;
         }
 
         async Task<Company> IHubSpotCompanyClient.AddContactToCompanyAsync(long companyId, long contactId)
         {
-            var result = await SendAsync<Company>(HttpMethod.Put, $"/companies/v2/companies/{companyId}/contacts/{contactId}");
+            var result = await _client.PutAsync<Company>($"/companies/v2/companies/{companyId}/contacts/{contactId}");
 
             return result;
         }
 
         async Task IHubSpotCompanyClient.RemoveContactFromCompanyAsync(long companyId, long contactId)
         {
-            await SendAsync<Company>(HttpMethod.Delete, $"/companies/v2/companies/{companyId}/contacts/{contactId}");
+            await _client.DeleteAsync<Company>($"/companies/v2/companies/{companyId}/contacts/{contactId}");
         }
     }
 }
