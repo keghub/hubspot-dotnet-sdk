@@ -1,32 +1,25 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AutoFixture.NUnit3;
 using HubSpot.Model.Contacts;
+using Kralizek.Extensions.Http;
+using Moq;
 using NUnit.Framework;
-using WorldDomination.Net.Http;
+
 
 namespace Tests.Contacts
 {
     [TestFixture]
-    public class GetRecentlyUpdatedAsyncTests : ContactTests
+    public class GetRecentlyUpdatedAsyncTests
     {
-        [Test]
-        public async Task Request_is_correct()
+        [Test, CustomAutoData]
+        public async Task Request_is_correct([Frozen] IHttpRestClient client, IHubSpotContactClient sut)
         {
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = Object(new ContactList())
-                }
-            };
-
-            var sut = CreateSystemUnderTest(options);
-
             var response = await sut.GetRecentlyUpdatedAsync();
 
-            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.AbsolutePath, Contains.Substring("/contacts/v1/lists/recently_updated/contacts/recent"));
+            Mock.Get(client)
+                .Verify(p => p.SendAsync<ContactList>(HttpMethod.Get, "/contacts/v1/lists/recently_updated/contacts/recent", It.IsAny<IQueryString>()));
         }
     }
 }

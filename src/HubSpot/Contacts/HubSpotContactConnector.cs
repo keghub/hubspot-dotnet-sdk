@@ -13,13 +13,11 @@ namespace HubSpot.Contacts
     {
         private readonly IHubSpotClient _client;
         private readonly ITypeManager<Model.Contacts.Contact, Contact> _typeManager;
-        private readonly ILogger<HubSpotContactConnector> _logger;
 
-        public HubSpotContactConnector(IHubSpotClient client, IContactTypeManager typeManager, ILogger<HubSpotContactConnector> logger)
+        public HubSpotContactConnector(IHubSpotClient client, IContactTypeManager typeManager)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _typeManager = typeManager ?? throw new ArgumentNullException(nameof(typeManager));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<TContact> GetAsync<TContact>(IContactSelector selector)
@@ -81,7 +79,7 @@ namespace HubSpot.Contacts
         public async Task<IReadOnlyList<TContact>> FindAsync<TContact>(IContactFilter filter = null)
             where TContact : Contact, new()
         {
-            filter = filter ?? FilterContacts.All;
+            filter ??= FilterContacts.All;
 
             var properties = _typeManager.GetCustomProperties<TContact>(TypeManager.AllProperties).Select(p => new Property(p.FieldName)).ToArray();
 

@@ -57,7 +57,7 @@ namespace Tests.Contacts
             var typeStore = new TypeStore(registrations);
             var typeManager = new ContactTypeManager(typeStore);
 
-            var connector = new HubSpotContactConnector(mockHubSpotClient.Object, typeManager, Mock.Of<ILogger<HubSpotContactConnector>>());
+            var connector = new HubSpotContactConnector(mockHubSpotClient.Object, typeManager);
 
             return connector;
         }

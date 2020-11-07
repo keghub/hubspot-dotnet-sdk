@@ -30,7 +30,7 @@ namespace HubSpot
                 properties
             };
 
-            var response = await SendAsync<object, Deal>(HttpMethod.Post, "/deals/v1/deal/", request);
+            var response = await _client.PostAsync<object, Deal>("/deals/v1/deal/", request);
 
             return response;
         }
@@ -43,7 +43,7 @@ namespace HubSpot
             }
 
             var list = new PropertyList<ValuedPropertyV2> { Properties = propertiesToUpdate };
-            var result = await SendAsync<PropertyList<ValuedPropertyV2>, Deal>(HttpMethod.Put, $"/deals/v1/deal/{dealId}", list);
+            var result = await _client.PutAsync<PropertyList<ValuedPropertyV2>, Deal>($"/deals/v1/deal/{dealId}", list);
 
             return result;
         }
@@ -55,12 +55,12 @@ namespace HubSpot
                 throw new ArgumentNullException(nameof(dealsToUpdate));
             }
 
-            await SendAsync(HttpMethod.Post, "/deals/v1/batch-async/update", dealsToUpdate);
+            await _client.SendAsync<IReadOnlyList<ObjectPropertyList<ValuedPropertyV2>>>(HttpMethod.Post, "/deals/v1/batch-async/update", dealsToUpdate);
         }
 
         async Task IHubSpotDealClient.DeleteAsync(long dealId)
         {
-            await SendAsync(HttpMethod.Delete, $"/deals/v1/deal/{dealId}");
+            await _client.DeleteAsync($"/deals/v1/deal/{dealId}");
         }
 
         async Task<Deal> IHubSpotDealClient.GetByIdAsync(long dealId, bool includePropertyVersions)
@@ -70,7 +70,7 @@ namespace HubSpot
 
             try
             {
-                var result = await SendAsync<Deal>(HttpMethod.Get, $"/deals/v1/deal/{dealId}", builder.BuildQuery());
+                var result = await _client.GetAsync<Deal>($"/deals/v1/deal/{dealId}", builder.BuildQuery());
                 return result;
             }
             catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
@@ -92,7 +92,7 @@ namespace HubSpot
                 builder.Add("id", id);
             }
 
-            await SendAsync(HttpMethod.Put, $"/deals/v1/deal/{dealId}/associations/CONTACT", builder.BuildQuery());
+            await _client.PutAsync($"/deals/v1/deal/{dealId}/associations/CONTACT", query: builder.BuildQuery());
         }
 
         async Task IHubSpotDealClient.RemoveAssociationToContactsAsync(long dealId, IReadOnlyList<long> ids)
@@ -108,7 +108,7 @@ namespace HubSpot
                 builder.Add("id", id);
             }
 
-            await SendAsync(HttpMethod.Delete, $"/deals/v1/deal/{dealId}/associations/CONTACT", builder.BuildQuery());
+            await _client.DeleteAsync($"/deals/v1/deal/{dealId}/associations/CONTACT", query: builder.BuildQuery());
         }
 
         async Task IHubSpotDealClient.AssociateCompaniesAsync(long dealId, IReadOnlyList<long> ids)
@@ -124,7 +124,7 @@ namespace HubSpot
                 builder.Add("id", id);
             }
 
-            await SendAsync(HttpMethod.Put, $"/deals/v1/deal/{dealId}/associations/COMPANY", builder.BuildQuery());
+            await _client.PutAsync($"/deals/v1/deal/{dealId}/associations/COMPANY", query: builder.BuildQuery());
         }
 
         async Task IHubSpotDealClient.RemoveAssociationToCompaniesAsync(long dealId, IReadOnlyList<long> ids)
@@ -140,7 +140,7 @@ namespace HubSpot
                 builder.Add("id", id);
             }
 
-            await SendAsync(HttpMethod.Delete, $"/deals/v1/deal/{dealId}/associations/COMPANY", builder.BuildQuery());
+            await _client.DeleteAsync($"/deals/v1/deal/{dealId}/associations/COMPANY", query: builder.BuildQuery());
         }
 
         async Task<DealList> IHubSpotDealClient.GetAllAsync(IReadOnlyList<IProperty> properties, IReadOnlyList<IProperty> propertiesWithHistory, bool includeAssociations, int limit, long? offset)
@@ -154,7 +154,7 @@ namespace HubSpot
             if (offset.HasValue)
                 builder.Add("offset", offset.Value.ToString());
 
-            var result = await SendAsync<DealList>(HttpMethod.Get, "/deals/v1/deal/paged", builder.BuildQuery());
+            var result = await _client.GetAsync<DealList>("/deals/v1/deal/paged", builder.BuildQuery());
 
             return result;
         }
@@ -171,7 +171,7 @@ namespace HubSpot
             if (offset.HasValue)
                 builder.Add("offset", offset.Value.ToString());
 
-            var result = await SendAsync<PagedList<Deal>>(HttpMethod.Get, "/deals/v1/deal/recent/created", builder.BuildQuery());
+            var result = await _client.GetAsync<PagedList<Deal>>("/deals/v1/deal/recent/created", builder.BuildQuery());
 
             return result;
         }
@@ -188,7 +188,7 @@ namespace HubSpot
             if (offset.HasValue)
                 builder.Add("offset", offset.Value.ToString());
 
-            var result = await SendAsync<PagedList<Deal>>(HttpMethod.Get, "/deals/v1/deal/recent/modified", builder.BuildQuery());
+            var result = await _client.GetAsync<PagedList<Deal>>("/deals/v1/deal/recent/modified", builder.BuildQuery());
 
             return result;
         }
@@ -204,7 +204,7 @@ namespace HubSpot
             if (offset.HasValue)
                 builder.Add("offset", offset.Value.ToString());
 
-            var result = await SendAsync<DealList>(HttpMethod.Get, $"/deals/v1/deal/associated/CONTACT/{contactId}/paged", builder.BuildQuery());
+            var result = await _client.GetAsync<DealList>($"/deals/v1/deal/associated/CONTACT/{contactId}/paged", builder.BuildQuery());
 
             return result;
         }
@@ -220,7 +220,7 @@ namespace HubSpot
             if (offset.HasValue)
                 builder.Add("offset", offset.Value.ToString());
 
-            var result = await SendAsync<DealList>(HttpMethod.Get, $"/deals/v1/deal/associated/COMPANY/{companyId}/paged", builder.BuildQuery());
+            var result = await _client.GetAsync<DealList>($"/deals/v1/deal/associated/COMPANY/{companyId}/paged", builder.BuildQuery());
 
             return result;
         }

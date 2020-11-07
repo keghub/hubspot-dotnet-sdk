@@ -1,0 +1,7 @@
+<Project>
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+        <LangVersion>latest</LangVersion>
+        <UserSecretsId>2b20bf8c-5292-40cf-b48a-8339546d21f7</UserSecretsId>
+    </PropertyGroup>
+</Project>

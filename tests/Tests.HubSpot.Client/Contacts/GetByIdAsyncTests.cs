@@ -7,137 +7,102 @@ using HubSpot;
 using HubSpot.Model;
 using HubSpot.Model.Contacts;
 using Kralizek.Extensions.Http;
+using Moq;
 using NUnit.Framework;
-using WorldDomination.Net.Http;
+using NUnit.Framework.Constraints;
 
 namespace Tests.Contacts
 {
     [TestFixture]
-    public class GetByIdAsyncTests : ContactTests
+    public class GetByIdAsyncTests
     {
         [Test]
-        [AutoData]
-        public void NotFoundException_is_thrown_if_404(long contactId)
+        [CustomAutoData]
+        public void NotFoundException_is_thrown_if_404([Frozen] IHttpRestClient client, IHubSpotContactClient sut, long contactId)
         {
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.NotFound)
-                {
-                    Content = JsonContent.EmptyObject
-                }
-            };
+            Mock.Get(client)
+                .Setup(p => p.SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", It.IsAny<IQueryString>()))
+                .Throws(new HttpException("Not Found", HttpStatusCode.NotFound));
 
-            var sut = CreateSystemUnderTest(options);
-
-            Assert.ThrowsAsync<NotFoundException>(() => sut.GetByIdAsync(contactId));
+            Assert.That(() => sut.GetByIdAsync(contactId), Throws.InstanceOf<NotFoundException>());
         }
 
         [Test]
-        [AutoData]
-        public async Task Request_absolutePath_is_correct(long contactId)
+        [CustomAutoData]
+        public async Task Request_absolutePath_is_correct([Frozen] IHttpRestClient client, IHubSpotContactClient sut, long contactId, Contact contact)
         {
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = JsonContent.EmptyObject
-                }
-            };
-
-            var sut = CreateSystemUnderTest(options);
+            Mock.Get(client)
+                .Setup(p => p.SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", It.IsAny<IQueryString>()))
+                .ReturnsAsync(contact)
+                .Verifiable();
 
             var response = await sut.GetByIdAsync(contactId);
 
-            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.AbsolutePath, Contains.Substring($"/contacts/v1/contact/vid/{contactId}/profile"));
+            Mock.Verify();
         }
 
-        [Test, AutoData]
-        public async Task Properties_are_added_to_queryString(long contactId, Property[] properties) 
+        [Test, CustomAutoData]
+        public async Task Properties_are_added_to_queryString([Frozen] IHttpRestClient client, IHubSpotContactClient sut, long contactId, Property[] properties, Contact contact)
         {
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = JsonContent.EmptyObject
-                }
-            };
-
-            var sut = CreateSystemUnderTest(options);
+            Mock.Get(client)
+                .Setup(p => p.SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", It.IsAny<IQueryString>()))
+                .ReturnsAsync(contact)
+                .Verifiable();
 
             var response = await sut.GetByIdAsync(contactId, properties);
 
-            foreach (var property in properties)
-            {
-                Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.Query, Contains.Substring($"property={property.Name}"));
-            }
+            Mock.Get(client)
+                .Verify(p => p.SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", QueryStringMatcher.That(NUnitHelpers.All(properties, property => Does.Contain($"property={property.Name}")))));
         }
 
         [Test]
-        [InlineAutoData(PropertyMode.ValueAndHistory, "value_and_history")]
-        [InlineAutoData(PropertyMode.ValueOnly, "value_only")]
-        public async Task PropertyMode_is_added_to_queryString(PropertyMode propertyMode, string queryStringValue, long contactId)
+        [InlineCustomAutoData(PropertyMode.ValueAndHistory, "value_and_history")]
+        [InlineCustomAutoData(PropertyMode.ValueOnly, "value_only")]
+        public async Task PropertyMode_is_added_to_queryString(PropertyMode propertyMode, string queryStringValue, [Frozen] IHttpRestClient client, IHubSpotContactClient sut, long contactId, Contact contact)
         {
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = JsonContent.EmptyObject
-                }
-            };
-
-            var sut = CreateSystemUnderTest(options);
+            Mock.Get(client)
+                .Setup(p => p.SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", It.IsAny<IQueryString>()))
+                .ReturnsAsync(contact)
+                .Verifiable();
 
             var response = await sut.GetByIdAsync(contactId, propertyMode: propertyMode);
 
-            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.Query, Contains.Substring($"propertyMode={queryStringValue}"));
+            Mock.Get(client)
+                .Verify(p => p.SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", QueryStringMatcher.That(Does.Contain($"propertyMode={queryStringValue}"))));
         }
 
         [Test]
-        [InlineAutoData(FormSubmissionMode.All, "all")]
-        [InlineAutoData(FormSubmissionMode.Newest, "newest")]
-        [InlineAutoData(FormSubmissionMode.Oldest, "oldest")]
-        [InlineAutoData(FormSubmissionMode.None, "none")]
-        public async Task FormSubmissionMode_is_added_to_queryString(FormSubmissionMode formSubmissionMode, string queryStringValue, long contactId)
+        [InlineCustomAutoData(FormSubmissionMode.All, "all")]
+        [InlineCustomAutoData(FormSubmissionMode.Newest, "newest")]
+        [InlineCustomAutoData(FormSubmissionMode.Oldest, "oldest")]
+        [InlineCustomAutoData(FormSubmissionMode.None, "none")]
+        public async Task FormSubmissionMode_is_added_to_queryString(FormSubmissionMode formSubmissionMode, string queryStringValue, [Frozen] IHttpRestClient client, IHubSpotContactClient sut, long contactId, Contact contact)
         {
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = JsonContent.EmptyObject
-                }
-            };
-
-            var sut = CreateSystemUnderTest(options);
+            Mock.Get(client)
+                .Setup(p => p.SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", It.IsAny<IQueryString>()))
+                .ReturnsAsync(contact)
+                .Verifiable();
 
             var response = await sut.GetByIdAsync(contactId, formSubmissionMode: formSubmissionMode);
 
-            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.Query, Contains.Substring($"formSubmissionMode={queryStringValue}"));
+            Mock.Get(client)
+                .Verify(p => p.SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", QueryStringMatcher.That(Does.Contain($"formSubmissionMode={queryStringValue}"))));
         }
 
         [Test]
-        [InlineAutoData(true, "true")]
-        [InlineAutoData(false, "false")]
-        public async Task ShowListMemberships_is_added_to_queryString(bool showListMemberships, string queryStringValue, long contactId)
+        [InlineCustomAutoData(true, "true")]
+        [InlineCustomAutoData(false, "false")]
+        public async Task ShowListMemberships_is_added_to_queryString(bool showListMemberships, string queryStringValue, [Frozen] IHttpRestClient client, IHubSpotContactClient sut, long contactId, Contact contact)
         {
-            var options = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Get,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = JsonContent.EmptyObject
-                }
-            };
-
-            var sut = CreateSystemUnderTest(options);
+            Mock.Get(client)
+                .Setup(p => p.SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", It.IsAny<IQueryString>()))
+                .ReturnsAsync(contact)
+                .Verifiable();
 
             var response = await sut.GetByIdAsync(contactId, showListMemberships: showListMemberships);
 
-            Assert.That(options.HttpResponseMessage.RequestMessage.RequestUri.Query, Contains.Substring($"showListMemberships={queryStringValue}"));
+            Mock.Get(client)
+                .Verify(p => p.SendAsync<Contact>(HttpMethod.Get, $"/contacts/v1/contact/vid/{contactId}/profile", QueryStringMatcher.That(Does.Contain($"showListMemberships={queryStringValue}"))));
         }
     }
 }

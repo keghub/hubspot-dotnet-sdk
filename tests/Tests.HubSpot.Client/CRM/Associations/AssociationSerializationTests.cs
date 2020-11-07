@@ -9,7 +9,7 @@ namespace Tests.CRM.Associations {
     public class AssociationSerializationTests
     {
         [Test]
-        [AutoData]
+        [CustomAutoData]
         public void Association_is_correctly_serialized(Association testAssociation)
         {
             var json = JsonConvert.SerializeObject(testAssociation);
@@ -18,7 +18,7 @@ namespace Tests.CRM.Associations {
         }
 
         [Test]
-        [AutoData]
+        [CustomAutoData]
         public void Association_is_correctly_deserialized(Association testAssociation)
         {
             var json = $@"{{""fromObjectId"":{testAssociation.FromId},""toObjectId"":{testAssociation.ToId},""definitionId"":{testAssociation.AssociationType.Id},""category"":""HUBSPOT_DEFINED""}}";

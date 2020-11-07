@@ -14,7 +14,7 @@ namespace Tests
     public class HttpQueryStringBuilderExtensionsTests
     {
         [Test]
-        [AutoData]
+        [CustomAutoData]
         public void AddProperties_adds_all_properties(string fieldName)
         {
             var builder = new HttpQueryStringBuilder();
@@ -33,7 +33,7 @@ namespace Tests
             Assert.That(query.Query, Contains.Substring($"{fieldName}={ContactProperties.FirstName.Name}"));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void AddProperties_builder_is_required(string fieldName)
         {
             var properties = new IProperty[]
@@ -73,7 +73,7 @@ namespace Tests
             Assert.That(query.Query, Contains.Substring($"showListMemberships={testValue.ToString().ToLower()}"));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void AddShowListMemberships_builder_is_required(bool testValue)
         {
             Assert.Throws<ArgumentNullException>(() => HttpQueryStringBuilderExtensions.AddShowListMemberships(null, testValue));
@@ -97,7 +97,7 @@ namespace Tests
             Assert.That(query.Query, Contains.Substring($"formSubmissionMode={value}"));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void AddFormSubmissionMode_builder_is_required(FormSubmissionMode testValue)
         {
             Assert.Throws<ArgumentNullException>(() => HttpQueryStringBuilderExtensions.AddFormSubmissionMode(null, testValue));
@@ -127,7 +127,7 @@ namespace Tests
             Assert.That(query.Query, Contains.Substring($"propertyMode={value}"));
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public void AddPropertyMode_builder_is_required(PropertyMode testValue)
         {
             Assert.Throws<ArgumentNullException>(() => HttpQueryStringBuilderExtensions.AddPropertyMode(null, testValue));

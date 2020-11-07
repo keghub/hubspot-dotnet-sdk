@@ -34,7 +34,7 @@ namespace Tests
     //        public TestContact(HubSpotContact entity) : base(entity) { }
     //    }
 
-    //    [Test, AutoData]
+    //    [Test, CustomAutoData]
     //    public async Task Test(HubSpotContact hubSpot)
     //    {
     //        var sut = new TypeManager<HubSpotContact, TestContact>(mockTypeStore.Object);

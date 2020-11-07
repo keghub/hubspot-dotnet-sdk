@@ -24,7 +24,7 @@ namespace Tests.Contacts.Selectors {
             mockClient.SetupGet(p => p.Contacts).Returns(mockContactClient.Object);
         }
 
-        [Test, AutoData]
+        [Test, CustomAutoData]
         public async Task GetContact_forwards_to_client(UserTokenContactSelector sut, Contact contact, IReadOnlyList<Property> properties)
         {
             mockContactClient.Setup(p => p.GetByUserTokenAsync(It.IsAny<string>(), It.IsAny<IReadOnlyList<IProperty>>(), It.IsAny<PropertyMode>(), It.IsAny<FormSubmissionMode>(), It.IsAny<bool>()))

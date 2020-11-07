@@ -8,34 +8,27 @@ using AutoFixture.Kernel;
 using AutoFixture.NUnit3;
 using HubSpot.Model;
 using HubSpot.Model.Contacts;
+using Kralizek.Extensions.Http;
+using Moq;
 using NUnit.Framework;
-using WorldDomination.Net.Http;
+
 
 namespace Tests.Contacts
 {
     [TestFixture]
-    public class CreateOrUpdateByEmailAsyncTests : ContactTests
+    public class CreateOrUpdateByEmailAsyncTests
     {
-        [Test, AutoData]
-        public async Task Request_is_correct(string email, Contact contact)
+        [Test, CustomAutoData]
+        public async Task Request_is_correct([Frozen] IHttpRestClient client, IHubSpotContactClient sut, string email, IReadOnlyList<ValuedProperty> properties, CreateOrUpdateResponse response)
         {
-            var properties = (from p in contact.Properties
-                              select new ValuedProperty(p.Key, p.Value.Value)).ToArray();
-
-            var option = new HttpMessageOptions
-            {
-                HttpMethod = HttpMethod.Post,
-                HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = Object(contact)
-                }
-            };
-
-            var sut = CreateSystemUnderTest(option);
+            Mock.Get(client)
+                .Setup(p => p.SendAsync<PropertyList<ValuedProperty>, CreateOrUpdateResponse>(HttpMethod.Post, It.Is<string>(s => s.StartsWith($"/contacts/v1/contact/createOrUpdate/email/")), It.IsAny<PropertyList<ValuedProperty>>(), null))
+                .ReturnsAsync(response);
 
             await sut.CreateOrUpdateByEmailAsync(email, properties);
 
-            Assert.That(option.HttpResponseMessage.RequestMessage.RequestUri.AbsolutePath, Contains.Substring($"/contacts/v1/contact/createOrUpdate/email/{email}"));
+            Mock.Get(client)
+                .Verify(p => p.SendAsync<PropertyList<ValuedProperty>, CreateOrUpdateResponse>(HttpMethod.Post, $"/contacts/v1/contact/createOrUpdate/email/{email}", PropertyList.Contains(properties), null));
         }
     }
 }

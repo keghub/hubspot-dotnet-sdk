@@ -4,15 +4,15 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture.NUnit3;
-using EMG.Common;
-using EMG.Testing;
+using EMG.Utilities;
 using HubSpot.Authentication;
 using Kralizek.Extensions.Http;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using WorldDomination.Net.Http;
 
-namespace Tests.Authentication {
+namespace Tests.Authentication 
+{
     [TestFixture]
     public class OAuthHubSpotAuthenticatorTests
     {
@@ -21,6 +21,7 @@ namespace Tests.Authentication {
             var handler = new FakeHttpMessageHandler(httpOptions);
 
             var wrapper = new OptionsWrapper<OAuthOptions>(options);
+            
             var authenticator = new OAuthHubSpotAuthenticator(wrapper) { InnerHandler = handler };
 
             var client = new HttpClient(authenticator, false);
@@ -35,14 +36,14 @@ namespace Tests.Authentication {
         [InlineAutoData("PUT")]
         public async Task Single_request_is_authenticated_and_executed(string methodName, OAuthOptions options, Uri requestUri, string accessToken, long expiresIn, TestClock clock)
         {
-            Clock.Default = clock;
+            Clock.Set(clock);
 
             var method = new HttpMethod(methodName);
 
             var refreshTokenOptions = new HttpMessageOptions
             {
                 HttpMethod = HttpMethod.Post,
-                RequestUri = new Uri("https://api.hubapi.com/oauth/v1/token"),
+                RequestUri = new Uri(requestUri, "/oauth/v1/token"),
                 HttpContent = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
                     ["grant_type"] = "refresh_token",
@@ -70,10 +71,9 @@ namespace Tests.Authentication {
 
             var client = CreateClient(options, refreshTokenOptions, randomRequestOptions);
 
-            using (var testRequest = new HttpRequestMessage(method, requestUri))
-            {
-                var response = await client.SendAsync(testRequest);
-            }
+            using var testRequest = new HttpRequestMessage(method, requestUri);
+            
+            using var response = await client.SendAsync(testRequest);
 
             Assert.That(refreshTokenOptions.NumberOfTimesCalled, Is.GreaterThan(0));
 
@@ -87,7 +87,7 @@ namespace Tests.Authentication {
         [InlineAutoData("PUT")]
         public async Task Multiple_requests_reuse_the_same_token(string methodName, OAuthOptions options, Uri requestUri, string accessToken, long expiresIn, TestClock clock)
         {
-            Clock.Default = clock;
+            Clock.Set(clock);
 
             var method = new HttpMethod(methodName);
 
@@ -96,7 +96,7 @@ namespace Tests.Authentication {
             var refreshTokenOptions = new HttpMessageOptions
             {
                 HttpMethod = HttpMethod.Post,
-                RequestUri = new Uri("https://api.hubapi.com/oauth/v1/token"),
+                RequestUri = new Uri(requestUri, "/oauth/v1/token"),
                 HttpContent = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
                     ["grant_type"] = "refresh_token",
@@ -131,7 +131,7 @@ namespace Tests.Authentication {
             for (int i = 0; i < 2; i++)
             {
                 var testRequest = new HttpRequestMessage(method, requestUri);
-                var response = await client.SendAsync(testRequest);
+                await client.SendAsync(testRequest);
             }
 
             Assert.That(refreshTokenOptions.NumberOfTimesCalled, Is.EqualTo(1));
@@ -145,7 +145,7 @@ namespace Tests.Authentication {
         [InlineAutoData("PUT")]
         public async Task Token_is_refreshed_if_expired(string methodName, OAuthOptions options, Uri requestUri, string accessToken, long expiresIn, TestClock clock)
         {
-            Clock.Default = clock;
+            Clock.Set(clock);
 
             var method = new HttpMethod(methodName);
 
@@ -154,7 +154,7 @@ namespace Tests.Authentication {
             var refreshTokenOptions = new HttpMessageOptions
             {
                 HttpMethod = HttpMethod.Post,
-                RequestUri = new Uri("https://api.hubapi.com/oauth/v1/token"),
+                RequestUri = new Uri(requestUri, "/oauth/v1/token"),
                 HttpContent = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
                     ["grant_type"] = "refresh_token",
@@ -205,7 +205,7 @@ namespace Tests.Authentication {
             async Task MakeARequest()
             {
                 var request = new HttpRequestMessage(method, requestUri);
-                var response = await client.SendAsync(request);
+                await client.SendAsync(request);
             }
         }
 
@@ -214,9 +214,9 @@ namespace Tests.Authentication {
         [InlineAutoData("POST")]
         [InlineAutoData("DELETE")]
         [InlineAutoData("PUT")]
-        public async Task Token_is_not_attached_if_request_fails(string methodName, OAuthOptions options, Uri requestUri, string accessToken, long expiresIn, TestClock clock)
+        public async Task Token_is_not_attached_if_request_fails(string methodName, OAuthOptions options, Uri requestUri, TestClock clock)
         {
-            Clock.Default = clock;
+            Clock.Set(clock);
 
             var method = new HttpMethod(methodName);
 
@@ -225,7 +225,7 @@ namespace Tests.Authentication {
             var refreshTokenOptions = new HttpMessageOptions
             {
                 HttpMethod = HttpMethod.Post,
-                RequestUri = new Uri("https://api.hubapi.com/oauth/v1/token"),
+                RequestUri = new Uri(requestUri, "/oauth/v1/token"),
                 HttpContent = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
                     ["grant_type"] = "refresh_token",
@@ -251,8 +251,8 @@ namespace Tests.Authentication {
 
             var client = CreateClient(options, httpOptions.ToArray());
 
-            var request = new HttpRequestMessage(method, requestUri);
-            var response = await client.SendAsync(request);
+            using var request = new HttpRequestMessage(method, requestUri);
+            using var response = await client.SendAsync(request);
 
             Assert.That(requestOption.HttpResponseMessage.RequestMessage.Headers.Authorization, Is.Null);
 

@@ -2,13 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>7.2</LangVersion>
-    <RootNamespace>HubSpot</RootNamespace>
     <AssemblyName>HubSpot</AssemblyName>
     <PackageId>EMG.HubSpot</PackageId>
-    <Authors>EMG</Authors>
-    <Company>EMG</Company>
-    <VersionPrefix>0.3.0</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>

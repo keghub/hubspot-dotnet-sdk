@@ -5,13 +5,13 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using EMG.Common;
+using EMG.Utilities;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 
 namespace HubSpot.Authentication
 {
-    public class OAuthHubSpotAuthenticator : HubSpotAuthenticator
+    public class OAuthHubSpotAuthenticator : DelegatingHandler
     {
         private readonly OAuthOptions _options;
 
@@ -30,7 +30,7 @@ namespace HubSpot.Authentication
 
             if (!_tokens.TryGetValue(key, out var token) || !IsTokenValid(token))
             {
-                token = await GetToken(cancellationToken);
+                token = await GetToken(requestUri, cancellationToken);
 
                 if (token != null)
                 {
@@ -44,50 +44,55 @@ namespace HubSpot.Authentication
             }
 
             return await base.SendAsync(request, cancellationToken).ConfigureAwait(false);
+
+            static string ExtractKey(Uri requestUri) => $"{requestUri.Host}:{requestUri.Port}";
+
+            bool IsTokenValid(AuthToken token) => (token.ExpiresOn - Clock.Default.UtcNow) >= _options.ClockSkew;
         }
 
-        private async Task<AuthToken> GetToken(CancellationToken cancellationToken)
+        private async Task<AuthToken> GetToken(Uri requestUri, CancellationToken cancellationToken)
         {
-            var requestUri = new Uri(ServiceUri, "/oauth/v1/token");
+            var authUri = GetAuthUri(requestUri);
 
-            using (var request = new HttpRequestMessage(HttpMethod.Post, requestUri))
+            using var request = new HttpRequestMessage(HttpMethod.Post, authUri);
+
+            var form = new Dictionary<string, string>
             {
-                var form = new Dictionary<string, string>
+                ["grant_type"] = "refresh_token",
+                ["client_id"] = _options.ClientId,
+                ["client_secret"] = _options.SecretKey,
+                ["redirect_uri"] = _options.RedirectUri.ToString(),
+                ["refresh_token"] = _options.RefreshToken
+            };
+
+            request.Content = new FormUrlEncodedContent(form);
+
+            using var response = await base.SendAsync(request, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+
+            var jobj = JObject.Parse(content);
+
+            var token = (string)jobj.GetValue("access_token");
+            var expiresIn = (long)jobj.GetValue("expires_in");
+
+            return new AuthToken(token, Clock.Default.UtcNow.AddSeconds(expiresIn));
+
+            static Uri GetAuthUri(Uri requestUri)
+            {
+                UriBuilder builder = new UriBuilder(requestUri.Scheme, requestUri.Host, requestUri.Port)
                 {
-                    ["grant_type"] = "refresh_token",
-                    ["client_id"] = _options.ClientId,
-                    ["client_secret"] = _options.SecretKey,
-                    ["redirect_uri"] = _options.RedirectUri.ToString(),
-                    ["refresh_token"] = _options.RefreshToken
+                    Path = "/oauth/v1/token"
                 };
 
-                request.Content = new FormUrlEncodedContent(form);
-
-                using (var response = await base.SendAsync(request, cancellationToken))
-                {
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        return null;
-                    }
-
-                    var content = await response.Content.ReadAsStringAsync();
-
-                    var jobj = JObject.Parse(content);
-
-                    var token = (string)jobj.GetValue("access_token");
-                    var expiresIn = (long)jobj.GetValue("expires_in");
-
-                    return new AuthToken(token, Clock.Default.UtcNow.AddSeconds(expiresIn));
-                }
+                return builder.Uri;
             }
         }
-
-        private bool IsTokenValid(AuthToken token)
-        {
-            return (token.ExpiresOn - Clock.Default.UtcNow) >= _options.ClockSkew;
-        }
-
-        private string ExtractKey(Uri requestUri) => $"{requestUri.Host}:{requestUri.Port}";
 
         private class AuthToken
         {

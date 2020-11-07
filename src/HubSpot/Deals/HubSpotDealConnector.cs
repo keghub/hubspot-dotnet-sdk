@@ -12,13 +12,11 @@ namespace HubSpot.Deals
     {
         private readonly IHubSpotClient _client;
         private readonly IDealTypeManager _typeManager;
-        private readonly ILogger<HubSpotDealConnector> _logger;
 
-        public HubSpotDealConnector(IHubSpotClient client, IDealTypeManager typeManager, ILogger<HubSpotDealConnector> logger)
+        public HubSpotDealConnector(IHubSpotClient client, IDealTypeManager typeManager)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
             _typeManager = typeManager ?? throw new ArgumentNullException(nameof(typeManager));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<TDeal> GetAsync<TDeal>(IDealSelector selector) where TDeal : Deal, new()
@@ -88,7 +86,7 @@ namespace HubSpot.Deals
         public async Task<IReadOnlyList<TDeal>> FindAsync<TDeal>(IDealFilter filter = null)
             where TDeal : Deal, new()
         {
-            filter = filter ?? FilterDeals.All;
+            filter ??= FilterDeals.All;
 
             var properties = _typeManager.GetCustomProperties<TDeal>(TypeManager.AllProperties).Select(p => new Property(p.FieldName)).ToArray();
 

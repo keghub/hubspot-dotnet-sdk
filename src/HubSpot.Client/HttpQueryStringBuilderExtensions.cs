@@ -45,18 +45,16 @@ namespace HubSpot
 
             builder.Add("formSubmissionMode", GetFormSubmissionMode(formSubmissionMode));
 
-            string GetFormSubmissionMode(FormSubmissionMode mode)
+            static string GetFormSubmissionMode(FormSubmissionMode mode)
             {
-                switch (mode)
+                return mode switch
                 {
-                    case FormSubmissionMode.All: return "all";
-                    case FormSubmissionMode.Newest: return "newest";
-                    case FormSubmissionMode.None: return "none";
-                    case FormSubmissionMode.Oldest: return "oldest";
-
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(mode));
-                }
+                    FormSubmissionMode.All => "all",
+                    FormSubmissionMode.Newest => "newest",
+                    FormSubmissionMode.None => "none",
+                    FormSubmissionMode.Oldest => "oldest",
+                    _ => throw new ArgumentOutOfRangeException(nameof(mode)),
+                };
             }
         }
 

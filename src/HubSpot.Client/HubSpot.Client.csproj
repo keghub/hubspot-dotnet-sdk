@@ -2,22 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>7.2</LangVersion>
-    <RootNamespace>HubSpot</RootNamespace>
     <AssemblyName>HubSpot.Client</AssemblyName>
     <PackageId>EMG.HubSpot.Client</PackageId>
-    <Authors>EMG</Authors>
-    <Company>EMG</Company>
-    <VersionPrefix>0.3.0</VersionPrefix>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EMG.Common.Framework.Clock" Version="1.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="2.0.0" />
+    <PackageReference Include="EMG.Utilities.Clock" Version="1.9.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.9" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.9" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="Kralizek.Extensions.Logging" Version="1.0.1" />
-    <PackageReference Include="Kralizek.Extensions.Http" Version="0.4.0" />
+    <PackageReference Include="Kralizek.Extensions.Logging" Version="2.0.1" />
+    <PackageReference Include="Kralizek.Extensions.Http.Json" Version="2.3.0" />
   </ItemGroup>
 
   <ItemGroup>
