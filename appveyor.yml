@@ -8,10 +8,6 @@ image: Visual Studio 2019
 cache:
   - '%LocalAppData%\NuGet\v3-cache'
 
-skip_commits:
-  files:
-    - docs/*
-
 nuget:
   account_feed: false
   project_feed: false
