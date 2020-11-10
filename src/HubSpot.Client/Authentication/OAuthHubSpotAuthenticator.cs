@@ -112,7 +112,7 @@ namespace HubSpot.Authentication
     {
         public string ClientId { get; set; }
 
-        public Uri RedirectUri { get; set; }
+        public Uri RedirectUri { get; set; } = new Uri("https://www.hubspot.com");
 
         public string RefreshToken { get; set; }
 

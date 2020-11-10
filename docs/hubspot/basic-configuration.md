@@ -19,14 +19,14 @@ Additional extension methods to the `IHubSpotConfigurator` type are available an
 
 While being a higher-layer library, this library allows full access to the customization of the HubSpot client as described [earlier](../hubspot-client/configuration.md).
 
-This can be achieved using the `AddClientConfiguration` method.
+This can be achieved using the `ConfigureHubSpotClient` method.
 
 In the snippet below, we're registering all the customizations we added earlier.
 
 ```csharp
 services.AddHubSpot(hs => 
 {
-    hs.AddClientConfiguration(client => client
+    hs.ConfigureHubSpotClient(client => client
         .SetBaseAddress(new Uri("https://localhost.temp"))
         .UseOAuthAuthentication(configuration.GetSection("HubSpot"))
         .ConfigureSerialization(settings => settings.Formatting = Newtonsoft.Json.Formatting.Indented)
@@ -39,7 +39,7 @@ services.AddHubSpot(hs =>
 
 ## Authentication
 
-Since HubSpot always require any of the two supported authentication methods, convenience methods are offered to set up the authentication method without the need of using `AddClientConfiguration`.
+Since HubSpot always require any of the two supported authentication methods, convenience methods are offered to set up the authentication method without the need of using `ConfigureHubSpotClient`.
 
 ```csharp
 services.AddHubSpot(hs => 
@@ -53,4 +53,4 @@ services.AddHubSpot(hs =>
 });
 ```
 
-The same assumptions done [earlier](../hubspot-client/configuration.md#Authentication) apply.
+The same assumptions done [earlier](../hubspot-client/configuration.md#authentication) apply.
