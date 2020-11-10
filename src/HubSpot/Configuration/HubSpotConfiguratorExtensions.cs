@@ -12,6 +12,13 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class HubSpotConfiguratorExtensions
     {
+        public static IHubSpotConfigurator ConfigureHubSpotClient(this IHubSpotConfigurator configurator, Action<IHubSpotClientConfigurator> clientConfiguration)
+        {
+            configurator.AddClientConfiguration(clientConfiguration);
+
+            return configurator;
+        }
+
         public static IHubSpotConfigurator UseContactConnector(this IHubSpotConfigurator configurator)
         {
             configurator.AddServiceConfiguration(services =>
