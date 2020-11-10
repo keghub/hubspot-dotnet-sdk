@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\HubSpot\HubSpot.csproj" />
+    <ProjectReference Include="..\..\..\src\HubSpot\HubSpot.csproj" />
   </ItemGroup>
-
 </Project>
