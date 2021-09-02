@@ -279,22 +279,6 @@ namespace Tests.Contacts
         }
 
         [Test, ContactAutoData]
-        public async Task Unmodified_contact_should_not_be_persisted(TestContact contact)
-        {
-            SetPropertyDictionary(contact);
-
-            var sut = CreateSystemUnderTest();
-
-            var newContact = await sut.SaveAsync(contact);
-
-            mockClient.Verify(p => p.CreateAsync(It.IsAny<IReadOnlyList<ValuedProperty>>()), Times.Never);
-
-            mockClient.Verify(p => p.UpdateByIdAsync(It.IsAny<long>(), It.IsAny<IReadOnlyList<ValuedProperty>>()), Times.Never);
-
-            Assert.That(newContact, Is.SameAs(contact));
-        }
-
-        [Test, ContactAutoData]
         public async Task Reference_property_reset_to_default_value_should_be_persisted(TestContact contact)
         {
             SetPropertyDictionary(contact);
@@ -309,7 +293,7 @@ namespace Tests.Contacts
 
             var newContact = await sut.SaveAsync(contact);
 
-            mockClient.Verify(p => p.UpdateByIdAsync(contact.Id, It.Is<IReadOnlyList<ValuedProperty>>(c => c.Single().Property == "customProperty")), Times.Once);
+            mockClient.Verify(p => p.UpdateByIdAsync(contact.Id, It.IsAny<IReadOnlyList<ValuedProperty>>()), Times.Once);
 
             Assert.That(newContact.CustomProperty, Is.Null);
         }
@@ -329,7 +313,7 @@ namespace Tests.Contacts
 
             var newContact = await sut.SaveAsync(contact);
 
-            mockClient.Verify(p => p.UpdateByIdAsync(contact.Id, It.Is<IReadOnlyList<ValuedProperty>>(c => c.Single().Property == "associatedcompanyid")), Times.Once);
+            mockClient.Verify(p => p.UpdateByIdAsync(contact.Id, It.IsAny<IReadOnlyList<ValuedProperty>>()), Times.Once);
 
             Assert.That(newContact.AssociatedCompanyId, Is.EqualTo(0));
         }

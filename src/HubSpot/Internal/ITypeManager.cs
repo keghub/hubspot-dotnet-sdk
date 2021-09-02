@@ -13,7 +13,7 @@ namespace HubSpot.Internal
         IReadOnlyList<CustomPropertyInfo> GetCustomProperties<T>(Func<CustomPropertyAttribute, bool> filter)
             where T : class, TEntity, new();
 
-        IReadOnlyList<(string name, string value)> GetModifiedProperties<T>(T item)
+        IReadOnlyList<PropertyData> GetPropertyData<T>(T item)
             where T : class, TEntity, new();
     }
 

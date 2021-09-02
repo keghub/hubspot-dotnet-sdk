@@ -114,29 +114,27 @@ namespace HubSpot.Internal
 
         protected abstract IReadOnlyList<KeyValuePair<string, object>> GetDefaultProperties(THubSpot item);
 
-        public IReadOnlyList<(string name, string value)> GetModifiedProperties<T>(T item)
+        public IReadOnlyList<PropertyData> GetPropertyData<T>(T item)
             where T : class, TEntity, new()
         {
             var properties = GetCustomProperties<T>(TypeManager.ModifiableProperties);
 
-            var data = from property in properties
-                       let value = property.ValueAccessor(item)
-                       select new PropertyData
-                       {
-                           PropertyName = property.FieldName,
-                           Value = value
-                       };
+            var propertyData = from property in properties
+                               let value = property.ValueAccessor(item)
+                               select new PropertyData
+                               {
+                                   PropertyName = property.FieldName,
+                                   Value = value
+                               };
 
-            var modifiedProperties = GetModifiedProperties(data, item);
+            var converted = ConvertPropertyValues(propertyData);
 
-            return modifiedProperties.ToArray();
+            return converted.ToList().AsReadOnly();
         }
 
-        private IEnumerable<(string name, string value)> GetModifiedProperties(IEnumerable<PropertyData> currentValues, IHubSpotEntity entity)
+        private IEnumerable<PropertyData> ConvertPropertyValues(IEnumerable<PropertyData> properties)
         {
-            var oldValues = entity.Properties;
-
-            foreach (var property in currentValues)
+            foreach (var property in properties)
             {
                 if (!property.Value.IsDefaultValue())
                 {
@@ -150,29 +148,11 @@ namespace HubSpot.Internal
                         throw new Exception($"{converter.GetType()} could not convert {property.Value ?? "<null>"} for {property.PropertyName}");
                     }
 
-                    if (!oldValues.TryGetValue(property.PropertyName, out var value))
-                    {
-                        yield return (property.PropertyName, newValue);
-                    }
-                    else
-                    {
-                        if (!converter.TryConvertFrom(value, out var oldValue))
-                        {
-                            throw new Exception($"{converter.GetType()} could not convert {value ?? "<null>"} for {property.PropertyName}");
-                        }
-
-                        if (!string.Equals(newValue, oldValue))
-                        {
-                            yield return (property.PropertyName, newValue);
-                        }
-                    }
+                    yield return new PropertyData(property.PropertyName, newValue);
                 }
                 else
                 {
-                    if (oldValues.TryGetValue(property.PropertyName, out var value) && value != null)
-                    {
-                        yield return (property.PropertyName, null);
-                    }
+                    yield return new PropertyData(property.PropertyName, null);
                 }
             }
         }

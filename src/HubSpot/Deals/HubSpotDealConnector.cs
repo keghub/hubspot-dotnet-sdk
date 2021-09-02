@@ -46,22 +46,24 @@ namespace HubSpot.Deals
                 throw new ArgumentNullException(nameof(deal));
             }
 
-            var modifiedProperties = (from property in _typeManager.GetModifiedProperties(deal)
-                                      select new ValuedPropertyV2(property.name, property.value)).ToArray();
+            var customProperties = (from property in _typeManager.GetPropertyData(deal)
+                                      select new ValuedPropertyV2(property.PropertyName, property.Value?.ToString())).ToArray();
+
+            var hasProperties = !customProperties.All(cp => string.IsNullOrEmpty(cp.Value));
 
             var modifiedAssociations = _typeManager.GetModifiedAssociations(deal).ToNestedLookup(o => o.type, o => o.operation, o => o.id);
 
-            if (modifiedProperties.Any() || modifiedAssociations.Any())
+            if (hasProperties || modifiedAssociations.Any())
             {
                 if (IsNew())
                 {
-                    var newDeal = await _client.Deals.CreateAsync(deal.AssociatedContactIds, deal.AssociatedCompanyIds, modifiedProperties).ConfigureAwait(false);
+                    var newDeal = await _client.Deals.CreateAsync(deal.AssociatedContactIds, deal.AssociatedCompanyIds, customProperties).ConfigureAwait(false);
 
                     return _typeManager.ConvertTo<TDeal>(newDeal);
                 }
                 else
                 {
-                    await _client.Deals.UpdateAsync(deal.Id, modifiedProperties).ConfigureAwait(false);
+                    await _client.Deals.UpdateAsync(deal.Id, customProperties).ConfigureAwait(false);
 
                     await _client.Deals.AssociateContactsAsync(deal.Id, modifiedAssociations.GetValues(AssociationType.Contact, Operation.Added)).ConfigureAwait(false);
                     await _client.Deals.AssociateCompaniesAsync(deal.Id, modifiedAssociations.GetValues(AssociationType.Company, Operation.Added)).ConfigureAwait(false);
