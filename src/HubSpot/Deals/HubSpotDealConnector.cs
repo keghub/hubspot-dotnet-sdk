@@ -53,31 +53,28 @@ namespace HubSpot.Deals
 
             var modifiedAssociations = _typeManager.GetModifiedAssociations(deal).ToNestedLookup(o => o.type, o => o.operation, o => o.id);
 
-            if (hasProperties || modifiedAssociations.Any())
+            if (!hasProperties && IsNew() && !modifiedAssociations.Any())
             {
-                if (IsNew())
-                {
-                    var newDeal = await _client.Deals.CreateAsync(deal.AssociatedContactIds, deal.AssociatedCompanyIds, customProperties).ConfigureAwait(false);
-
-                    return _typeManager.ConvertTo<TDeal>(newDeal);
-                }
-                else
-                {
-                    await _client.Deals.UpdateAsync(deal.Id, customProperties).ConfigureAwait(false);
-
-                    await _client.Deals.AssociateContactsAsync(deal.Id, modifiedAssociations.GetValues(AssociationType.Contact, Operation.Added)).ConfigureAwait(false);
-                    await _client.Deals.AssociateCompaniesAsync(deal.Id, modifiedAssociations.GetValues(AssociationType.Company, Operation.Added)).ConfigureAwait(false);
-
-                    await _client.Deals.RemoveAssociationToContactsAsync(deal.Id, modifiedAssociations.GetValues(AssociationType.Contact, Operation.Removed)).ConfigureAwait(false);
-                    await _client.Deals.RemoveAssociationToCompaniesAsync(deal.Id, modifiedAssociations.GetValues(AssociationType.Company, Operation.Removed)).ConfigureAwait(false);
-
-                    var updatedDeal = await GetAsync<TDeal>(SelectDeal.ById(deal.Id)).ConfigureAwait(false);
-
-                    return updatedDeal;
-                }
+                return deal;
             }
 
-            return deal;
+            if (IsNew())
+            {
+                var newDeal = await _client.Deals.CreateAsync(deal.AssociatedContactIds, deal.AssociatedCompanyIds, customProperties).ConfigureAwait(false);
+                return _typeManager.ConvertTo<TDeal>(newDeal);
+            }
+
+            await _client.Deals.UpdateAsync(deal.Id, customProperties).ConfigureAwait(false);
+
+            await _client.Deals.AssociateContactsAsync(deal.Id, modifiedAssociations.GetValues(AssociationType.Contact, Operation.Added)).ConfigureAwait(false);
+            await _client.Deals.AssociateCompaniesAsync(deal.Id, modifiedAssociations.GetValues(AssociationType.Company, Operation.Added)).ConfigureAwait(false);
+
+            await _client.Deals.RemoveAssociationToContactsAsync(deal.Id, modifiedAssociations.GetValues(AssociationType.Contact, Operation.Removed)).ConfigureAwait(false);
+            await _client.Deals.RemoveAssociationToCompaniesAsync(deal.Id, modifiedAssociations.GetValues(AssociationType.Company, Operation.Removed)).ConfigureAwait(false);
+
+            var updatedDeal = await GetAsync<TDeal>(SelectDeal.ById(deal.Id)).ConfigureAwait(false);
+
+            return updatedDeal;
 
             bool IsNew()
             {

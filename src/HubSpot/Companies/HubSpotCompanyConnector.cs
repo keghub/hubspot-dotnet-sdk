@@ -50,7 +50,7 @@ namespace HubSpot.Companies
             var customProperties = (from property in _typeManager.GetPropertyData(company)
                                       select new ValuedPropertyV2(property.PropertyName, property.Value?.ToString())).ToArray();
 
-            if (customProperties.All(cp => string.IsNullOrEmpty(cp.Value)))
+            if (customProperties.All(cp => string.IsNullOrEmpty(cp.Value)) && IsNew())
             {
                 return company;
             }
