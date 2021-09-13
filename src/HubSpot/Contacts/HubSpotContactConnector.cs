@@ -50,25 +50,24 @@ namespace HubSpot.Contacts
                 throw new ArgumentNullException(nameof(contact));
             }
 
-            var modifiedProperties = (from property in _typeManager.GetModifiedProperties(contact)
-                                      select new ValuedProperty(property.name, property.value)).ToArray();
+            var customProperties = (from property in _typeManager.GetPropertyData(contact)
+                                      select new ValuedProperty(property.PropertyName, property.Value?.ToString()))
+                                      .ToArray();
 
-            if (modifiedProperties.Any())
+            if (customProperties.All(cp => string.IsNullOrEmpty(cp.Value)) && IsNewContact())
             {
-                if (IsNewContact())
-                {
-                    var newContact = await _client.Contacts.CreateAsync(modifiedProperties);
-                    return _typeManager.ConvertTo<TContact>(newContact);
-                }
-                else
-                {
-                    await _client.Contacts.UpdateByIdAsync(contact.Id, modifiedProperties);
-                    var newContact = await GetAsync<TContact>(SelectContact.ById(contact.Id));
-                    return newContact;
-                }
+                return contact;
             }
 
-            return contact;
+            if (IsNewContact())
+            {
+                var newContact = await _client.Contacts.CreateAsync(customProperties);
+                return _typeManager.ConvertTo<TContact>(newContact);
+            }
+
+            await _client.Contacts.UpdateByIdAsync(contact.Id, customProperties);
+            var modifiedContact = await GetAsync<TContact>(SelectContact.ById(contact.Id));
+            return modifiedContact;
 
             bool IsNewContact()
             {

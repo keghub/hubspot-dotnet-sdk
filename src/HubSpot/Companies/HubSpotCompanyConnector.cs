@@ -47,26 +47,25 @@ namespace HubSpot.Companies
                 throw new ArgumentNullException(nameof(company));
             }
 
-            var modifiedProperties = (from property in _typeManager.GetModifiedProperties(company)
-                                      select new ValuedPropertyV2(property.name, property.value)).ToArray();
+            var customProperties = (from property in _typeManager.GetPropertyData(company)
+                                      select new ValuedPropertyV2(property.PropertyName, property.Value?.ToString()))
+                                      .ToArray();
 
-            if (modifiedProperties.Any())
+            if (customProperties.All(cp => string.IsNullOrEmpty(cp.Value)) && IsNew())
             {
-                if (IsNew())
-                {
-                    var createdCompany = await _client.Companies.CreateAsync(modifiedProperties).ConfigureAwait(false);
-                    var newCompany = await _client.Companies.GetByIdAsync(createdCompany.Id).ConfigureAwait(false);
-                    return _typeManager.ConvertTo<TCompany>(newCompany);
-                }
-                else
-                {
-                    await _client.Companies.UpdateAsync(company.Id, modifiedProperties).ConfigureAwait(false);
-                    var modifiedCompany = await _client.Companies.GetByIdAsync(company.Id).ConfigureAwait(false);
-                    return _typeManager.ConvertTo<TCompany>(modifiedCompany);
-                }
+                return company;
             }
 
-            return company;
+            if (IsNew())
+            {
+                var createdCompany = await _client.Companies.CreateAsync(customProperties).ConfigureAwait(false);
+                var newCompany = await _client.Companies.GetByIdAsync(createdCompany.Id).ConfigureAwait(false);
+                return _typeManager.ConvertTo<TCompany>(newCompany);
+            }
+            
+            await _client.Companies.UpdateAsync(company.Id, customProperties).ConfigureAwait(false);
+            var modifiedCompany = await _client.Companies.GetByIdAsync(company.Id).ConfigureAwait(false);
+            return _typeManager.ConvertTo<TCompany>(modifiedCompany);
 
             bool IsNew()
             {

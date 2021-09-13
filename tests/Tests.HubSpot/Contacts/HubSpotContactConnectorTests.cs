@@ -124,14 +124,14 @@ namespace Tests.Contacts
         }
 
         [Test, CustomAutoData]
-        public async Task SaveAsync_persists_a_new_contact(TestContact contact, (string, string)[] properties)
+        public async Task SaveAsync_persists_a_new_contact(TestContact contact, PropertyData[] properties)
         {
             contact.Id = 0;
             contact.Created = default;
 
             var toCreate = CreateFromContact(contact);
 
-            mockTypeManager.Setup(p => p.GetModifiedProperties(It.IsAny<TestContact>())).Returns(properties);
+            mockTypeManager.Setup(p => p.GetPropertyData(It.IsAny<TestContact>())).Returns(properties);
 
             mockContactClient.Setup(p => p.CreateAsync(It.IsAny<IReadOnlyList<ValuedProperty>>())).ReturnsAsync(toCreate);
 
