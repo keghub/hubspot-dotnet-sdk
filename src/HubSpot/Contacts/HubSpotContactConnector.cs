@@ -51,7 +51,8 @@ namespace HubSpot.Contacts
             }
 
             var customProperties = (from property in _typeManager.GetPropertyData(contact)
-                                      select new ValuedProperty(property.PropertyName, property.Value?.ToString())).ToArray();
+                                      select new ValuedProperty(property.PropertyName, property.Value?.ToString()))
+                                      .ToArray();
 
             if (customProperties.All(cp => string.IsNullOrEmpty(cp.Value)) && IsNewContact())
             {

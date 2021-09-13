@@ -47,7 +47,8 @@ namespace HubSpot.Deals
             }
 
             var customProperties = (from property in _typeManager.GetPropertyData(deal)
-                                      select new ValuedPropertyV2(property.PropertyName, property.Value?.ToString())).ToArray();
+                                      select new ValuedPropertyV2(property.PropertyName, property.Value?.ToString()))
+                                      .ToArray();
 
             var hasProperties = !customProperties.All(cp => string.IsNullOrEmpty(cp.Value));
 
