@@ -29,7 +29,7 @@ namespace HubSpot.Deals
         [CustomProperty("createdate")]
         public DateTimeOffset Created { get; set; }
 
-        [CustomProperty("num_associated_contacts")]
+        [CustomProperty("num_associated_contacts", IsReadOnly = true)]
         public long NumberOfAssociatedContacts { get; set; }
 
         public IReadOnlyList<long> AssociatedCompanyIds { get; set; } = Array.Empty<long>();
