@@ -1,4 +1,6 @@
-﻿namespace HubSpot.Converters {
+﻿using System.Globalization;
+
+namespace HubSpot.Converters {
     public class DecimalTypeConverter : ITypeConverter
     {
         public bool TryConvertTo(string value, out object result)
@@ -29,7 +31,7 @@
 
             if (value is decimal num)
             {
-                result = num.ToString("D");
+                result = num.ToString("G", CultureInfo.InvariantCulture);
                 return true;
             }
 
