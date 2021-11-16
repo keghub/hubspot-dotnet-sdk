@@ -4,6 +4,7 @@ using HubSpot.Model.CRM.Associations;
 using HubSpot.Model.Deals;
 using HubSpot.Model.Lists;
 using HubSpot.Model.Owners;
+using HubSpot.Model.Pipelines;
 
 namespace HubSpot
 {
@@ -14,6 +15,8 @@ namespace HubSpot
         IHubSpotCompanyClient Companies { get; }
 
         IHubSpotDealClient Deals { get; }
+
+        IHubSpotPipelineClient Pipelines { get; }
 
         IHubSpotListClient Lists { get; }
 

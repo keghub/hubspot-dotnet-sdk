@@ -8,6 +8,7 @@ using HubSpot.Model.CRM.Associations;
 using HubSpot.Model.Deals;
 using HubSpot.Model.Lists;
 using HubSpot.Model.Owners;
+using HubSpot.Model.Pipelines;
 using HubSpot.Utils;
 using Kralizek.Extensions.Http;
 using Microsoft.Extensions.Logging;
@@ -51,5 +52,7 @@ namespace HubSpot
         public IHubSpotOwnerClient Owners => this;
 
         public IHubSpotCrmClient Crm => this;
+
+        public IHubSpotPipelineClient Pipelines => this;
     }
 }

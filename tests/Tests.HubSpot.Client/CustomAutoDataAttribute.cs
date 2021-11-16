@@ -50,6 +50,8 @@ namespace Tests
 
             fixture.Register((HttpHubSpotClient client) => client.Owners);
 
+            fixture.Register((HttpHubSpotClient client) => client.Pipelines);
+
             fixture.Register((HttpHubSpotClient client) => client.Contacts.Properties);
 
             fixture.Register((HttpHubSpotClient client) => client.Contacts.PropertyGroups);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HubSpot.Model.Pipelines;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -31,6 +32,11 @@ namespace HubSpot.Deals
 
         [CustomProperty("num_associated_contacts", IsReadOnly = true)]
         public long NumberOfAssociatedContacts { get; set; }
+
+        [CustomProperty("pipeline")]
+        public string PipelineGuid { get; set; }
+
+        public Pipeline Pipeline { get; set; }
 
         public IReadOnlyList<long> AssociatedCompanyIds { get; set; } = Array.Empty<long>();
 
