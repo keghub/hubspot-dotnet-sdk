@@ -30,12 +30,13 @@ namespace Tests.Pipelines
         }
 
         [Test, CustomAutoData]
-        public void GetByGuidAsync_throws_NotFoundException_if_request_returns_NotFound_status([Frozen] IHttpRestClient httpRestClient, IHubSpotPipelineClient sut, string guid)
+        public void GetByGuidAsync_throws_NotFoundException_if_request_returns_NotFound_status([Frozen] IHttpRestClient httpRestClient, IHubSpotPipelineClient sut, string guid, IFixture fixture)
         {
             //Arrange
+            var httpException = fixture.Build<HttpException>().With(x => x.StatusCode, HttpStatusCode.NotFound).Create();
             Mock.Get(httpRestClient)
                 .Setup(p => p.SendAsync<Pipeline>(HttpMethod.Get, $"/deals/v1/pipelines/{guid}", null))
-                .Throws(new HttpException("Not Found", HttpStatusCode.NotFound));
+                .Throws(httpException);
 
             //Act
 
@@ -56,14 +57,14 @@ namespace Tests.Pipelines
         }
 
         [Test, CustomAutoData]
-        public async Task GetByGuidAsync_returns_null_if_guid_is_empty([Frozen] IHttpRestClient httpRestClient, IHubSpotPipelineClient sut)
+        public async Task GetByGuidAsync_returns_null_if_API_retrieves_null([Frozen] IHttpRestClient httpRestClient, IHubSpotPipelineClient sut, string guid)
         {
             //Arrange
             Mock.Get(httpRestClient)
-                .Setup(p => p.SendAsync<Pipeline>(HttpMethod.Get, $"/deals/v1/pipelines/{string.Empty}", null)).Returns(Task.FromResult((Pipeline)null));
+                .Setup(p => p.SendAsync<Pipeline>(HttpMethod.Get, $"/deals/v1/pipelines/{guid}", null)).Returns(Task.FromResult((Pipeline)null));
 
             //Act
-            var result = await sut.GetByGuidAsync(string.Empty);
+            var result = await sut.GetByGuidAsync(guid);
 
             //Assert
             Assert.That(result, Is.Null);
