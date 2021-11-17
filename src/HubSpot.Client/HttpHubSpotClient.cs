@@ -54,5 +54,6 @@ namespace HubSpot
         public IHubSpotCrmClient Crm => this;
 
         public IHubSpotPipelineClient Pipelines => this;
+
     }
 }
