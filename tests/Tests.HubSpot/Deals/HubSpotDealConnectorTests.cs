@@ -97,10 +97,9 @@ namespace Tests.Deals
         }
 
         [Test, CustomAutoData]
-        public async Task GetAsync_returns_null_if_deal_retrieving_throws_NotFoundException([Frozen] IHubSpotClient hubSpotClient, [Frozen] IDealSelector dealSelector, HubSpotDealConnector sut, IFixture fixture)
+        public async Task GetAsync_returns_null_if_deal_retrieving_throws_NotFoundException([Frozen] IHubSpotClient hubSpotClient, [Frozen] IDealSelector dealSelector, HubSpotDealConnector sut, NotFoundException notFoundException)
         {
             //Arrange
-            var notFoundException = fixture.Create<NotFoundException>();
             Mock.Get(dealSelector).Setup(x => x.GetDeal(hubSpotClient)).Throws(notFoundException);
 
             //Act
@@ -111,10 +110,9 @@ namespace Tests.Deals
         }
 
         [Test, CustomAutoData]
-        public async Task GetAsync_returns_null_if_pipeline_retrieving_throws_NotFoundeException([Frozen] IHubSpotClient hubSpotClient, [Frozen] IDealSelector dealSelector, HubSpotDealConnector sut, string guid, IFixture fixture)
+        public async Task GetAsync_returns_null_if_pipeline_retrieving_throws_NotFoundeException([Frozen] IHubSpotClient hubSpotClient, [Frozen] IDealSelector dealSelector, HubSpotDealConnector sut, NotFoundException notFoundException)
         {
             //Arrange
-            var notFoundException = fixture.Create<NotFoundException>();
             Mock.Get(hubSpotClient).Setup(x => x.Pipelines.GetByGuidAsync(It.IsAny<string>())).Throws(notFoundException);
 
             //Act
