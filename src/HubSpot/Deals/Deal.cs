@@ -36,8 +36,6 @@ namespace HubSpot.Deals
         [CustomProperty("pipeline")]
         public string PipelineGuid { get; set; }
 
-        public Pipeline Pipeline { get; set; }
-
         public IReadOnlyList<long> AssociatedCompanyIds { get; set; } = Array.Empty<long>();
 
         public IReadOnlyList<long> AssociatedContactIds { get; set; } = Array.Empty<long>();
