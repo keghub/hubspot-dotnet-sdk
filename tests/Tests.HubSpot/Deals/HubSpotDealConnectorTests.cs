@@ -71,7 +71,6 @@ namespace Tests.Deals
         {
             //Arrange
             Mock.Get(dealTypeManager).Setup(x => x.ConvertTo<HubSpot.Deals.Deal>(It.IsAny<HubSpot.Model.Deals.Deal>())).Returns(convertedDeal);
-            Mock.Get(hubSpotClient).Setup(x => x.Pipelines.GetByGuidAsync(It.IsAny<string>())).Returns(Task.FromResult((Pipeline)null));
 
             //Act
             var result = await sut.GetAsync<HubSpot.Deals.Deal>(dealSelector);
