@@ -30,7 +30,6 @@ namespace HubSpot.Deals
             {
                 var hubspotDeal = await selector.GetDeal(_client).ConfigureAwait(false);
                 var deal = _typeManager.ConvertTo<TDeal>(hubspotDeal);
-                deal.Pipeline = await _client.Pipelines.GetByGuidAsync(deal.PipelineGuid);
                 return deal;
             }
             catch (NotFoundException)

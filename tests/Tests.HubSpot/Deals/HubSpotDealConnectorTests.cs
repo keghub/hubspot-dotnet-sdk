@@ -67,10 +67,9 @@ namespace Tests.Deals
         }
 
         [Test, CustomAutoData]
-        public async Task GetAsync_returns_converted_deal([Frozen] IDealTypeManager dealTypeManager, [Frozen] IHubSpotClient hubSpotClient, [Frozen] IDealSelector dealSelector, HubSpotDealConnector sut, IFixture fixture) 
+        public async Task GetAsync_returns_converted_deal([Frozen] IDealTypeManager dealTypeManager, [Frozen] IHubSpotClient hubSpotClient, [Frozen] IDealSelector dealSelector, HubSpot.Deals.Deal convertedDeal, HubSpotDealConnector sut, IFixture fixture) 
         {
             //Arrange
-            var convertedDeal = fixture.Build<HubSpot.Deals.Deal>().Without(x => x.Pipeline).Create();
             Mock.Get(dealTypeManager).Setup(x => x.ConvertTo<HubSpot.Deals.Deal>(It.IsAny<HubSpot.Model.Deals.Deal>())).Returns(convertedDeal);
             Mock.Get(hubSpotClient).Setup(x => x.Pipelines.GetByGuidAsync(It.IsAny<string>())).Returns(Task.FromResult((Pipeline)null));
 
@@ -82,38 +81,10 @@ namespace Tests.Deals
         }
 
         [Test, CustomAutoData]
-        public async Task GetAsync_returns_deal_with_pipeline_retrieved_by_http_client([Frozen] IDealTypeManager dealTypeManager, [Frozen] IHubSpotClient hubSpotClient, [Frozen] IDealSelector dealSelector, HubSpotDealConnector sut, IFixture fixture, Pipeline pipeline)
-        {
-            //Arrange
-            var convertedDeal = fixture.Build<HubSpot.Deals.Deal>().Without(x => x.Pipeline).Create();
-            Mock.Get(dealTypeManager).Setup(x => x.ConvertTo<HubSpot.Deals.Deal>(It.IsAny<HubSpot.Model.Deals.Deal>())).Returns(convertedDeal);
-            Mock.Get(hubSpotClient).Setup(x => x.Pipelines.GetByGuidAsync(It.IsAny<string>())).Returns(Task.FromResult(pipeline));
-
-            //Act
-            var result = await sut.GetAsync<HubSpot.Deals.Deal>(dealSelector);
-
-            //Assert
-            Assert.That(result.Pipeline, Is.EqualTo(pipeline));
-        }
-
-        [Test, CustomAutoData]
         public async Task GetAsync_returns_null_if_deal_retrieving_throws_NotFoundException([Frozen] IHubSpotClient hubSpotClient, [Frozen] IDealSelector dealSelector, HubSpotDealConnector sut, NotFoundException notFoundException)
         {
             //Arrange
             Mock.Get(dealSelector).Setup(x => x.GetDeal(hubSpotClient)).Throws(notFoundException);
-
-            //Act
-            var result = await sut.GetAsync<HubSpot.Deals.Deal>(dealSelector);
-
-            //Assert
-            Assert.That(result, Is.Null);
-        }
-
-        [Test, CustomAutoData]
-        public async Task GetAsync_returns_null_if_pipeline_retrieving_throws_NotFoundeException([Frozen] IHubSpotClient hubSpotClient, [Frozen] IDealSelector dealSelector, HubSpotDealConnector sut, NotFoundException notFoundException)
-        {
-            //Arrange
-            Mock.Get(hubSpotClient).Setup(x => x.Pipelines.GetByGuidAsync(It.IsAny<string>())).Throws(notFoundException);
 
             //Act
             var result = await sut.GetAsync<HubSpot.Deals.Deal>(dealSelector);
