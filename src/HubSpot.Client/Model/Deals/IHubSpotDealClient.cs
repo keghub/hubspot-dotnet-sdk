@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HubSpot.Model.LineItems;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -33,5 +34,7 @@ namespace HubSpot.Model.Deals
         Task<DealList> FindByContactAsync(long contactId, IReadOnlyList<IProperty> properties = null, IReadOnlyList<IProperty> propertiesWithHistory = null, bool includeAssociations = true, int limit = 100, long? offset = null);
 
         Task<DealList> FindByCompanyAsync(long companyId, IReadOnlyList<IProperty> properties = null, IReadOnlyList<IProperty> propertiesWithHistory = null, bool includeAssociations = true, int limit = 100, long? offset = null);
+
+        Task<LineItemAssociationList> GetLineItemAssociationsAsync(long dealId);
     }
 }

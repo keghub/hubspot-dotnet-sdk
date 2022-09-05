@@ -94,5 +94,11 @@ namespace HubSpot.Deals
 
             return matchingDeals.Select(_typeManager.ConvertTo<TDeal>).ToArray();
         }
+
+        public async Task<IReadOnlyList<long>> GetDealLineItemsAsync(long dealId)
+        {
+            var lineItems = await _client.Deals.GetLineItemAssociationsAsync(dealId);
+            return lineItems?.LineItemAssociations?.Select(x => x.Id).ToList().AsReadOnly();
+        }
     }
 }

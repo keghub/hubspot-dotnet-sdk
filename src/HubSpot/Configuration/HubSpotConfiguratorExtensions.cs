@@ -6,6 +6,7 @@ using HubSpot.Contacts;
 using HubSpot.Converters;
 using HubSpot.Deals;
 using HubSpot.Internal;
+using HubSpot.LineItems;
 using Microsoft.Extensions.Configuration;
 
 namespace Microsoft.Extensions.DependencyInjection
@@ -61,11 +62,25 @@ namespace Microsoft.Extensions.DependencyInjection
             return configurator;
         }
 
+        public static IHubSpotConfigurator UseLineItemConnector(this IHubSpotConfigurator configurator)
+        {
+            configurator.AddServiceConfiguration(services =>
+            {
+                services.AddSingleton<ILineItemTypeManager, LineItemTypeManager>();
+                services.AddSingleton<IHubSpotLineItemConnector, HubSpotLineItemConnector>();
+            });
+
+            configurator.RequireTypeStore();
+
+            return configurator;
+        }
+
         public static IHubSpotConfigurator RegisterDefaultConverters(this IHubSpotConfigurator configurator)
         {
             configurator.RegisterConverter(new StringTypeConverter(), typeof(string));
             configurator.RegisterConverter(new LongTypeConverter(), typeof(long), typeof(long?));
-            configurator.RegisterConverter(new DateTimeTypeConverter(), typeof(DateTimeOffset), typeof(DateTimeOffset?));
+            configurator.RegisterConverter(new DateTimeOffSetConverter(), typeof(DateTimeOffset), typeof(DateTimeOffset?));
+            configurator.RegisterConverter(new DateTimeConverter(), typeof(DateTime), typeof(DateTime?));
             configurator.RegisterConverter(new IntTypeConverter(), typeof(int), typeof(int?));
             configurator.RegisterConverter(new DecimalTypeConverter(), typeof(decimal), typeof(decimal?));
             configurator.RegisterConverter(new StringListConverter(), typeof(List<string>), typeof(IList<string>), typeof(IEnumerable<string>), typeof(IReadOnlyList<string>));

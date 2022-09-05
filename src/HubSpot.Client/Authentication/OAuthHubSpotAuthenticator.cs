@@ -15,12 +15,14 @@ namespace HubSpot.Authentication
     {
         private readonly OAuthOptions _options;
 
-        public OAuthHubSpotAuthenticator(IOptions<OAuthOptions> options)
+        public OAuthHubSpotAuthenticator(IOptions<OAuthOptions> options, ITokenSelector tokenSelector)
         {
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
+            _tokenSelector = tokenSelector ?? throw new ArgumentNullException(nameof(options));
         }
 
         private readonly ConcurrentDictionary<string, AuthToken> _tokens = new ConcurrentDictionary<string, AuthToken>();
+        private readonly ITokenSelector _tokenSelector;
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -28,7 +30,7 @@ namespace HubSpot.Authentication
 
             var key = ExtractKey(requestUri);
 
-            if (!_tokens.TryGetValue(key, out var token) || !IsTokenValid(token))
+            if (!_tokens.TryGetValue(key, out var token) || !IsTokenValid(token) || _tokenSelector.IsTokenChanged())
             {
                 token = await GetToken(requestUri, cancellationToken);
 
@@ -62,7 +64,7 @@ namespace HubSpot.Authentication
                 ["client_id"] = _options.ClientId,
                 ["client_secret"] = _options.SecretKey,
                 ["redirect_uri"] = _options.RedirectUri.ToString(),
-                ["refresh_token"] = _options.RefreshToken
+                ["refresh_token"] = _tokenSelector.SelectToken(_options.RefreshTokens)
             };
 
             request.Content = new FormUrlEncodedContent(form);
@@ -114,7 +116,7 @@ namespace HubSpot.Authentication
 
         public Uri RedirectUri { get; set; } = new Uri("https://www.hubspot.com");
 
-        public string RefreshToken { get; set; }
+        public Dictionary<string, string> RefreshTokens { get; set; }
 
         public string SecretKey { get; set; }
 
