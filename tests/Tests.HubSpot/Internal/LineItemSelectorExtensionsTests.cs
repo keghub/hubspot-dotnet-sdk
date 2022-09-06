@@ -15,7 +15,7 @@ namespace Tests.Internal
     {
         #region GetByIdAsync
         [Test, CustomAutoData]
-        public async Task GetByIdAsync_returns_lineitem_generated_by_connector([Frozen] IHubSpotLineItemConnector lineItemConnector, long lineItemId, LineItem expected, Property[] properties)
+        public async Task GetByIdAsync_returns_lineitem_generated_by_connector([Frozen] IHubSpotLineItemConnector lineItemConnector, long lineItemId, LineItem expected, string[] properties)
         {
             //Arrange
             Mock.Get(lineItemConnector).Setup(x => x.GetAsync<LineItem>(It.IsAny<ILineItemSelector>(), properties)).ReturnsAsync(expected);
@@ -28,7 +28,7 @@ namespace Tests.Internal
         }
 
         [Test, CustomAutoData]
-        public async Task GetByIdAsync_calls_connector_GetAsync_method([Frozen] IHubSpotLineItemConnector lineItemConnector, long lineItemId, LineItem expected, Property[] properties)
+        public async Task GetByIdAsync_calls_connector_GetAsync_method([Frozen] IHubSpotLineItemConnector lineItemConnector, long lineItemId, LineItem expected, string[] properties)
         {
             //Arrange
             Mock.Get(lineItemConnector).Setup(x => x.GetAsync<LineItem>(It.IsAny<ILineItemSelector>(), properties)).ReturnsAsync(expected);
@@ -42,7 +42,7 @@ namespace Tests.Internal
         #endregion
         #region GetBySKUAsync
         [Test, CustomAutoData]
-        public async Task GetBySKUAsync_returns_lineitem_generated_by_connector([Frozen] IHubSpotLineItemConnector lineItemConnector, IReadOnlyList<long> lineItemIds, string sku, LineItem expected, Property[] properties)
+        public async Task GetBySKUAsync_returns_lineitem_generated_by_connector([Frozen] IHubSpotLineItemConnector lineItemConnector, IReadOnlyList<long> lineItemIds, string sku, LineItem expected, string[] properties)
         {
             //Arrange
             Mock.Get(lineItemConnector).Setup(x => x.GetBySKUAsync<LineItem>(It.IsAny<ILineItemSelector>(), sku, properties)).ReturnsAsync(expected);
@@ -55,7 +55,7 @@ namespace Tests.Internal
         }
 
         [Test, CustomAutoData]
-        public async Task GetBySKUAsync_calls_connector_GetBySKUAsync_method([Frozen] IHubSpotLineItemConnector lineItemConnector, IReadOnlyList<long> lineItemIds, string sku, LineItem expected, Property[] properties)
+        public async Task GetBySKUAsync_calls_connector_GetBySKUAsync_method([Frozen] IHubSpotLineItemConnector lineItemConnector, IReadOnlyList<long> lineItemIds, string sku, LineItem expected, string[] properties)
         {
             //Arrange
             Mock.Get(lineItemConnector).Setup(x => x.GetBySKUAsync<LineItem>(It.IsAny<ILineItemSelector>(), sku, properties)).ReturnsAsync(expected);

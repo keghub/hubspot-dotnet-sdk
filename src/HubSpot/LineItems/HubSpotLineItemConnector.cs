@@ -18,7 +18,7 @@ namespace HubSpot.LineItems
             _hubSpotClient = hubSpotClient ?? throw new ArgumentNullException(nameof(hubSpotClient));
             _lineItemTypeManager = lineItemTypeManager ?? throw new ArgumentNullException(nameof(lineItemTypeManager));
         }
-        public async Task<TLineItem> GetAsync<TLineItem>(ILineItemSelector selector, Property[] properties) where TLineItem : LineItem, new()
+        public async Task<TLineItem> GetAsync<TLineItem>(ILineItemSelector selector, string[] customProperties) where TLineItem : LineItem, new()
         {
             if(selector == null)
             {
@@ -27,6 +27,11 @@ namespace HubSpot.LineItems
 
             try
             {
+                var properties = _lineItemTypeManager.GetCustomProperties<TLineItem>(TypeManager.AllProperties).Select(p => new Property(p.FieldName)).ToList();
+                if (customProperties?.Count() > 0)
+                {
+                    properties.AddRange(customProperties.Select(x => new Property(x)));
+                }
                 var hubSpotLineItem = await selector.GetLineItemAsync(_hubSpotClient, properties).ConfigureAwait(false);
                 var lineItem = _lineItemTypeManager.ConvertTo<TLineItem>(hubSpotLineItem);
                 return lineItem;
@@ -37,15 +42,20 @@ namespace HubSpot.LineItems
             }
         }
 
-        public async Task<TLineItem> GetBySKUAsync<TLineItem>(ILineItemSelector selector, string sku, Property[] properties) where TLineItem : LineItem, new()
+        public async Task<TLineItem> GetBySKUAsync<TLineItem>(ILineItemSelector selector, string sku, string[] customProperties) where TLineItem : LineItem, new()
         {
             if (selector == null)
             {
                 throw new ArgumentNullException(nameof(selector));
             }
-
             try
             {
+                var properties = _lineItemTypeManager.GetCustomProperties<TLineItem>(TypeManager.AllProperties).Select(p => new Property(p.FieldName)).ToList();
+                if (customProperties?.Count() > 0)
+                {
+                    properties.AddRange(customProperties.Select(x => new Property(x)));
+                }
+
                 var hubSpotLineItem = await selector.GetLineItemBySKUAsync(_hubSpotClient, properties, sku).ConfigureAwait(false);
                 var lineItem = _lineItemTypeManager.ConvertTo<TLineItem>(hubSpotLineItem);
                 return lineItem;

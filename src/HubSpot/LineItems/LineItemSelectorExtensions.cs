@@ -14,10 +14,10 @@ namespace HubSpot.LineItems
 
     public static class LineItemSelectorExtensions
     {
-        public static Task<TLineItem> GetByIdAsync<TLineItem>(this IHubSpotLineItemConnector connector, long lineItemId, Property[] properties) where TLineItem : LineItem, new()
-            => connector.GetAsync<TLineItem>(SelectLineItem.ById(lineItemId), properties);
+        public static Task<TLineItem> GetByIdAsync<TLineItem>(this IHubSpotLineItemConnector connector, long lineItemId, string[] customProperties) where TLineItem : LineItem, new()
+            => connector.GetAsync<TLineItem>(SelectLineItem.ById(lineItemId), customProperties);
 
-        public static Task<TLineItem> GetBySKUAsync<TLineItem>(this IHubSpotLineItemConnector connector, IReadOnlyList<long> lineItemIds, string sku, Property[] properties) where TLineItem : LineItem, new()
-            => connector.GetBySKUAsync<TLineItem>(SelectLineItem.ByIdRange(lineItemIds), sku, properties);
+        public static Task<TLineItem> GetBySKUAsync<TLineItem>(this IHubSpotLineItemConnector connector, IReadOnlyList<long> lineItemIds, string sku, string[] customProperties) where TLineItem : LineItem, new()
+            => connector.GetBySKUAsync<TLineItem>(SelectLineItem.ByIdRange(lineItemIds), sku, customProperties);
     }
 }
