@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using Tests.Model;
 
 namespace Tests.Configuration
 {
@@ -34,7 +35,7 @@ namespace Tests.Configuration
         }
 
         [Test, CustomAutoData]
-        public void UseOAuthAuthentication_registers_needed_services(HubSpotClientConfigurator configurator, OAuthOptions apiKeyOptions, ServiceCollection services)
+        public void UseOAuthAuthentication_registers_needed_services(HubSpotClientConfigurator configurator, OAuthOptions apiKeyOptions, TestTokenSelector tokenSelector, ServiceCollection services)
         {
             var configurationBuilder = new ConfigurationBuilder();
 
@@ -45,6 +46,8 @@ namespace Tests.Configuration
             configurator.UseOAuthAuthentication(configuration);
 
             configurator.ApplyServiceConfigurations(services);
+
+            services.AddSingleton<ITokenSelector, TestTokenSelector>();
 
             var serviceProvider = services.BuildServiceProvider();
 
