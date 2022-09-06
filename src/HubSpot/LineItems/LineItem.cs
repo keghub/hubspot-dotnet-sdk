@@ -25,7 +25,7 @@ namespace HubSpot.LineItems
         public int MonthsTerm { get; set; }  
         
         [CustomProperty("hs_recurring_billing_start_date")]
-        public DateTime StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
 
         [CustomProperty("quantity")]
         public int Quantity { get; set; }
@@ -47,22 +47,7 @@ namespace HubSpot.LineItems
         
         [CustomProperty("hs_margin_tcv")]
         public decimal TCV { get; set; }
-
-        [CustomProperty("number_of_services")]
-        public int NumberOfServices { get; set; }  
-        
-        [CustomProperty("contract_start_date")]
-        public DateTime? ContractStartDate { get; set; }    
-        
-        [CustomProperty("contract_expiration_date")]
-        public DateTime? ContractEndDate { get; set; }  
-        
-        [CustomProperty("service_start_date")]
-        public DateTime ServiceStartDate { get; set; }      
-        
-        [CustomProperty("service_end_date")]
-        public DateTime ServiceEndDate { get; set; }
-
+       
         [CustomProperty("hs_line_item_currency_code")]
         public string Currency { get; set; }
 

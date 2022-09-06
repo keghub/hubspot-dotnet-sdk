@@ -18,14 +18,12 @@ namespace HubSpot.LineItems
             _hubSpotClient = hubSpotClient ?? throw new ArgumentNullException(nameof(hubSpotClient));
             _lineItemTypeManager = lineItemTypeManager ?? throw new ArgumentNullException(nameof(lineItemTypeManager));
         }
-        public async Task<TLineItem> GetAsync<TLineItem>(ILineItemSelector selector) where TLineItem : LineItem, new()
+        public async Task<TLineItem> GetAsync<TLineItem>(ILineItemSelector selector, Property[] properties) where TLineItem : LineItem, new()
         {
             if(selector == null)
             {
                 throw new ArgumentNullException(nameof(selector));
             }
-
-            var properties = _lineItemTypeManager.GetCustomProperties<TLineItem>(TypeManager.AllProperties).Select(p => new Property(p.FieldName)).ToArray();
 
             try
             {
@@ -39,14 +37,12 @@ namespace HubSpot.LineItems
             }
         }
 
-        public async Task<TLineItem> GetBySKUAsync<TLineItem>(ILineItemSelector selector, string sku) where TLineItem : LineItem, new()
+        public async Task<TLineItem> GetBySKUAsync<TLineItem>(ILineItemSelector selector, string sku, Property[] properties) where TLineItem : LineItem, new()
         {
             if (selector == null)
             {
                 throw new ArgumentNullException(nameof(selector));
             }
-
-            var properties = _lineItemTypeManager.GetCustomProperties<TLineItem>(TypeManager.AllProperties).Select(p => new Property(p.FieldName)).ToArray();
 
             try
             {

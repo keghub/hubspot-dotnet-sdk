@@ -37,69 +37,58 @@ namespace Tests.LineItems
             //Act
 
             //Assert
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.GetAsync<LineItem>(null));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.GetAsync<LineItem>(null, null));
         }
 
         [Test, CustomAutoData]
-        public async Task GetAsync_invoke_type_manager_to_retrieve_parameters([Frozen] ILineItemTypeManager lineItemTypeManager,
-            [Frozen] ILineItemSelector lineItemSelector, HubSpotLineItemConnector sut)
+        public async Task GetAsync_invoke_selector_from_parameters_to_Retrieve_lineItem([Frozen] IHubSpotClient hubSpotClient, [Frozen] ILineItemSelector lineItemSelector, Property[] properties, HubSpotLineItemConnector sut)
         {
             //Arrange
 
             //Act
-            await sut.GetAsync<LineItem>(lineItemSelector);
-
-            //Assert
-            Mock.Get(lineItemTypeManager).Verify(x => x.GetCustomProperties<LineItem>(TypeManager.AllProperties), Times.Once);
-        }
-
-        [Test, CustomAutoData]
-        public async Task GetAsync_invoke_selector_from_parameters_to_Retrieve_lineItem([Frozen] IHubSpotClient hubSpotClient, [Frozen] ILineItemSelector lineItemSelector, HubSpotLineItemConnector sut)
-        {
-            //Arrange
-
-            //Act
-            await sut.GetAsync<LineItem>(lineItemSelector);
+            await sut.GetAsync<LineItem>(lineItemSelector, properties);
 
             //Assert
             Mock.Get(lineItemSelector).Verify(x => x.GetLineItemAsync(hubSpotClient, It.IsAny<IReadOnlyList<IProperty>>()), Times.Once);
         }
 
         [Test, CustomAutoData]
-        public async Task GetAsync_invoke_type_manager_to_convert_selector_result([Frozen] ILineItemTypeManager lineItemTypeManager, [Frozen] ILineItemSelector lineItemSelector, [Frozen] IHubSpotClient hubspotClient, HubSpotLineItemConnector sut, IFixture fixture)
+        public async Task GetAsync_invoke_type_manager_to_convert_selector_result([Frozen] ILineItemTypeManager lineItemTypeManager, [Frozen] ILineItemSelector lineItemSelector, [Frozen] IHubSpotClient hubspotClient, Property[] properties,
+            HubSpotLineItemConnector sut, IFixture fixture)
         {
             //Arrange
             var lineItem = fixture.Build<HubSpot.Model.LineItems.LineItem>().Without(x => x.Properties).Create();
             Mock.Get(lineItemSelector).Setup(x => x.GetLineItemAsync(hubspotClient, It.IsAny<IReadOnlyList<IProperty>>())).Returns(Task.FromResult(lineItem));
 
             //Act
-            await sut.GetAsync<LineItem>(lineItemSelector);
+            await sut.GetAsync<LineItem>(lineItemSelector, properties);
 
             //Assert
             Mock.Get(lineItemTypeManager).Verify(x => x.ConvertTo<LineItem>(lineItem), Times.Once);
         }
 
         [Test, CustomAutoData]
-        public async Task GetAsync_returns_converted_line_item([Frozen] LineItem lineItem, [Frozen] ILineItemTypeManager lineItemTypeManager, [Frozen] ILineItemSelector lineItemSelector, HubSpotLineItemConnector sut)
+        public async Task GetAsync_returns_converted_line_item([Frozen] LineItem lineItem, [Frozen] ILineItemTypeManager lineItemTypeManager, [Frozen] ILineItemSelector lineItemSelector, Property[] properties,
+            HubSpotLineItemConnector sut)
         {
             //Arrange
             Mock.Get(lineItemTypeManager).Setup(x => x.ConvertTo<LineItem>(It.IsAny<HubSpot.Model.LineItems.LineItem>())).Returns(lineItem);
 
             //Act
-            var result = await sut.GetAsync<LineItem>(lineItemSelector);
+            var result = await sut.GetAsync<LineItem>(lineItemSelector, properties);
 
             //Assert
             Assert.That(result, Is.EqualTo(lineItem));
         }
 
         [Test, CustomAutoData]
-        public async Task GetAsync_returns_null_if_lineitem_retrieving_throws_NotFoundException([Frozen] IHubSpotClient hubSpotClient, [Frozen] ILineItemSelector lineItemSelector, HubSpotLineItemConnector sut, NotFoundException notFoundException)
+        public async Task GetAsync_returns_null_if_lineitem_retrieving_throws_NotFoundException([Frozen] IHubSpotClient hubSpotClient, [Frozen] ILineItemSelector lineItemSelector, Property[] properties, HubSpotLineItemConnector sut, NotFoundException notFoundException)
         {
             //Arrange
             Mock.Get(lineItemSelector).Setup(x => x.GetLineItemAsync(hubSpotClient, It.IsAny<IReadOnlyList<IProperty>>())).Throws(notFoundException);
 
             //Act
-            var result = await sut.GetAsync<LineItem>(lineItemSelector);
+            var result = await sut.GetAsync<LineItem>(lineItemSelector, properties);
 
             //Assert
             Assert.That(result, Is.Null);
@@ -115,73 +104,60 @@ namespace Tests.LineItems
             //Act
 
             //Assert
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.GetBySKUAsync<LineItem>(null, string.Empty));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.GetBySKUAsync<LineItem>(null, string.Empty, null));
         }
 
         [Test, CustomAutoData]
-        public async Task GetBySKUAsync_invoke_type_manager_to_retrieve_parameters([Frozen] ILineItemTypeManager lineItemTypeManager,
-            [Frozen] ILineItemSelector lineItemSelector, HubSpotLineItemConnector sut, string sku)
-        {
-            //Arrange
-
-            //Act
-            await sut.GetBySKUAsync<LineItem>(lineItemSelector, sku);
-
-            //Assert
-            Mock.Get(lineItemTypeManager).Verify(x => x.GetCustomProperties<LineItem>(TypeManager.AllProperties), Times.Once);
-        }
-
-        [Test, CustomAutoData]
-        public async Task GetBySKUAsync_invoke_selector_from_parameters_to_Retrieve_lineItem([Frozen] IHubSpotClient hubSpotClient, [Frozen] ILineItemSelector lineItemSelector, HubSpotLineItemConnector sut,
+        public async Task GetBySKUAsync_invoke_selector_from_parameters_to_Retrieve_lineItem([Frozen] IHubSpotClient hubSpotClient, [Frozen] ILineItemSelector lineItemSelector, Property[] properties, HubSpotLineItemConnector sut,
             string sku)
         {
             //Arrange
 
             //Act
-            await sut.GetBySKUAsync<LineItem>(lineItemSelector, sku);
+            await sut.GetBySKUAsync<LineItem>(lineItemSelector, sku, properties);
 
             //Assert
             Mock.Get(lineItemSelector).Verify(x => x.GetLineItemBySKUAsync(hubSpotClient, It.IsAny<IReadOnlyList<IProperty>>(), sku), Times.Once);
         }
 
         [Test, CustomAutoData]
-        public async Task GetBySKUAsync_invoke_type_manager_to_convert_selector_result([Frozen] ILineItemTypeManager lineItemTypeManager, [Frozen] ILineItemSelector lineItemSelector, [Frozen] IHubSpotClient hubspotClient, HubSpotLineItemConnector sut, IFixture fixture,
-            string sku)
+        public async Task GetBySKUAsync_invoke_type_manager_to_convert_selector_result([Frozen] ILineItemTypeManager lineItemTypeManager, [Frozen] ILineItemSelector lineItemSelector, [Frozen] IHubSpotClient hubspotClient, 
+            Property[] properties, HubSpotLineItemConnector sut, IFixture fixture, string sku)
         {
             //Arrange
             var lineItem = fixture.Build<HubSpot.Model.LineItems.LineItem>().Without(x => x.Properties).Create();
             Mock.Get(lineItemSelector).Setup(x => x.GetLineItemBySKUAsync(hubspotClient, It.IsAny<IReadOnlyList<IProperty>>(), sku)).Returns(Task.FromResult(lineItem));
 
             //Act
-            await sut.GetBySKUAsync<LineItem>(lineItemSelector, sku);
+            await sut.GetBySKUAsync<LineItem>(lineItemSelector, sku, properties);
 
             //Assert
             Mock.Get(lineItemTypeManager).Verify(x => x.ConvertTo<LineItem>(lineItem), Times.Once);
         }
 
         [Test, CustomAutoData]
-        public async Task GetBySKUAsync_returns_converted_line_item([Frozen] LineItem lineItem, [Frozen] ILineItemTypeManager lineItemTypeManager, [Frozen] ILineItemSelector lineItemSelector, HubSpotLineItemConnector sut,
-            string sku)
+        public async Task GetBySKUAsync_returns_converted_line_item([Frozen] LineItem lineItem, [Frozen] ILineItemTypeManager lineItemTypeManager, [Frozen] ILineItemSelector lineItemSelector, Property[] properties, 
+            HubSpotLineItemConnector sut, string sku)
         {
             //Arrange
             Mock.Get(lineItemTypeManager).Setup(x => x.ConvertTo<LineItem>(It.IsAny<HubSpot.Model.LineItems.LineItem>())).Returns(lineItem);
 
             //Act
-            var result = await sut.GetBySKUAsync<LineItem>(lineItemSelector, sku);
+            var result = await sut.GetBySKUAsync<LineItem>(lineItemSelector, sku, properties);
 
             //Assert
             Assert.That(result, Is.EqualTo(lineItem));
         }
 
         [Test, CustomAutoData]
-        public async Task GetBySKUAsync_returns_null_if_lineitem_retrieving_throws_NotFoundException([Frozen] IHubSpotClient hubSpotClient, [Frozen] ILineItemSelector lineItemSelector, HubSpotLineItemConnector sut, NotFoundException notFoundException,
-            string sku)
+        public async Task GetBySKUAsync_returns_null_if_lineitem_retrieving_throws_NotFoundException([Frozen] IHubSpotClient hubSpotClient, [Frozen] ILineItemSelector lineItemSelector, 
+            Property[] properties, HubSpotLineItemConnector sut, NotFoundException notFoundException, string sku)
         {
             //Arrange
             Mock.Get(lineItemSelector).Setup(x => x.GetLineItemBySKUAsync(hubSpotClient, It.IsAny<IReadOnlyList<IProperty>>(), sku)).Throws(notFoundException);
 
             //Act
-            var result = await sut.GetBySKUAsync<LineItem>(lineItemSelector, sku);
+            var result = await sut.GetBySKUAsync<LineItem>(lineItemSelector, sku, properties);
 
             //Assert
             Assert.That(result, Is.Null);
