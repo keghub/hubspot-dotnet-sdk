@@ -72,16 +72,17 @@ namespace HubSpot.Internal
                              value = hp.Value,
                              type = ep.PropertyType
                          };
-
+            List<PropertyData> propertyDataList = new List<PropertyData>();
             foreach (var zip in zipped)
             {
                 if (_typeStore.TryGetTypeConverter(zip.type, out var converter) && converter.TryConvertTo(zip.value, out var convertedValue))
                 {
                     zip.property.SetValue(entity, convertedValue);
 
-                    yield return new PropertyData(zip.propertyName, convertedValue);
+                    propertyDataList.Add(new PropertyData(zip.propertyName, convertedValue));
                 }
             }
+            return propertyDataList;
         }
 
         private static string GetPropertyName(PropertyInfo property) => property.GetCustomAttribute<CustomPropertyAttribute>().FieldName;

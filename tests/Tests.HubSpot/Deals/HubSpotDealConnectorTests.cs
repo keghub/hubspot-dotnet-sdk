@@ -4,12 +4,14 @@ using AutoFixture.NUnit3;
 using HubSpot;
 using HubSpot.Deals;
 using HubSpot.Model.Deals;
+using HubSpot.Model.LineItems;
 using HubSpot.Model.Pipelines;
 using Kralizek.Extensions.Http;
 using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -90,6 +92,51 @@ namespace Tests.Deals
 
             //Assert
             Assert.That(result, Is.Null);
+        }
+
+        [Test, CustomAutoData]
+        public async Task GetDealLineItemsAsync_returns_null_if_deal_client_returns_null([Frozen] IHubSpotClient hubSpotClient, long dealId, HubSpotDealConnector sut)
+        {
+            //Arrange
+            Mock.Get(hubSpotClient).Setup(x => x.Deals.GetLineItemAssociationsAsync(dealId)).Returns(Task.FromResult((LineItemAssociationList)null));
+
+            //Act
+            var result = await sut.GetDealLineItemsAsync(dealId);
+
+            //Assert
+            Assert.That(result, Is.Null);
+        }
+
+        [Test, CustomAutoData]
+        public async Task GetDealLineItemsAsync_returns_same_amount_of_records_as_deal_client([Frozen] IHubSpotClient hubSpotClient, long dealId, HubSpotDealConnector sut, IFixture fixture)
+        {
+            //Arrange
+            var lineItemAssociations = fixture.Build<LineItemAssociation>().CreateMany().ToList().AsReadOnly();
+            var lineItemAssociationList = fixture.Build<LineItemAssociationList>().With(x => x.LineItemAssociations, lineItemAssociations).Create();
+            Mock.Get(hubSpotClient).Setup(x => x.Deals.GetLineItemAssociationsAsync(dealId)).Returns(Task.FromResult(lineItemAssociationList));
+
+            //Act
+            var result = await sut.GetDealLineItemsAsync(dealId);
+
+            //Assert
+            Assert.That(result.Count, Is.EqualTo(lineItemAssociations.Count));
+        }
+
+        [Test, CustomAutoData]
+        public async Task GetDealLineItemsAsync_returns_valid_line_items_ids_as_deal_client([Frozen] IHubSpotClient hubSpotClient, long dealId, HubSpotDealConnector sut, IFixture fixture)
+        {
+            //Arrange 
+            var lineItemAssociations = fixture.Build<LineItemAssociation>().CreateMany().ToList().AsReadOnly();
+            var lineItemAssociationList = fixture.Build<LineItemAssociationList>().With(x => x.LineItemAssociations, lineItemAssociations).Create();
+            Mock.Get(hubSpotClient).Setup(x => x.Deals.GetLineItemAssociationsAsync(dealId)).Returns(Task.FromResult(lineItemAssociationList));
+
+            var expected = lineItemAssociations.Select(x => x.Id).ToList().AsReadOnly();
+
+            //Act
+            var result = await sut.GetDealLineItemsAsync(dealId);
+
+            //Assert
+            Assert.That(result, Is.EquivalentTo(expected));
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using HubSpot.Model;
 using HubSpot.Model.Deals;
+using HubSpot.Model.LineItems;
 using HubSpot.Utils;
 using Kralizek.Extensions.Http;
 
@@ -223,6 +224,19 @@ namespace HubSpot
             var result = await _client.GetAsync<DealList>($"/deals/v1/deal/associated/COMPANY/{companyId}/paged", builder.BuildQuery());
 
             return result;
+        }
+
+        async Task<LineItemAssociationList> IHubSpotDealClient.GetLineItemAssociationsAsync(long dealId)
+        {
+            try
+            {
+                var result = await _client.GetAsync<LineItemAssociationList>($"/crm/v3/objects/deals/{dealId}/associations/line_items");
+                return result;
+            }
+            catch (HttpException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                throw new NotFoundException("Deal not found", ex);
+            }
         }
     }
 }

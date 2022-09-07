@@ -1,15 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace HubSpot.Converters {
-    public class DateTimeTypeConverter : ITypeConverter
+namespace HubSpot.Converters
+{
+    public class DateTimeConverter : ITypeConverter
     {
         public bool TryConvertTo(string value, out object result)
         {
             result = default;
 
-            if (long.TryParse(value, out var epoch))
+            if (DateTime.TryParse(value, out var dateTime))
             {
-                result = DateTimeOffset.FromUnixTimeMilliseconds(epoch);
+                result = dateTime;
                 return true;
             }
 
@@ -18,9 +21,9 @@ namespace HubSpot.Converters {
 
         public bool TryConvertFrom(object value, out string result)
         {
-            if (value is DateTimeOffset dto)
+            if (value is DateTime dt)
             {
-                result = dto.ToUnixTimeMilliseconds().ToString("D");
+                result = dt.ToString("G");
                 return true;
             }
 

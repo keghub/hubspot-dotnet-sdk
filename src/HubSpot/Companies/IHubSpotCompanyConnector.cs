@@ -11,6 +11,8 @@ namespace HubSpot.Companies
         Task<TCompany> SaveAsync<TCompany>(TCompany company)
             where TCompany : Company, new();
 
+        Task<bool> UpdatePropertiesAsync(long id, IDictionary<string, string> properties);
+
         Task<IReadOnlyList<TCompany>> FindAsync<TCompany>(ICompanyFilter filter = null)
             where TCompany : Company, new();
 

@@ -6,6 +6,7 @@ using HubSpot.Model.Companies;
 using HubSpot.Model.Contacts;
 using HubSpot.Model.CRM.Associations;
 using HubSpot.Model.Deals;
+using HubSpot.Model.LineItems;
 using HubSpot.Model.Lists;
 using HubSpot.Model.Owners;
 using HubSpot.Model.Pipelines;
@@ -54,6 +55,8 @@ namespace HubSpot
         public IHubSpotCrmClient Crm => this;
 
         public IHubSpotPipelineClient Pipelines => this;
+
+        public IHubSpotLineItemClient LineItems => this;
 
     }
 }

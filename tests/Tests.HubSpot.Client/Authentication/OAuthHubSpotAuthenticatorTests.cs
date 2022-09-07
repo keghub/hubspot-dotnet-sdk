@@ -9,6 +9,7 @@ using HubSpot.Authentication;
 using Kralizek.Extensions.Http;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using Tests.Model;
 using WorldDomination.Net.Http;
 
 namespace Tests.Authentication 
@@ -21,8 +22,10 @@ namespace Tests.Authentication
             var handler = new FakeHttpMessageHandler(httpOptions);
 
             var wrapper = new OptionsWrapper<OAuthOptions>(options);
-            
-            var authenticator = new OAuthHubSpotAuthenticator(wrapper) { InnerHandler = handler };
+
+            var testTokenSelector = new TestTokenSelector();
+
+            var authenticator = new OAuthHubSpotAuthenticator(wrapper, testTokenSelector) { InnerHandler = handler };
 
             var client = new HttpClient(authenticator, false);
 
@@ -34,7 +37,7 @@ namespace Tests.Authentication
         [InlineAutoData("POST")]
         [InlineAutoData("DELETE")]
         [InlineAutoData("PUT")]
-        public async Task Single_request_is_authenticated_and_executed(string methodName, OAuthOptions options, Uri requestUri, string accessToken, long expiresIn, TestClock clock)
+        public async Task Single_request_is_authenticated_and_executed(string methodName, OAuthOptions options, TestTokenSelector tokenSelector, Uri requestUri, string accessToken, long expiresIn, TestClock clock)
         {
             Clock.Set(clock);
 
@@ -50,7 +53,7 @@ namespace Tests.Authentication
                     ["client_id"] = options.ClientId,
                     ["client_secret"] = options.SecretKey,
                     ["redirect_uri"] = options.RedirectUri.ToString(),
-                    ["refresh_token"] = options.RefreshToken
+                    ["refresh_token"] = tokenSelector.SelectToken(options.RefreshTokens)
                 }),
                 HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
                 {
@@ -85,7 +88,7 @@ namespace Tests.Authentication
         [InlineAutoData("POST")]
         [InlineAutoData("DELETE")]
         [InlineAutoData("PUT")]
-        public async Task Multiple_requests_reuse_the_same_token(string methodName, OAuthOptions options, Uri requestUri, string accessToken, long expiresIn, TestClock clock)
+        public async Task Multiple_requests_reuse_the_same_token(string methodName, OAuthOptions options, TestTokenSelector tokenSelector, Uri requestUri, string accessToken, long expiresIn, TestClock clock)
         {
             Clock.Set(clock);
 
@@ -103,7 +106,7 @@ namespace Tests.Authentication
                     ["client_id"] = options.ClientId,
                     ["client_secret"] = options.SecretKey,
                     ["redirect_uri"] = options.RedirectUri.ToString(),
-                    ["refresh_token"] = options.RefreshToken
+                    ["refresh_token"] = tokenSelector.SelectToken(options.RefreshTokens)
                 }),
                 HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
                 {
@@ -143,7 +146,7 @@ namespace Tests.Authentication
         [InlineAutoData("POST")]
         [InlineAutoData("DELETE")]
         [InlineAutoData("PUT")]
-        public async Task Token_is_refreshed_if_expired(string methodName, OAuthOptions options, Uri requestUri, string accessToken, long expiresIn, TestClock clock)
+        public async Task Token_is_refreshed_if_expired(string methodName, OAuthOptions options, TestTokenSelector tokenSelector, Uri requestUri, string accessToken, long expiresIn, TestClock clock)
         {
             Clock.Set(clock);
 
@@ -161,7 +164,7 @@ namespace Tests.Authentication
                     ["client_id"] = options.ClientId,
                     ["client_secret"] = options.SecretKey,
                     ["redirect_uri"] = options.RedirectUri.ToString(),
-                    ["refresh_token"] = options.RefreshToken
+                    ["refresh_token"] = tokenSelector.SelectToken(options.RefreshTokens)
                 }),
                 HttpResponseMessage = CreateNewResponse()
             };
@@ -214,7 +217,7 @@ namespace Tests.Authentication
         [InlineAutoData("POST")]
         [InlineAutoData("DELETE")]
         [InlineAutoData("PUT")]
-        public async Task Token_is_not_attached_if_request_fails(string methodName, OAuthOptions options, Uri requestUri, TestClock clock)
+        public async Task Token_is_not_attached_if_request_fails(string methodName, OAuthOptions options, TestTokenSelector tokenSelector, Uri requestUri, TestClock clock)
         {
             Clock.Set(clock);
 
@@ -232,7 +235,7 @@ namespace Tests.Authentication
                     ["client_id"] = options.ClientId,
                     ["client_secret"] = options.SecretKey,
                     ["redirect_uri"] = options.RedirectUri.ToString(),
-                    ["refresh_token"] = options.RefreshToken
+                    ["refresh_token"] = tokenSelector.SelectToken(options.RefreshTokens)
                 }),
                 HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.Unauthorized)
             };

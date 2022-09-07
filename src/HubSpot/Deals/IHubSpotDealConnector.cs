@@ -13,6 +13,8 @@ namespace HubSpot.Deals
 
         Task<IReadOnlyList<TDeal>> FindAsync<TDeal>(IDealFilter filter = null)
             where TDeal : Deal, new();
+
+        Task<IReadOnlyList<long>> GetDealLineItemsAsync(long dealId);
     }
 
     public static class HubSpotDealConnectorExtensions

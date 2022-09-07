@@ -74,6 +74,16 @@ namespace HubSpot.Companies
             }
         }
 
+        public async Task<bool> UpdatePropertiesAsync(long id, IDictionary<string, string> properties)
+        {
+            if (id < 1) throw new ArgumentException($"Cannot update company with invalid id {id}");
+            if (properties == null) throw new ArgumentNullException(nameof(properties));
+
+            var hubspotProperties = properties.Select(x => new ValuedPropertyV2(x.Key, x.Value)).ToList();
+            var updateCompany = await _client.Companies.UpdateAsync(id, hubspotProperties);
+            return updateCompany != null;
+        }
+
         public async Task<IReadOnlyList<TCompany>> FindAsync<TCompany>(ICompanyFilter filter = null) where TCompany : Company, new()
         {
             if (filter == null)

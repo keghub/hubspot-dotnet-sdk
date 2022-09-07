@@ -12,7 +12,7 @@ namespace HubSpot.Converters {
                 return true;
             }
 
-            if (decimal.TryParse(value, out var output))
+            if (decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var output))
             {
                 result = output;
                 return true;

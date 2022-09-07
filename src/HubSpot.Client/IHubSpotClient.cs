@@ -2,6 +2,7 @@
 using HubSpot.Model.Contacts;
 using HubSpot.Model.CRM.Associations;
 using HubSpot.Model.Deals;
+using HubSpot.Model.LineItems;
 using HubSpot.Model.Lists;
 using HubSpot.Model.Owners;
 using HubSpot.Model.Pipelines;
@@ -23,6 +24,8 @@ namespace HubSpot
         IHubSpotOwnerClient Owners { get; }
 
         IHubSpotCrmClient Crm { get; }
+
+        IHubSpotLineItemClient LineItems { get; }
     }
 
     public interface IHubSpotCrmClient
