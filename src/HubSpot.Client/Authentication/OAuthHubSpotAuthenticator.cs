@@ -108,19 +108,6 @@ namespace HubSpot.Authentication
         }
     }
 
-    public class OAuthSettings
-    {
-        public string ClientId { get; set; }
-
-        public Uri RedirectUri { get; set; } = new Uri("https://www.hubspot.com");
-
-        public Dictionary<string, string> RefreshTokens { get; set; }
-
-        public string SecretKey { get; set; }
-
-        public TimeSpan ClockSkew { get; set; } = TimeSpan.Zero;
-    }
-
     public class OAuthOptions
     {
         public string ClientId { get; set; }
