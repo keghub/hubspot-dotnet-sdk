@@ -23,9 +23,7 @@ namespace Tests.Authentication
 
             var wrapper = new OptionsWrapper<OAuthOptions>(options);
 
-            var testTokenSelector = new TestTokenSelector();
-
-            var authenticator = new OAuthHubSpotAuthenticator(wrapper, testTokenSelector) { InnerHandler = handler };
+            var authenticator = new OAuthHubSpotAuthenticator(wrapper, handler);
 
             var client = new HttpClient(authenticator, false);
 
@@ -53,7 +51,7 @@ namespace Tests.Authentication
                     ["client_id"] = options.ClientId,
                     ["client_secret"] = options.SecretKey,
                     ["redirect_uri"] = options.RedirectUri.ToString(),
-                    ["refresh_token"] = tokenSelector.SelectToken(options.RefreshTokens)
+                    ["refresh_token"] = options.RefreshToken
                 }),
                 HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
                 {
@@ -106,7 +104,7 @@ namespace Tests.Authentication
                     ["client_id"] = options.ClientId,
                     ["client_secret"] = options.SecretKey,
                     ["redirect_uri"] = options.RedirectUri.ToString(),
-                    ["refresh_token"] = tokenSelector.SelectToken(options.RefreshTokens)
+                    ["refresh_token"] = options.RefreshToken
                 }),
                 HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
                 {
@@ -164,7 +162,7 @@ namespace Tests.Authentication
                     ["client_id"] = options.ClientId,
                     ["client_secret"] = options.SecretKey,
                     ["redirect_uri"] = options.RedirectUri.ToString(),
-                    ["refresh_token"] = tokenSelector.SelectToken(options.RefreshTokens)
+                    ["refresh_token"] = options.RefreshToken
                 }),
                 HttpResponseMessage = CreateNewResponse()
             };
@@ -235,7 +233,7 @@ namespace Tests.Authentication
                     ["client_id"] = options.ClientId,
                     ["client_secret"] = options.SecretKey,
                     ["redirect_uri"] = options.RedirectUri.ToString(),
-                    ["refresh_token"] = tokenSelector.SelectToken(options.RefreshTokens)
+                    ["refresh_token"] = options.RefreshToken
                 }),
                 HttpResponseMessage = new HttpResponseMessage(HttpStatusCode.Unauthorized)
             };
