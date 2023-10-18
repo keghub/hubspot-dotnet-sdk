@@ -1,7 +1,7 @@
-*                   @emgdev/reviewers
-*.cake              @emgdev/devops
-Dockerfile          @emgdev/devops
-package.json        @emgdev/devops
-package-lock.json   @emgdev/devops
-azure-pipelines.yml @emgdev/devops
-.github/            @emgdev/admins
+*                  		@emgdev/reviewers @keghub/reviewers @keghub/emg-reviewers
+*.cake             		@emgdev/devops @keghub/devops @keghub/emg-devops
+Dockerfile         		@emgdev/devops @keghub/devops @keghub/emg-devops
+package.json       		@emgdev/devops @keghub/devops @keghub/emg-devops
+package-lock.json  		@emgdev/devops @keghub/devops @keghub/emg-devops
+azure-pipelines.yml		@emgdev/devops @keghub/devops @keghub/emg-devops
+.github/           		@emgdev/admins @keghub/admins @keghub/admins
